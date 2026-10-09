@@ -49,3 +49,23 @@ export async function actuarComo(tx: pg.Client, userId: string): Promise<void> {
   ]);
   await tx.query('set local role authenticated');
 }
+
+/**
+ * Corre una query que se espera que falle y devuelve el código de error de Postgres.
+ * Usa un savepoint para que la transacción del test siga viva después del error.
+ */
+export async function codigoDeError(
+  tx: pg.Client,
+  sql: string,
+  params: unknown[] = [],
+): Promise<string | undefined> {
+  await tx.query('savepoint esperando_error');
+  try {
+    await tx.query(sql, params);
+    await tx.query('release savepoint esperando_error');
+    return undefined;
+  } catch (error) {
+    await tx.query('rollback to savepoint esperando_error');
+    return (error as { code?: string }).code;
+  }
+}
