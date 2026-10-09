@@ -1,0 +1,50 @@
+/*
+ * Tokens de color de Mostrador Lois. Es el ÚNICO archivo con valores de color:
+ * el resto del código usa las clases que salen de acá (bg-background, text-codigo, …).
+ * La fuente de verdad es DESIGN.md: si cambiás un valor, cambialo en los dos lados.
+ */
+:root {
+  --background: oklch(0.985 0.002 250);
+  --foreground: oklch(0.2 0.01 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.01 250);
+  --muted: oklch(0.95 0.004 250);
+  --muted-foreground: oklch(0.48 0.01 250);
+  --border: oklch(0.88 0.006 250);
+  --input: oklch(0.88 0.006 250);
+  --ring: oklch(0.62 0.17 55);
+  --primary: oklch(0.62 0.17 55);
+  --primary-foreground: oklch(0.18 0.02 55);
+  --secondary: oklch(0.93 0.005 250);
+  --secondary-foreground: oklch(0.25 0.01 250);
+  --destructive: oklch(0.55 0.21 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --aviso: oklch(0.8 0.16 85);
+  --aviso-foreground: oklch(0.3 0.08 70);
+  --exito: oklch(0.6 0.14 150);
+  --codigo: oklch(0.2 0.01 250);
+  --sin-foto: oklch(0.92 0.004 250);
+}
+
+.dark {
+  --background: oklch(0.16 0.006 250);
+  --foreground: oklch(0.94 0.004 250);
+  --card: oklch(0.2 0.008 250);
+  --card-foreground: oklch(0.94 0.004 250);
+  --muted: oklch(0.24 0.008 250);
+  --muted-foreground: oklch(0.7 0.01 250);
+  --border: oklch(0.3 0.01 250);
+  --input: oklch(0.32 0.01 250);
+  --ring: oklch(0.72 0.16 60);
+  --primary: oklch(0.72 0.16 60);
+  --primary-foreground: oklch(0.18 0.02 55);
+  --secondary: oklch(0.26 0.008 250);
+  --secondary-foreground: oklch(0.92 0.004 250);
+  --destructive: oklch(0.62 0.2 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --aviso: oklch(0.78 0.15 85);
+  --aviso-foreground: oklch(0.2 0.05 70);
+  --exito: oklch(0.7 0.14 150);
+  --codigo: oklch(0.98 0.002 250);
+  --sin-foto: oklch(0.26 0.008 250);
+}
