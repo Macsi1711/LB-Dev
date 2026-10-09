@@ -8,6 +8,7 @@ import {
   RequireAuth,
 } from '@/features/auth';
 import { CounterScreen } from '@/features/counter';
+import { PhotosScreen } from '@/features/photos';
 import { AppShell, RequireRole } from '@/features/shell';
 import { Toaster } from '@/shared/ui/sonner';
 
@@ -34,7 +35,7 @@ const router = createBrowserRouter([
           {
             element: <RequireRole />,
             children: [
-              { path: '/fotos', element: <Pendiente titulo="Fotos" /> },
+              { path: '/fotos', element: <PhotosScreen /> },
               { path: '/bot', element: <Pendiente titulo="Bot" /> },
             ],
           },

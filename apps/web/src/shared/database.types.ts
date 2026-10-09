@@ -233,6 +233,22 @@ export type Database = {
         };
         Relationships: [];
       };
+      v_articulos_sin_foto: {
+        Row: {
+          codigo: string | null;
+          descripcion: string | null;
+          familia_codigo: string | null;
+          familia_nombre: string | null;
+          id: number | null;
+          imagen_drive_id: string | null;
+          imagen_url: string | null;
+          nombre: string | null;
+          observaciones: string | null;
+          tiene_foto: boolean | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
     };
     Functions: {
       articulo_texto_busqueda: {
