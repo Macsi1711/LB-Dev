@@ -1,0 +1,23 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+coverage/
+*.tsbuildinfo
+
+# Entorno: nunca se commitean, solo los .env.example
+.env
+.env.*
+!.env.example
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Editor y SO
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log
