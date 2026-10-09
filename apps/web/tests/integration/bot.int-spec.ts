@@ -11,6 +11,9 @@ afterAll(async () => {
 });
 
 async function seedQueries(tx: pg.Client) {
+  // Arranca de cero dentro de la transacción: el seed local también trae consultas.
+  await tx.query('delete from consultas_bot');
+  await tx.query('delete from usuarios_telegram');
   await tx.query(
     `insert into usuarios_telegram (chat_id, nombre, activo) values (10, 'Juan', true), (11, 'Ana', false)`,
   );

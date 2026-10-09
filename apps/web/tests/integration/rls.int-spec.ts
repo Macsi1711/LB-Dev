@@ -135,6 +135,7 @@ describe('admin', () => {
 
   it('administra la lista blanca del bot y lee las consultas', async () => {
     await inTransaction(db, async (tx) => {
+      await tx.query('delete from consultas_bot');
       await tx.query(
         `insert into consultas_bot (chat_id, fuente, texto, cantidad) values (1, 'texto', 'x', 0)`,
       );
