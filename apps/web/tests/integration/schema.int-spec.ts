@@ -1,10 +1,10 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { conectar, enTransaccion } from './db';
+import { connect, inTransaction } from './db';
 
 let db: pg.Client;
 beforeAll(async () => {
-  db = await conectar();
+  db = await connect();
 });
 afterAll(async () => {
   await db.end();
@@ -31,7 +31,7 @@ describe('articulos: contrato con n8n', () => {
   });
 
   it('actualiza actualizado_en cuando n8n escribe la foto', async () => {
-    await enTransaccion(db, async (tx) => {
+    await inTransaction(db, async (tx) => {
       await tx.query(
         `update articulos set actualizado_en = '2000-01-01' where "Codigo" = '854001'`,
       );
