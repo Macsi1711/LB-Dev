@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { CoverageCard } from './coverage-card';
 import { MissingPhotosTab } from './missing-photos-tab';
 import { usePhotosPort } from './photos-context';
+import { UnmatchedPhotosTab } from './unmatched-photos-tab';
 
 export function PhotosPage() {
   const port = usePhotosPort();
@@ -21,9 +22,13 @@ export function PhotosPage() {
       <Tabs defaultValue="sin-foto">
         <TabsList>
           <TabsTrigger value="sin-foto">Sin foto</TabsTrigger>
+          <TabsTrigger value="sin-match">Fotos que no matchearon</TabsTrigger>
         </TabsList>
         <TabsContent value="sin-foto">
           <MissingPhotosTab families={stats.data?.families ?? []} />
+        </TabsContent>
+        <TabsContent value="sin-match">
+          <UnmatchedPhotosTab />
         </TabsContent>
       </Tabs>
     </div>
