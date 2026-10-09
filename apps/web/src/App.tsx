@@ -7,6 +7,7 @@ import {
   NewPasswordPage,
   RequireAuth,
 } from '@/features/auth';
+import { CounterScreen } from '@/features/counter';
 import { AppShell, RequireRole } from '@/features/shell';
 import { Toaster } from '@/shared/ui/sonner';
 
@@ -29,7 +30,7 @@ const router = createBrowserRouter([
       {
         element: <AppShell />,
         children: [
-          { path: '/', element: <Pendiente titulo="Mostrador" /> },
+          { path: '/', element: <CounterScreen /> },
           {
             element: <RequireRole />,
             children: [
