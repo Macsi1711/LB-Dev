@@ -23,6 +23,8 @@ color. En el código se usan como clases de Tailwind (`bg-background`, `text-cod
 | ---------------------------------------- | ---------------------------------------------------------- |
 | `background` / `foreground`              | Fondo de la app y texto principal                          |
 | `card` / `card-foreground`               | Tarjetas de artículo y paneles                             |
+| `popover` / `popover-foreground`         | Menús desplegables, combobox y avisos (toasts)             |
+| `accent` / `accent-foreground`           | Hover y selección dentro de menús y listas                 |
 | `muted` / `muted-foreground`             | Superficies secundarias y texto de apoyo (familia, fechas) |
 | `border`, `input`, `ring`                | Bordes, campos y foco visible                              |
 | `primary` / `primary-foreground`         | Acción principal (ámbar: se ve bien con poca luz)          |
@@ -51,7 +53,8 @@ color. En el código se usan como clases de Tailwind (`bg-background`, `text-cod
 
 ## Componentes
 
-- Base: shadcn/ui, con los tokens de arriba.
+- Base: shadcn/ui en `apps/web/src/shared/ui`, generados con el CLI y adaptados a estos tokens
+  (sin `text-white` ni otros colores de Tailwind).
 - Miniatura: proporción 4:3 y `loading="lazy"`. Si la miniatura de Drive falla, se prueba
   googleusercontent, y si también falla, el placeholder `sin-foto` con el texto "Sin foto".
 
