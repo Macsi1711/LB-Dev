@@ -18,7 +18,7 @@ port = 55429
 
 [db.seed]
 enabled = true
-sql_paths = ["./seed.sql"]
+sql_paths = ["./seed.sql", "./seed-usuarios.sql"]
 
 [studio]
 port = 55423
@@ -29,10 +29,8 @@ port = 55424
 [auth]
 site_url = "http://localhost:5180"
 additional_redirect_urls = ["http://localhost:5180/**", "http://127.0.0.1:5180/**"]
-# Sin registro público: los usuarios los invita el admin.
-enable_signup = false
-
-[auth.email]
+# Sin registro público: los usuarios los invita el admin. OJO: no poner
+# [auth.email] enable_signup = false, porque eso apaga también el login por email.
 enable_signup = false
 
 # Servicios que la app no usa.
