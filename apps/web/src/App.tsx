@@ -1,6 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import { AuthModule, LoginPage, RequireAuth, useAuth } from '@/features/auth';
+import {
+  AuthModule,
+  ForgotPasswordPage,
+  LoginPage,
+  NewPasswordPage,
+  RequireAuth,
+  useAuth,
+} from '@/features/auth';
 import { Toaster } from '@/shared/ui/sonner';
 
 const queryClient = new QueryClient({
@@ -24,6 +31,8 @@ function Home() {
 
 const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  { path: '/recuperar', element: <ForgotPasswordPage /> },
+  { path: '/nueva-clave', element: <NewPasswordPage /> },
   { element: <RequireAuth />, children: [{ path: '/', element: <Home /> }] },
 ]);
 
