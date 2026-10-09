@@ -239,6 +239,27 @@ export type Database = {
         Args: { codigo: string; descripcion: string; nombre: string; observaciones: string };
         Returns: string;
       };
+      asignar_foto: {
+        Args: { p_articulo_id: number; p_foto_id: number };
+        Returns: {
+          codigo: string | null;
+          descripcion: string | null;
+          familia_codigo: string | null;
+          familia_nombre: string | null;
+          id: number | null;
+          imagen_drive_id: string | null;
+          imagen_url: string | null;
+          nombre: string | null;
+          observaciones: string | null;
+          tiene_foto: boolean | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'v_articulos';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       buscar_articulos: {
         Args: {
           p_con_foto?: boolean;
@@ -304,6 +325,16 @@ export type Database = {
           familia_nombre: string;
           porcentaje: number;
           total: number;
+        }[];
+      };
+      sugerir_codigos: {
+        Args: { p_limit?: number; p_textos: string[] };
+        Returns: {
+          codigo: string;
+          id: number;
+          nombre: string;
+          similitud: number;
+          tiene_foto: boolean;
         }[];
       };
       tiene_perfil: { Args: Record<PropertyKey, never>; Returns: boolean };
