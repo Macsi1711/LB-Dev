@@ -4,4 +4,3 @@ coverage
 pnpm-lock.yaml
 supabase/.temp
 supabase/.branches
-**/database.types.ts
