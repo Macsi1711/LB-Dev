@@ -49,10 +49,21 @@ describe('asignar_foto', () => {
     });
   });
 
-  it('no deja asignar a un vendedor', async () => {
+  it('un vendedor también asigna', async () => {
     await inTransaction(db, async (tx) => {
       const photoId = await pendingPhoto(tx);
       await actAs(tx, await createUser(tx, 'vendedor'));
+      const { rows } = await tx.query('select codigo from asignar_foto($1, 2)', [photoId]);
+      expect(rows).toHaveLength(1);
+    });
+  });
+
+  it('no deja asignar a un usuario sin perfil', async () => {
+    await inTransaction(db, async (tx) => {
+      const photoId = await pendingPhoto(tx);
+      const id = await createUser(tx);
+      await tx.query('delete from perfiles where user_id = $1', [id]);
+      await actAs(tx, id);
       await expect(tx.query('select asignar_foto($1, 2)', [photoId])).rejects.toMatchObject({
         code: '42501',
       });
