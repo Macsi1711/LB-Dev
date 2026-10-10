@@ -70,3 +70,19 @@ describe('asignar_foto', () => {
     });
   });
 });
+
+describe('sugerir_codigos por nombre', () => {
+  it('encuentra el artículo por el nombre cuando el archivo no trae el código', async () => {
+    const { rows } = await db.query(
+      `select codigo from sugerir_codigos(array['filtro kangoo.jpg'])`,
+    );
+    expect(rows[0]).toEqual({ codigo: '120-34' });
+  });
+
+  it('el código en el nombre del archivo sigue ganando sobre el parecido del nombre', async () => {
+    const { rows } = await db.query(
+      `select codigo from sugerir_codigos(array['854000 pastilla onix.jpg'])`,
+    );
+    expect(rows[0]).toEqual({ codigo: '854000' });
+  });
+});
