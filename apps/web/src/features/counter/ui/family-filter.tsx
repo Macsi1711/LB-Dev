@@ -7,17 +7,29 @@ import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { useCounterPort } from './counter-context';
 
-export function FamilyFilter(props: {
-  value: string | null;
-  onChange: (code: string | null) => void;
-}) {
+function useFamilies() {
   const port = useCounterPort();
-  const [open, setOpen] = useState(false);
-  const { data: families = [] } = useQuery({
+  const { data = [] } = useQuery({
     queryKey: ['familias'],
     queryFn: () => port.families(),
     staleTime: 10 * 60_000,
   });
+  return data;
+}
+
+/** Nombre de la familia para mostrar; si todavía no cargaron, null. */
+export function useFamilyName(code: string | null): string | null {
+  const families = useFamilies();
+  return (code && families.find((f) => f.code === code)?.name) || null;
+}
+
+/** Chip que filtra por familia los mensajes que se mandan después. */
+export function FamilyFilter(props: {
+  value: string | null;
+  onChange: (code: string | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const families = useFamilies();
   const selected = families.find((f) => f.code === props.value);
   const choose = (code: string | null) => {
     props.onChange(code);
@@ -28,10 +40,12 @@ export function FamilyFilter(props: {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          type="button"
+          variant={props.value ? 'secondary' : 'outline'}
           role="combobox"
           aria-expanded={open}
-          className="min-w-0 flex-1 justify-between sm:max-w-72"
+          aria-label="Familia"
+          className="h-10 max-w-60 min-w-0 shrink-0 justify-between rounded-full"
         >
           <span className="truncate">
             {selected ? (selected.name ?? selected.code) : 'Todas las familias'}
