@@ -49,16 +49,27 @@ export function createDemoPhotos(): PhotosPort {
     unmatchedPhotos: async () =>
       demoUnmatchedPhotos.filter((p) => !p.resolved).map(({ resolved: _r, ...p }) => p),
     async suggestCodes(texts) {
-      const clean = texts.map((t) => normalize(t.replace(/\.[a-z0-9]{2,5}$/i, '')));
+      // Mismo criterio que sugerir_codigos(): por código y, con tope 0,9, por nombre.
+      const clean = texts.map((t) =>
+        normalize(t.replace(/\.[a-z0-9]{2,5}$/i, '').replace(/_/g, ' ')),
+      );
+      const nameScore = (text: string, name: string) => {
+        const words = text.split(' ').filter(Boolean);
+        const coverage = words.filter((w) => name.includes(w)).length / (words.length || 1);
+        return 0.9 * ((coverage + similarity(text, name)) / 2);
+      };
       return demoArticles
         .map((a) => {
           const code = normalize(a.code);
+          const name = normalize(a.name);
           const score = Math.max(
-            ...clean.map((t) => (t.split(' ').includes(code) ? 1 : similarity(code, t))),
+            ...clean.map((t) =>
+              Math.max(t.split(' ').includes(code) ? 1 : similarity(code, t), nameScore(t, name)),
+            ),
           );
           return { articleId: a.id, code: a.code, name: a.name, hasPhoto: !!a.photo, score };
         })
-        .filter((s) => s.score > 0)
+        .filter((s) => s.score > 0.15)
         .sort((a, b) => b.score - a.score)
         .slice(0, 5)
         .map(({ score: _s, ...s }) => s);
