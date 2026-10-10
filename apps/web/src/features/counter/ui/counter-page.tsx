@@ -1,5 +1,5 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useDebouncedValue } from '@/shared/lib/use-debounced-value';
 import { Button } from '@/shared/ui/button';
@@ -14,6 +14,7 @@ import {
   toSearchParams,
   type SearchState,
 } from '../domain/search-state';
+import { syncSearchText } from '../domain/search-sync';
 import { ArticleCard } from './article-card';
 import { ArticleDetail } from './article-detail';
 import { useCounterPort } from './counter-context';
@@ -36,16 +37,20 @@ export function CounterPage() {
       }),
     [setParams],
   );
+  // Buscador ↔ URL: si la URL cambia desde afuera (atrás, link compartido) manda la URL;
+  // si no, el texto escrito cuando terminó el debounce.
+  const synced = useRef(state.q);
   useEffect(() => {
-    setParams(
-      (prev) => {
-        const current = parseSearchState(prev);
-        if (current.q.trim() === debouncedText.trim()) return prev;
-        return toSearchParams({ ...current, q: debouncedText });
-      },
-      { replace: true },
-    );
-  }, [debouncedText, setParams]);
+    const result = syncSearchText({
+      url: state.q,
+      synced: synced.current,
+      text,
+      debounced: debouncedText,
+    });
+    synced.current = result.synced;
+    if (result.setText !== undefined) setText(result.setText);
+    if (result.writeUrl !== undefined) update({ q: result.writeUrl });
+  }, [state.q, text, debouncedText, update]);
 
   const results = useInfiniteQuery({
     queryKey: ['articulos', state],
