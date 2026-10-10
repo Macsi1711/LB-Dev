@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f5f7"/><stop offset="1" stop-color="#dfe2e7"/></linearGradient><radialGradient id="sh" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs><rect width="400" height="300" fill="url(#bg)"/>
+<defs><linearGradient id="can" x1="0" x2="1"><stop offset="0" stop-color="#123f7a"/><stop offset=".45" stop-color="#2e6fc4"/><stop offset="1" stop-color="#0f3466"/></linearGradient></defs>
+<ellipse cx="200" cy="262" rx="90" ry="14" fill="url(#sh)"/>
+<rect x="125" y="70" width="150" height="180" rx="14" fill="url(#can)"/>
+<g stroke="#0c2a52" stroke-width="3" opacity=".6"><line x1="140" y1="78" x2="140" y2="112"/>
+<line x1="156" y1="78" x2="156" y2="112"/>
+<line x1="172" y1="78" x2="172" y2="112"/>
+<line x1="188" y1="78" x2="188" y2="112"/>
+<line x1="204" y1="78" x2="204" y2="112"/>
+<line x1="220" y1="78" x2="220" y2="112"/>
+<line x1="236" y1="78" x2="236" y2="112"/>
+<line x1="252" y1="78" x2="252" y2="112"/></g>
+<rect x="150" y="138" width="100" height="56" rx="6" fill="#f2f2f2"/>
+<text x="200" y="166" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="middle" fill="#123f7a">FILTRO</text>
+<text x="200" y="185" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#123f7a">ACEITE</text>
+<ellipse cx="200" cy="70" rx="75" ry="10" fill="#4d84cf"/>
+</svg>

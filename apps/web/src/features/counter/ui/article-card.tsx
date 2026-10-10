@@ -1,9 +1,9 @@
 import { TriangleAlert } from 'lucide-react';
-import { Badge } from '@/shared/ui/badge';
 import type { Article } from '../domain/ports';
 import { ArticleThumbnail } from './article-thumbnail';
 import { CopyCodeButton } from './copy-code-button';
 
+/** Fila de un resultado dentro de la respuesta del chat. */
 export function ArticleCard({
   article,
   onOpen,
@@ -13,11 +13,11 @@ export function ArticleCard({
 }) {
   return (
     <article
-      className="flex cursor-pointer gap-3 rounded-lg border bg-card p-2 text-card-foreground hover:border-ring sm:flex-col"
+      className="flex cursor-pointer items-center gap-3 rounded-md py-2 hover:bg-accent"
       onClick={() => onOpen(article)}
     >
-      <ArticleThumbnail driveId={article.driveId} className="w-28 shrink-0 rounded-md sm:w-full" />
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <ArticleThumbnail driveId={article.driveId} className="w-20 shrink-0 rounded-md" />
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex items-center gap-1">
           <button
             type="button"
@@ -35,17 +35,13 @@ export function ArticleCard({
               aria-label="Tiene observaciones"
             />
           )}
-          <span className="ml-auto">
-            <CopyCodeButton code={article.code} />
-          </span>
         </div>
         <p className="line-clamp-2 text-sm">{article.name}</p>
         {article.familyName && (
-          <Badge variant="secondary" className="max-w-full truncate">
-            {article.familyName}
-          </Badge>
+          <p className="truncate text-xs text-muted-foreground">{article.familyName}</p>
         )}
       </div>
+      <CopyCodeButton code={article.code} />
     </article>
   );
 }

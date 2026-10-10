@@ -17,7 +17,13 @@ const otherFeatureIndex = {
 
 export default tseslint.config(
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/coverage/**', '**/database.types.ts'],
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/dist-demo/**',
+      '**/coverage/**',
+      '**/database.types.ts',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

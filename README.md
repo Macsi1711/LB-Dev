@@ -1,6 +1,6 @@
 # Mostrador Lois
 
-Web para buscar artículos de Lois y Boago desde el mostrador (celular o PC), con foto, y panel
+Web para buscar artículos de Lois y Bogao desde el mostrador (celular o PC), con foto, y panel
 de administración de fotos y del bot de Telegram. El backend es Supabase y convive con dos flujos
 de n8n en producción.
 

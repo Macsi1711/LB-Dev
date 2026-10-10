@@ -1,6 +1,6 @@
 # CLAUDE.md — guía para agentes
 
-**Mostrador Lois** es la web para buscar artículos de Lois y Boago desde el mostrador y para
+**Mostrador Lois** es la web para buscar artículos de Lois y Bogao desde el mostrador y para
 administrar las fotos y el bot de Telegram. El backend es Supabase (Postgres + Auth + RLS), sin
 API propia. La misma base la usan **dos flujos de n8n en producción**.
 
