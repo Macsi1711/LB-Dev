@@ -23,9 +23,3 @@ export function toSearchParams(state: SearchState): URLSearchParams {
   if (state.withPhoto) params.set('foto', '1');
   return params;
 }
-
-export function emptyResultsMessage(state: SearchState): string {
-  const q = state.q.trim();
-  if (!q) return 'No hay artículos con esos filtros.';
-  return `No encontré nada para «${q}». Probá con menos palabras o sacá el filtro de familia.`;
-}
