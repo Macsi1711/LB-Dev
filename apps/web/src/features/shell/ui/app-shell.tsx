@@ -81,7 +81,13 @@ export function AppShell() {
   const actions = <SessionActions theme={theme} onToggleTheme={toggleTheme} />;
 
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[14rem_1fr]">
+    <div
+      className={cn(
+        'flex min-h-dvh flex-col lg:grid lg:grid-cols-[14rem_1fr]',
+        // Alto de la barra inferior del celular; el chat del Mostrador se apoya encima.
+        items.length > 1 ? '[--nav-h:3.5rem] lg:[--nav-h:0px]' : '[--nav-h:0px]',
+      )}
+    >
       <aside className="sticky top-0 hidden h-dvh flex-col gap-4 bg-marca p-3 text-marca-foreground lg:flex">
         <Wordmark className="px-3 pt-3 pb-2" />
         <nav className="grid gap-1">
@@ -93,12 +99,12 @@ export function AppShell() {
         </div>
       </aside>
 
-      <header className="flex items-center justify-between bg-marca px-4 py-1.5 text-marca-foreground lg:hidden">
+      <header className="sticky top-0 z-40 flex items-center justify-between bg-marca px-4 py-1.5 text-marca-foreground lg:hidden">
         <Wordmark />
         {actions}
       </header>
 
-      <main className={cn('min-w-0', items.length > 1 && 'pb-16 lg:pb-0')}>
+      <main className="flex min-w-0 flex-1 flex-col pb-[calc(var(--nav-h)+env(safe-area-inset-bottom))]">
         {isDemo && (
           <p className="bg-aviso px-4 py-1 text-center text-xs font-medium text-aviso-foreground">
             Modo demo: datos y fotos de ejemplo. Los cambios se pierden al recargar.
@@ -108,7 +114,7 @@ export function AppShell() {
       </main>
 
       {items.length > 1 && (
-        <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t bg-background pb-[env(safe-area-inset-bottom)] lg:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-40 flex h-[calc(var(--nav-h)+env(safe-area-inset-bottom))] border-t bg-background pb-[env(safe-area-inset-bottom)] lg:hidden">
           <NavLinks items={items} compact />
         </nav>
       )}
