@@ -35,3 +35,14 @@ describe('driveViewUrl', () => {
     expect(driveViewUrl('abc')).toBe('https://drive.google.com/file/d/abc/view?usp=drivesdk');
   });
 });
+
+describe('fotos del modo demo', () => {
+  it('un ID "demo/…" apunta a la ilustración local, relativa a la página', () => {
+    expect(thumbnailCandidates('demo/bujia')).toEqual(['demo/bujia.svg']);
+    expect(driveViewUrl('demo/bujia')).toBe('demo/bujia.svg');
+  });
+
+  it('los IDs reales de Drive nunca tienen "/", así que no se confunden', () => {
+    expect(extractDriveId('https://drive.google.com/file/d/demo/view')).toBe('demo');
+  });
+});
