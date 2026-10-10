@@ -16,7 +16,13 @@
     "build": "pnpm -r --if-present build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:migrate": "supabase migration up --local",
+    "db:deploy": "supabase db push",
+    "db:generate": "supabase gen types typescript --local > apps/web/src/shared/database.types.ts && prettier --write apps/web/src/shared/database.types.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
@@ -30,6 +36,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.9",
+    "supabase": "^2.120.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1"
   }
