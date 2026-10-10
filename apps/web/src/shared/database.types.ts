@@ -249,6 +249,21 @@ export type Database = {
         ComputedFields: never;
         Relationships: [];
       };
+      v_consultas_bot: {
+        Row: {
+          cantidad: number | null;
+          chat_id: number | null;
+          created_at: string | null;
+          error: string | null;
+          fuente: string | null;
+          id: number | null;
+          sql_generado: string | null;
+          texto: string | null;
+          usuario_nombre: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
     };
     Functions: {
       articulo_texto_busqueda: {
@@ -331,6 +346,15 @@ export type Database = {
           isSetofReturn: true;
         };
       };
+      kpis_bot: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          consultas_hoy: number;
+          consultas_semana: number;
+          porcentaje_sin_resultados: number;
+          usuarios_activos: number;
+        }[];
+      };
       mi_perfil: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -347,6 +371,14 @@ export type Database = {
         };
       };
       normalizar_busqueda: { Args: { texto: string }; Returns: string };
+      ranking_sin_resultados: {
+        Args: { p_dias?: number; p_limit?: number };
+        Returns: {
+          texto: string;
+          ultima: string;
+          veces: number;
+        }[];
+      };
       sincronizar_familias: { Args: Record<PropertyKey, never>; Returns: number };
       stats_fotos: {
         Args: Record<PropertyKey, never>;
