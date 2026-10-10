@@ -17,9 +17,12 @@ pnpm dev:web                           # http://localhost:5180
 Puertos reservados para este proyecto: **55420 a 55429** para Supabase (API 55421, DB 55422,
 Studio 55423, mails 55424) y **5180** para la web.
 
-## 3. Crear tu usuario (5 min)
+## 3. Usuarios (5 min)
 
-No hay registro público. En local:
+`pnpm db:start` ya carga dos usuarios de prueba (`supabase/seed-usuarios.sql`, solo local):
+`admin@lois.local` y `vendedor@lois.local`, con la contraseña que figura en ese archivo.
+
+No hay registro público. Para crear otro usuario en local:
 
 1. Entrá a Studio (http://127.0.0.1:55423) → Authentication → Add user, con email y contraseña.
 2. Para hacerlo admin, en el SQL editor:
