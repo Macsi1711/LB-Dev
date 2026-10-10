@@ -28,6 +28,11 @@
   --color-exito: var(--exito);
   --color-codigo: var(--codigo);
   --color-sin-foto: var(--sin-foto);
+  --color-marca: var(--marca);
+  --color-marca-foreground: var(--marca-foreground);
+  --color-marca-muted: var(--marca-muted);
+  --color-naranja: var(--naranja);
+  --font-sans: 'Montserrat Variable', Montserrat, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
@@ -36,7 +41,7 @@
 
 /* No es un color: radio base de los componentes. */
 :root {
-  --radius: 0.5rem;
+  --radius: 0.25rem; /* botones casi rectos, como loisybogao.com */
 }
 
 @layer base {
