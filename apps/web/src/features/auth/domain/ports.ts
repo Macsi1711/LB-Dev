@@ -1,4 +1,6 @@
-export type Role = 'vendedor' | 'admin';
+import type { Role } from '@/shared/roles';
+
+export type { Role };
 
 export interface Profile {
   userId: string;
