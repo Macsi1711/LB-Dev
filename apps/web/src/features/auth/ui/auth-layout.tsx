@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Wordmark } from '@/shared/ui/wordmark';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 
 export function AuthLayout(props: { title: string; description?: string; children: ReactNode }) {
@@ -6,7 +7,7 @@ export function AuthLayout(props: { title: string; description?: string; childre
     <main className="flex min-h-dvh items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <p className="font-mono text-sm font-semibold text-primary">MOSTRADOR LOIS</p>
+          <Wordmark className="text-primary" />
           <CardTitle className="text-xl">{props.title}</CardTitle>
           {props.description && <CardDescription>{props.description}</CardDescription>}
         </CardHeader>

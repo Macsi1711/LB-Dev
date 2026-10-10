@@ -3,6 +3,20 @@
 Manda en todo lo visual. Si algo no está acá, está **Pendiente**: no se inventa, se propone en una
 PR que actualice este archivo.
 
+## Identidad
+
+Sigue la web de la empresa, [loisybogao.com](https://loisybogao.com):
+
+- **Azul marino `#012967`** como color de marca: barra lateral, header del celular, botones
+  principales y códigos de artículo.
+- **Naranja `#F85000`** como acento, con moderación: el "&" de la marca, el ítem activo de la
+  navegación y el foco de los controles.
+- **Montserrat** (variable, 400 a 800) para todo el texto. Los títulos van en 700 u 800, como en
+  la web.
+- Botones y campos casi rectos (radio de 4 px).
+- La marca se escribe "LOIS & BOGAO" en Montserrat 800, con "MOSTRADOR" debajo
+  (`shared/ui/wordmark.tsx`).
+
 ## Principios
 
 1. **Herramienta de trabajo, no landing.** Densa, rápida y legible con poca luz, en una pantalla
@@ -34,11 +48,14 @@ color. En el código se usan como clases de Tailwind (`bg-background`, `text-cod
 | `exito`                                  | Confirmaciones (código copiado, foto asignada)             |
 | `codigo`                                 | Texto del código de artículo: contraste máximo             |
 | `sin-foto`                               | Placeholder gris de "Sin foto"                             |
+| `marca` / `marca-foreground`             | Barra lateral y header del celular                         |
+| `marca-muted`                            | Texto secundario sobre la marca                            |
+| `naranja`                                | Acento: ítem activo, el "&" de la marca, foco (`ring`)     |
 
 ## Tipografía
 
-- Texto: la fuente del sistema (`system-ui`). Base de 16 px en el celular, para que iOS no haga
-  zoom en el buscador.
+- Texto: Montserrat variable, autoalojada con `@fontsource-variable/montserrat` (no depende de
+  Google Fonts). Base de 16 px en el celular, para que iOS no haga zoom en el buscador.
 - Código de artículo: `font-mono`, `text-xl` y `font-semibold` en la tarjeta, `text-3xl` en el
   detalle.
 - Números en tablas y KPIs: `tabular-nums`.
@@ -60,5 +77,4 @@ color. En el código se usan como clases de Tailwind (`bg-background`, `text-cod
 
 ## Pendiente
 
-- Logo e ícono de la app.
-- Tipografía propia (por ahora, la del sistema).
+- Logo en imagen e ícono de la app (por ahora, la marca va en texto).
