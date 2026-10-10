@@ -13,7 +13,8 @@ Sigue la web de la empresa, [loisybogao.com](https://loisybogao.com):
   navegación y el foco de los controles.
 - **Montserrat** (variable, 400 a 800) para todo el texto. Los títulos van en 700 u 800, como en
   la web.
-- Botones y campos casi rectos (radio de 4 px).
+- Botones y campos casi rectos (radio de 4 px). La excepción es el chat del Mostrador: burbujas,
+  chips y caja de texto redondeados, como en Telegram o WhatsApp.
 - La marca se escribe "LOIS & BOGAO" en Montserrat 800, con "MOSTRADOR" debajo
   (`shared/ui/wordmark.tsx`).
 
@@ -21,7 +22,7 @@ Sigue la web de la empresa, [loisybogao.com](https://loisybogao.com):
 
 1. **Herramienta de trabajo, no landing.** Densa, rápida y legible con poca luz, en una pantalla
    chica y parado en el mostrador.
-2. **El código del artículo es lo más importante.** En cada tarjeta es lo más grande y lo más
+2. **El código del artículo es lo más importante.** En cada resultado es lo más grande y lo más
    contrastado, en monoespaciada y con un botón para copiarlo.
 3. **Mobile-first.** Se diseña para 360 px de ancho y después se agranda. Los objetivos táctiles
    tienen 44 px como mínimo.
@@ -56,16 +57,21 @@ color. En el código se usan como clases de Tailwind (`bg-background`, `text-cod
 
 - Texto: Montserrat variable, autoalojada con `@fontsource-variable/montserrat` (no depende de
   Google Fonts). Base de 16 px en el celular, para que iOS no haga zoom en el buscador.
-- Código de artículo: `font-mono`, `text-xl` y `font-semibold` en la tarjeta, `text-3xl` en el
-  detalle.
+- Código de artículo: `font-mono`, `text-xl` y `font-semibold` en la fila del resultado,
+  `text-3xl` en el detalle.
 - Números en tablas y KPIs: `tabular-nums`.
 
 ## Layout
 
-- Celular: barra inferior de navegación y grilla de 1 columna. El detalle se abre como drawer
-  desde abajo.
-- Desktop (`lg` en adelante): barra lateral y grilla de 3 o 4 columnas. El detalle se abre como
-  panel lateral.
+- Celular: header fijo arriba y barra inferior de navegación. El detalle se abre como drawer desde
+  abajo.
+- Desktop (`lg` en adelante): barra lateral. El detalle se abre como panel lateral.
+- **El Mostrador es un chat**, como el bot de Telegram que ya usan en el mostrador, y no un
+  buscador tipo Google. La caja para escribir queda fija abajo, con los chips de filtro (familia y
+  "solo con foto") arriba de ella. Cada consulta se ve como una burbuja propia a la derecha
+  (`primary`), y la respuesta como una burbuja a la izquierda (`card`): cuántos encontró, los
+  primeros 5 resultados y "Ver los N" para el resto. Lo nuevo aparece abajo y la pantalla lo sigue,
+  salvo que hayas subido a leer. La conversación dura lo que la pestaña.
 - Margen lateral de 16 px en el celular. Nunca hay scroll horizontal de la página.
 
 ## Componentes
