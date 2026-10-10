@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { telegramUserErrorMessage, validateTelegramUser } from './telegram-user';
+import {
+  canManageTelegramUsers,
+  telegramUserErrorMessage,
+  validateTelegramUser,
+} from './telegram-user';
 
 describe('validateTelegramUser', () => {
   it('acepta un chat_id numérico (los grupos son negativos) y un nombre', () => {
@@ -39,5 +43,12 @@ describe('telegramUserErrorMessage', () => {
 
   it('usa un mensaje genérico para el resto', () => {
     expect(telegramUserErrorMessage(undefined)).toBe('No se pudo guardar. Probá de nuevo.');
+  });
+});
+
+describe('canManageTelegramUsers', () => {
+  it('solo el admin agrega, cambia o saca usuarios del bot; el vendedor los ve', () => {
+    expect(canManageTelegramUsers('admin')).toBe(true);
+    expect(canManageTelegramUsers('vendedor')).toBe(false);
   });
 });

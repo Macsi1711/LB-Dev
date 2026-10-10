@@ -3,6 +3,14 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [Sin publicar]
+
+### Cambiado
+
+- **Permisos:** los vendedores ven y usan todas las secciones (Mostrador, Fotos y Bot). Lo único
+  que queda solo para el admin es agregar, cambiar o sacar usuarios del bot. La migración
+  `20261009000013_vendedor_ve_todo.sql` ajusta RLS y no toca el contrato con n8n.
+
 ## [0.1.0] - 2026-10-10
 
 Primera versión de Mostrador Lois.

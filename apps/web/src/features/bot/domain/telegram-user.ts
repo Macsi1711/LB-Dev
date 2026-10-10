@@ -1,3 +1,5 @@
+import type { Role } from '@/shared/roles';
+
 export interface TelegramUser {
   chatId: number;
   name: string;
@@ -31,4 +33,9 @@ export function validateTelegramUser(form: {
 export function telegramUserErrorMessage(code: string | undefined): string {
   if (code === '23505') return 'Ese chat_id ya está habilitado.';
   return 'No se pudo guardar. Probá de nuevo.';
+}
+
+/** Todos ven los usuarios del bot; solo el admin los agrega, cambia o saca (lo mismo exige RLS). */
+export function canManageTelegramUsers(role: Role): boolean {
+  return role === 'admin';
 }

@@ -9,8 +9,8 @@ export interface NavItem {
 
 const ITEMS: readonly NavItem[] = [
   { path: '/', label: 'Mostrador', icon: 'search', roles: ['vendedor', 'admin'] },
-  { path: '/fotos', label: 'Fotos', icon: 'image', roles: ['admin'] },
-  { path: '/bot', label: 'Bot', icon: 'bot', roles: ['admin'] },
+  { path: '/fotos', label: 'Fotos', icon: 'image', roles: ['vendedor', 'admin'] },
+  { path: '/bot', label: 'Bot', icon: 'bot', roles: ['vendedor', 'admin'] },
 ];
 
 export function navigationFor(role: Role): NavItem[] {

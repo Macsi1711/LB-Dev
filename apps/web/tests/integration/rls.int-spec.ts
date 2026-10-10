@@ -69,11 +69,14 @@ describe('vendedor', () => {
     });
   });
 
-  it('no puede cambiar fotos ni otras columnas', async () => {
+  it('asigna una foto a mano, pero no toca otras columnas', async () => {
     await inTransaction(db, async (tx) => {
       await actAs(tx, await createUser(tx, 'vendedor'));
-      const r = await tx.query(`update articulos set "Imagen" = 'x' where "Codigo" = '854001'`);
-      expect(r.rowCount).toBe(0);
+      const r = await tx.query(
+        `update articulos set "Imagen" = 'https://drive.google.com/file/d/Z/view?usp=drivesdk'
+         where "Codigo" = '854001'`,
+      );
+      expect(r.rowCount).toBe(1);
       expect(
         await errorCode(
           tx,
@@ -84,8 +87,10 @@ describe('vendedor', () => {
     });
   });
 
-  it('no ve nada del bot ni de las fotos sin match', async () => {
+  it('ve el bot y las fotos sin match, y resuelve fotos', async () => {
     await inTransaction(db, async (tx) => {
+      for (const table of ['consultas_bot', 'usuarios_telegram', 'fotos_sin_match'])
+        await tx.query(`delete from ${table}`);
       await tx.query(
         `insert into consultas_bot (chat_id, fuente, texto, cantidad) values (1, 'texto', 'x', 0)`,
       );
@@ -94,11 +99,26 @@ describe('vendedor', () => {
       await actAs(tx, await createUser(tx, 'vendedor'));
       for (const table of ['consultas_bot', 'usuarios_telegram', 'fotos_sin_match']) {
         const { rows } = await tx.query(`select * from ${table}`);
-        expect(rows, table).toEqual([]);
+        expect(rows, table).toHaveLength(1);
       }
+      const r = await tx.query(`update fotos_sin_match set resuelto = true where drive_id = 'd1'`);
+      expect(r.rowCount).toBe(1);
+    });
+  });
+
+  it('no agrega, cambia ni saca usuarios del bot: eso es solo del admin', async () => {
+    await inTransaction(db, async (tx) => {
+      await tx.query(`insert into usuarios_telegram (chat_id, nombre) values (1, 'Juan')`);
+      await actAs(tx, await createUser(tx, 'vendedor'));
       expect(
         await errorCode(tx, `insert into usuarios_telegram (chat_id, nombre) values (2, 'Ana')`),
       ).toBe(PERMISSION_DENIED);
+      const updated = await tx.query(
+        `update usuarios_telegram set activo = false where chat_id = 1`,
+      );
+      expect(updated.rowCount).toBe(0);
+      const deleted = await tx.query('delete from usuarios_telegram where chat_id = 1');
+      expect(deleted.rowCount).toBe(0);
     });
   });
 });
