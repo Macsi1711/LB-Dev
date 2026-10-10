@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router';
+import { isDemo } from '@/shared/lib/demo';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
@@ -27,7 +28,14 @@ export function LoginPage() {
   }
 
   return (
-    <AuthLayout title="Ingresar">
+    <AuthLayout
+      title="Ingresar"
+      description={
+        isDemo
+          ? 'Demo: entrá con cualquier email y contraseña. Si el email empieza con "vendedor", ves la vista de vendedor.'
+          : undefined
+      }
+    >
       <form onSubmit={onSubmit} className="grid gap-4">
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>

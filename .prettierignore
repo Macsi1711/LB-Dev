@@ -4,3 +4,4 @@ coverage
 pnpm-lock.yaml
 supabase/.temp
 supabase/.branches
+dist-demo

@@ -2,6 +2,7 @@ import { Bot, Image, LogOut, Moon, Search, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router';
 import { useAuth } from '@/features/auth';
+import { isDemo } from '@/shared/lib/demo';
 import { cn } from '@/shared/lib/utils';
 import { applyTheme, currentTheme } from '@/shared/lib/theme';
 import { Button } from '@/shared/ui/button';
@@ -76,6 +77,11 @@ export function AppShell() {
       </header>
 
       <main className={cn('min-w-0', items.length > 1 && 'pb-16 lg:pb-0')}>
+        {isDemo && (
+          <p className="bg-aviso px-4 py-1 text-center text-xs font-medium text-aviso-foreground">
+            Modo demo: datos y fotos de ejemplo. Los cambios se pierden al recargar.
+          </p>
+        )}
         <Outlet />
       </main>
 
