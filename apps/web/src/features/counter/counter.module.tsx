@@ -1,11 +1,15 @@
-import type { ReactNode } from 'react';
 import { supabase } from '@/infra/supabase';
 import { createSupabaseCounter } from './data/supabase-counter';
 import { CounterPortContext } from './ui/counter-context';
+import { CounterPage } from './ui/counter-page';
 
 const port = createSupabaseCounter(supabase);
 
-/** Composition root del Mostrador: provee el puerto conectado a Supabase. */
-export function CounterModule({ children }: { children: ReactNode }) {
-  return <CounterPortContext value={port}>{children}</CounterPortContext>;
+/** Composition root del Mostrador. */
+export function CounterScreen() {
+  return (
+    <CounterPortContext value={port}>
+      <CounterPage />
+    </CounterPortContext>
+  );
 }
