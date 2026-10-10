@@ -331,6 +331,7 @@ export type Database = {
         };
       };
       normalizar_busqueda: { Args: { texto: string }; Returns: string };
+      sincronizar_familias: { Args: Record<PropertyKey, never>; Returns: number };
       stats_fotos: {
         Args: Record<PropertyKey, never>;
         Returns: {

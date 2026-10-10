@@ -65,7 +65,7 @@ describe('vendedor', () => {
       const { rows } = await tx.query(`select codigo from buscar_articulos('pastilla onix')`);
       expect(rows).toHaveLength(2);
       const familias = await tx.query('select count(*)::int as n from familias');
-      expect(familias.rows[0].n).toBeGreaterThanOrEqual(0);
+      expect(familias.rows[0].n).toBeGreaterThan(0);
     });
   });
 

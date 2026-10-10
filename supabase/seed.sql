@@ -14,3 +14,6 @@ values
   ('BUJ-10', 'BUJÍA IRIDIUM NGK', 'Para motores nafteros', null, 'BU', 'BUJÍAS', null),
   ('999001', 'DESCUENTO ESPECIAL', null, null, '999', 'VARIOS', null),
   ('DV01', 'DEVOLUCIÓN', null, null, 'DV', 'DEVOLUCIONES', null);
+
+-- Las migraciones corren antes que este seed: las familias se cargan acá.
+select public.sincronizar_familias();
