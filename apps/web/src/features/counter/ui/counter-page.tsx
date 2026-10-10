@@ -1,130 +1,105 @@
-import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { useDebouncedValue } from '@/shared/lib/use-debounced-value';
-import { Button } from '@/shared/ui/button';
-import { Label } from '@/shared/ui/label';
-import { Skeleton } from '@/shared/ui/skeleton';
-import { Switch } from '@/shared/ui/switch';
+import { restoreHistory, sendQuery, type ChatQuery } from '../domain/conversation';
 import type { Article } from '../domain/ports';
-import {
-  emptyResultsMessage,
-  PAGE_SIZE,
-  parseSearchState,
-  toSearchParams,
-  type SearchState,
-} from '../domain/search-state';
-import { syncSearchText } from '../domain/search-sync';
-import { ArticleCard } from './article-card';
+import { parseSearchState, toSearchParams, type SearchState } from '../domain/search-state';
 import { ArticleDetail } from './article-detail';
-import { useCounterPort } from './counter-context';
-import { FamilyFilter } from './family-filter';
-import { SearchBar } from './search-bar';
+import { ChatComposer } from './chat-composer';
+import { ReplyBubble, UserBubble, WelcomeBubble } from './chat-messages';
+
+const STORAGE_KEY = 'mostrador-chat';
+
+// La conversación dura lo que la pestaña: sobrevive a recargar y a ir a otra pantalla.
+function loadHistory(): ChatQuery[] {
+  try {
+    return restoreHistory(JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '[]'));
+  } catch {
+    return [];
+  }
+}
+
+const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+/** Distancia al final de la página para seguir "pegado" a los mensajes nuevos. */
+const STICK_PX = 120;
 
 export function CounterPage() {
-  const port = useCounterPort();
   const [params, setParams] = useSearchParams();
-  const state = parseSearchState(params);
-  const [text, setText] = useState(state.q);
-  const debouncedText = useDebouncedValue(text, 250);
+  const urlKey = params.toString();
+  const [history, setHistory] = useState(loadHistory);
+  const [draft, setDraft] = useState<SearchState>(() => ({ ...parseSearchState(params), q: '' }));
   const [selected, setSelected] = useState<Article | null>(null);
+  const messages = useRef<HTMLDivElement>(null);
+  const stick = useRef(true);
 
-  // Forma funcional: siempre parte de la URL vigente, sin cerrar sobre un estado viejo.
-  const update = useCallback(
-    (patch: Partial<SearchState>) =>
-      setParams((prev) => toSearchParams({ ...parseSearchState(prev), ...patch }), {
-        replace: true,
-      }),
+  const send = useCallback(
+    (state: SearchState) => {
+      stick.current = true;
+      setHistory((h) => sendQuery(h, state, { id: newId(), sentAt: Date.now() }));
+      // La última consulta queda en la URL para poder compartir el link.
+      setParams(toSearchParams(state), { replace: true });
+    },
     [setParams],
   );
-  // Buscador ↔ URL: si la URL cambia desde afuera (atrás, link compartido) manda la URL;
-  // si no, el texto escrito cuando terminó el debounce.
-  const synced = useRef(state.q);
-  useEffect(() => {
-    const result = syncSearchText({
-      url: state.q,
-      synced: synced.current,
-      text,
-      debounced: debouncedText,
-    });
-    synced.current = result.synced;
-    if (result.setText !== undefined) setText(result.setText);
-    if (result.writeUrl !== undefined) update({ q: result.writeUrl });
-  }, [state.q, text, debouncedText, update]);
 
-  const results = useInfiniteQuery({
-    queryKey: ['articulos', state],
-    queryFn: ({ pageParam }) => port.search(state, pageParam, PAGE_SIZE),
-    initialPageParam: 0,
-    getNextPageParam: (last, pages) =>
-      last.length < PAGE_SIZE ? undefined : pages.length * PAGE_SIZE,
-    placeholderData: keepPreviousData,
-  });
-  const total = useQuery({
-    queryKey: ['articulos-total', state],
-    queryFn: () => port.count(state),
-    placeholderData: keepPreviousData,
-  });
-  const articles = results.data?.pages.flat() ?? [];
+  // Un link compartido (?q=…) llega como un mensaje más; si ya es el último, no se repite.
+  const [seenUrl, setSeenUrl] = useState<string | null>(null);
+  if (seenUrl !== urlKey) {
+    setSeenUrl(urlKey);
+    const state = parseSearchState(params);
+    setHistory((h) => sendQuery(h, state, { id: newId(), sentAt: Date.now() }));
+  }
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    } catch {
+      // Sin almacenamiento (modo privado): la conversación se pierde al recargar.
+    }
+  }, [history]);
+
+  // Como en un chat: si estás abajo, lo nuevo te lleva al final; si subiste a leer, no.
+  useEffect(() => {
+    const el = messages.current;
+    if (!el) return;
+    const toBottom = () => {
+      if (stick.current) window.scrollTo({ top: document.documentElement.scrollHeight });
+    };
+    const onScroll = () => {
+      const { scrollHeight } = document.documentElement;
+      stick.current = scrollHeight - (window.scrollY + window.innerHeight) < STICK_PX;
+    };
+    const observer = new ResizeObserver(toBottom);
+    observer.observe(el);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
   return (
-    <div className="flex flex-col gap-3 p-3 sm:p-4">
-      <div className="sticky top-0 z-30 -mx-3 flex flex-col gap-2 bg-background px-3 pt-1 pb-2 sm:-mx-4 sm:px-4">
-        <SearchBar value={text} onChange={setText} />
-        <div className="flex items-center gap-3">
-          <FamilyFilter value={state.family} onChange={(family) => update({ family })} />
-          <div className="flex items-center gap-2">
-            <Switch
-              id="solo-foto"
-              checked={state.withPhoto}
-              onCheckedChange={(withPhoto) => update({ withPhoto })}
+    <div className="flex flex-1 flex-col">
+      <div
+        ref={messages}
+        className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-end gap-3 px-3 py-4 sm:px-4"
+        aria-live="polite"
+      >
+        <WelcomeBubble onSend={(q) => send({ ...draft, q })} />
+        {history.map((query) => (
+          <div key={query.id} className="grid gap-3">
+            <UserBubble query={query} />
+            <ReplyBubble
+              query={query}
+              onOpen={setSelected}
+              onExpand={() => (stick.current = false)}
             />
-            <Label htmlFor="solo-foto" className="whitespace-nowrap">
-              Solo con foto
-            </Label>
           </div>
-        </div>
-        {total.data !== undefined && (
-          <p className="text-xs text-muted-foreground tabular-nums">
-            {total.data.toLocaleString('es-AR')} {total.data === 1 ? 'artículo' : 'artículos'}
-          </p>
-        )}
+        ))}
       </div>
-
-      {results.isError ? (
-        <div className="grid justify-items-center gap-2 py-10 text-center">
-          <p>No se pudo buscar. Revisá la conexión.</p>
-          <Button variant="outline" onClick={() => void results.refetch()}>
-            Reintentar
-          </Button>
-        </div>
-      ) : results.isPending ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 6 }, (_, i) => (
-            <Skeleton key={i} className="h-32 sm:h-64" />
-          ))}
-        </div>
-      ) : articles.length === 0 ? (
-        <p className="py-10 text-center text-muted-foreground">{emptyResultsMessage(state)}</p>
-      ) : (
-        <>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {articles.map((a) => (
-              <ArticleCard key={a.id} article={a} onOpen={setSelected} />
-            ))}
-          </div>
-          {results.hasNextPage && (
-            <Button
-              variant="outline"
-              className="mx-auto"
-              disabled={results.isFetchingNextPage}
-              onClick={() => void results.fetchNextPage()}
-            >
-              {results.isFetchingNextPage ? 'Cargando…' : `Cargar ${PAGE_SIZE} más`}
-            </Button>
-          )}
-        </>
-      )}
+      <div className="sticky bottom-[calc(var(--nav-h)+env(safe-area-inset-bottom))] z-30 border-t bg-background/95 backdrop-blur">
+        <ChatComposer draft={draft} onDraftChange={setDraft} onSend={send} />
+      </div>
       <ArticleDetail article={selected} onClose={() => setSelected(null)} />
     </div>
   );

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { emptyResultsMessage, parseSearchState, toSearchParams } from './search-state';
+import { parseSearchState, toSearchParams } from './search-state';
 
 describe('parseSearchState', () => {
   it('lee la búsqueda de la URL (?q=&familia=&foto=)', () => {
@@ -33,20 +33,6 @@ describe('toSearchParams', () => {
     );
     expect(toSearchParams({ q: '', family: 'PF', withPhoto: true }).toString()).toBe(
       'familia=PF&foto=1',
-    );
-  });
-});
-
-describe('emptyResultsMessage', () => {
-  it('sugiere menos palabras o sacar el filtro de familia', () => {
-    expect(emptyResultsMessage({ q: 'pastilla xyz', family: 'PF', withPhoto: false })).toBe(
-      'No encontré nada para «pastilla xyz». Probá con menos palabras o sacá el filtro de familia.',
-    );
-  });
-
-  it('sin texto, habla de los filtros', () => {
-    expect(emptyResultsMessage({ q: '', family: 'PF', withPhoto: true })).toBe(
-      'No hay artículos con esos filtros.',
     );
   });
 });

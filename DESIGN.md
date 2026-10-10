@@ -37,7 +37,7 @@ color. En el código se usan como clases de Tailwind (`bg-background`, `text-cod
 | Token                                    | Uso                                                        |
 | ---------------------------------------- | ---------------------------------------------------------- |
 | `background` / `foreground`              | Fondo de la app y texto principal                          |
-| `card` / `card-foreground`               | Tarjetas de artículo y paneles                             |
+| `card` / `card-foreground`               | Burbujas de respuesta del chat y paneles                   |
 | `popover` / `popover-foreground`         | Menús desplegables, combobox y avisos (toasts)             |
 | `accent` / `accent-foreground`           | Hover y selección dentro de menús y listas                 |
 | `muted` / `muted-foreground`             | Superficies secundarias y texto de apoyo (familia, fechas) |
@@ -56,7 +56,7 @@ color. En el código se usan como clases de Tailwind (`bg-background`, `text-cod
 ## Tipografía
 
 - Texto: Montserrat variable, autoalojada con `@fontsource-variable/montserrat` (no depende de
-  Google Fonts). Base de 16 px en el celular, para que iOS no haga zoom en el buscador.
+  Google Fonts). Base de 16 px en el celular, para que iOS no haga zoom en la caja del chat.
 - Código de artículo: `font-mono`, `text-xl` y `font-semibold` en la fila del resultado,
   `text-3xl` en el detalle.
 - Números en tablas y KPIs: `tabular-nums`.
