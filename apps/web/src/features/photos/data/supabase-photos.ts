@@ -50,5 +50,44 @@ export function createSupabasePhotos(client: SupabaseClient<Database>): PhotosPo
         if (page.length < PAGE) return all;
       }
     },
+    async unmatchedPhotos() {
+      const { data, error } = await client
+        .from('fotos_sin_match')
+        .select('id, drive_id, archivo, candidatos, created_at')
+        .eq('resuelto', false)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data.map((r) => ({
+        id: r.id,
+        driveId: r.drive_id,
+        file: r.archivo,
+        candidates: r.candidatos,
+        createdAt: r.created_at,
+      }));
+    },
+    async suggestCodes(texts) {
+      const { data, error } = await client.rpc('sugerir_codigos', { p_textos: texts });
+      if (error) throw error;
+      return data.map((r) => ({
+        articleId: r.id,
+        code: r.codigo,
+        name: r.nombre,
+        hasPhoto: r.tiene_foto,
+      }));
+    },
+    async assignPhoto(photoId, articleId) {
+      const { error } = await client.rpc('asignar_foto', {
+        p_foto_id: photoId,
+        p_articulo_id: articleId,
+      });
+      if (error) throw error;
+    },
+    async dismissPhoto(photoId) {
+      const { error } = await client
+        .from('fotos_sin_match')
+        .update({ resuelto: true })
+        .eq('id', photoId);
+      if (error) throw error;
+    },
   };
 }

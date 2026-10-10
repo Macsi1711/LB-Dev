@@ -17,3 +17,11 @@ values
 
 -- Las migraciones corren antes que este seed: las familias se cargan acá.
 select public.sincronizar_familias();
+
+-- Fotos que n8n no pudo asignar (solo local), para probar la pantalla Fotos.
+insert into public.fotos_sin_match (drive_id, archivo, candidatos, link) values
+  ('1SINMATCHonix_copia', '854000 copia.jpg', '854000 COPIA|854000COPIA',
+   'https://drive.google.com/file/d/1SINMATCHonix_copia/view?usp=drivesdk'),
+  ('1SINMATCHbujia', 'bujia ngk.png', 'BUJIA NGK|BUJIANGK',
+   'https://drive.google.com/file/d/1SINMATCHbujia/view?usp=drivesdk')
+on conflict (drive_id) do nothing;
