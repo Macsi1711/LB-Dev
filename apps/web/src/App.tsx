@@ -1,8 +1,39 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createBrowserRouter, RouterProvider } from 'react-router';
+import { AuthModule, LoginPage, RequireAuth, useAuth } from '@/features/auth';
+import { Toaster } from '@/shared/ui/sonner';
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
+});
+
+// Provisorio hasta la PR del layout y la navegación.
+function Home() {
+  const { profile, port } = useAuth();
+  return (
+    <main className="p-4">
+      <p>
+        Hola {profile?.name}. Rol: {profile?.role}.
+      </p>
+      <button className="underline" onClick={() => void port.signOut()}>
+        Salir
+      </button>
+    </main>
+  );
+}
+
+const router = createBrowserRouter([
+  { path: '/login', element: <LoginPage /> },
+  { element: <RequireAuth />, children: [{ path: '/', element: <Home /> }] },
+]);
+
 export function App() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-screen-xl flex-col gap-2 p-4">
-      <h1 className="text-xl font-semibold">Mostrador Lois</h1>
-      <p className="text-muted-foreground">Buscador de artículos. En construcción.</p>
-    </main>
+    <QueryClientProvider client={queryClient}>
+      <AuthModule>
+        <RouterProvider router={router} />
+        <Toaster position="top-center" />
+      </AuthModule>
+    </QueryClientProvider>
   );
 }
