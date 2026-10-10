@@ -87,3 +87,16 @@ describe('stats_fotos', () => {
     });
   });
 });
+
+describe('v_articulos_sin_foto', () => {
+  it('lista los artículos sin foto, sin las familias internas', async () => {
+    const { rows } = await db.query<{ codigo: string }>(
+      'select codigo from v_articulos_sin_foto order by codigo',
+    );
+    const codes = rows.map((r) => r.codigo);
+    expect(codes).toContain('854001');
+    expect(codes).not.toContain('854000'); // tiene foto
+    expect(codes).not.toContain('999001'); // familia 999: no es producto
+    expect(codes).not.toContain('DV01'); // familia DV: no es producto
+  });
+});
