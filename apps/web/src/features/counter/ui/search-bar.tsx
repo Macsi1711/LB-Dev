@@ -42,7 +42,7 @@ export function SearchBar(props: { value: string; onChange: (value: string) => v
         placeholder="Código, pieza o modelo… ej: pastilla onix"
         value={props.value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-12 pr-10 pl-10 text-lg md:text-lg"
+        className="h-12 pr-10 pl-10 text-lg md:text-lg [&::-webkit-search-cancel-button]:appearance-none"
       />
       {props.value && (
         <button
