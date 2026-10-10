@@ -55,7 +55,9 @@ function UnmatchedPhotoCard({ photo }: { photo: UnmatchedPhoto }) {
             </Badge>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground">Artículos con el código más parecido:</p>
+        <p className="text-xs text-muted-foreground">
+          Artículos más parecidos (por código o nombre):
+        </p>
         <ul className="grid gap-1">
           {suggestions.data?.map((s) => (
             <li

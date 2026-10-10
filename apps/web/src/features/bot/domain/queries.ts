@@ -43,3 +43,9 @@ export function dateRange(from: string | null, to: string | null): { gte?: strin
 export function userLabel(query: Pick<BotQuery, 'userName'>): string {
   return query.userName ?? 'no autorizado';
 }
+
+/** "sin resultados", "1 resultado", "1.500 resultados". */
+export function resultsLabel(count: number): string {
+  if (count === 0) return 'sin resultados';
+  return `${count.toLocaleString('es-AR')} ${count === 1 ? 'resultado' : 'resultados'}`;
+}

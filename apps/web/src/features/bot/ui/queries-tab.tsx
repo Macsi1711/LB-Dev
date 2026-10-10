@@ -7,6 +7,7 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Switch } from '@/shared/ui/switch';
 import {
+  resultsLabel,
   UNAUTHORIZED,
   userLabel,
   type BotQuery,
@@ -37,7 +38,7 @@ function QueryRow({ q }: { q: BotQuery }) {
         <span className="min-w-0 flex-1 basis-48">{q.text}</span>
         {q.results !== null && (
           <Badge variant={q.results === 0 ? 'destructive' : 'secondary'} className="tabular-nums">
-            {q.results === 0 ? 'sin resultados' : `${q.results} resultados`}
+            {resultsLabel(q.results)}
           </Badge>
         )}
         {q.error && <span className="text-xs text-destructive">{q.error}</span>}

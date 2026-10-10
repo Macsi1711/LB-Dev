@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dateRange, userLabel } from './queries';
+import { dateRange, resultsLabel, userLabel } from './queries';
 
 describe('dateRange', () => {
   it('convierte las fechas del filtro a un rango en hora argentina, con el "hasta" inclusive', () => {
@@ -23,5 +23,14 @@ describe('userLabel', () => {
   it('muestra "no autorizado" si el chat no está en la lista blanca', () => {
     expect(userLabel({ userName: 'Juan' })).toBe('Juan');
     expect(userLabel({ userName: null })).toBe('no autorizado');
+  });
+});
+
+describe('resultsLabel', () => {
+  it('usa singular, plural y "sin resultados"', () => {
+    expect(resultsLabel(0)).toBe('sin resultados');
+    expect(resultsLabel(1)).toBe('1 resultado');
+    expect(resultsLabel(2)).toBe('2 resultados');
+    expect(resultsLabel(1500)).toBe('1.500 resultados');
   });
 });
