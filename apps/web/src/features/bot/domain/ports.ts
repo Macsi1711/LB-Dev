@@ -1,3 +1,4 @@
+import type { BotQuery, QueryFilters } from './queries';
 import type { TelegramUser, TelegramUserInput } from './telegram-user';
 
 export interface BotPort {
@@ -8,6 +9,7 @@ export interface BotPort {
     patch: Partial<TelegramUserInput & { active: boolean }>,
   ): Promise<void>;
   deleteTelegramUser(chatId: number): Promise<void>;
+  recentQueries(filters: QueryFilters, offset: number, limit: number): Promise<BotQuery[]>;
 }
 
 /** Error de la base con el código de Postgres, para elegir el mensaje. */

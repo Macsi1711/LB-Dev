@@ -25,3 +25,12 @@ insert into public.fotos_sin_match (drive_id, archivo, candidatos, link) values
   ('1SINMATCHbujia', 'bujia ngk.png', 'BUJIA NGK|BUJIANGK',
    'https://drive.google.com/file/d/1SINMATCHbujia/view?usp=drivesdk')
 on conflict (drive_id) do nothing;
+
+-- Bot de Telegram (solo local): un usuario habilitado y algunas consultas.
+insert into public.usuarios_telegram (chat_id, nombre, notas) values (111111111, 'Juan (mostrador)', 'Ejemplo local')
+on conflict (chat_id) do nothing;
+insert into public.consultas_bot (chat_id, fuente, texto, sql_generado, cantidad, error, created_at) values
+  (111111111, 'texto', 'pastilla onix', 'SELECT "Codigo" FROM articulos WHERE "Nombre artículo" ILIKE ''%ONIX%''', 2, null, now() - interval '5 minutes'),
+  (111111111, 'audio', 'amortiguador trasero gol', 'SELECT "Codigo" FROM articulos WHERE false', 0, null, now() - interval '1 hour'),
+  (111111111, 'foto', 'amortiguador trasero gol', 'SELECT "Codigo" FROM articulos WHERE false', 0, null, now() - interval '2 days'),
+  (222222222, 'texto', 'hola', null, null, 'no autorizado', now() - interval '3 hours');
