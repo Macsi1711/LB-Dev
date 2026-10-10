@@ -15,16 +15,18 @@ import {
   type SearchState,
 } from '../domain/search-state';
 import { ArticleCard } from './article-card';
+import { ArticleDetail } from './article-detail';
 import { useCounterPort } from './counter-context';
 import { FamilyFilter } from './family-filter';
 import { SearchBar } from './search-bar';
 
-export function CounterPage(props: { onOpen?: (article: Article) => void }) {
+export function CounterPage() {
   const port = useCounterPort();
   const [params, setParams] = useSearchParams();
   const state = parseSearchState(params);
   const [text, setText] = useState(state.q);
   const debouncedText = useDebouncedValue(text, 250);
+  const [selected, setSelected] = useState<Article | null>(null);
 
   // Forma funcional: siempre parte de la URL vigente, sin cerrar sobre un estado viejo.
   const update = useCallback(
@@ -103,7 +105,7 @@ export function CounterPage(props: { onOpen?: (article: Article) => void }) {
         <>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {articles.map((a) => (
-              <ArticleCard key={a.id} article={a} onOpen={props.onOpen ?? (() => undefined)} />
+              <ArticleCard key={a.id} article={a} onOpen={setSelected} />
             ))}
           </div>
           {results.hasNextPage && (
@@ -118,6 +120,7 @@ export function CounterPage(props: { onOpen?: (article: Article) => void }) {
           )}
         </>
       )}
+      <ArticleDetail article={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }
