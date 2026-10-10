@@ -11,7 +11,7 @@ export function PhotosPage() {
   const stats = useQuery({ queryKey: ['stats-fotos'], queryFn: () => port.stats() });
 
   return (
-    <div className="grid gap-4 p-3 sm:p-4">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 p-3 sm:p-4">
       <h1 className="text-xl font-semibold">Fotos</h1>
       <p className="rounded-md border bg-muted p-3 text-sm">
         Para cargar fotos, subilas a la carpeta de Drive <em>Lois base de datos</em> con el{' '}
@@ -20,7 +20,7 @@ export function PhotosPage() {
       </p>
       {stats.data ? <CoverageCard stats={stats.data} /> : <Skeleton className="h-24" />}
       <Tabs defaultValue="sin-foto">
-        <TabsList>
+        <TabsList className="max-w-full justify-start overflow-x-auto">
           <TabsTrigger value="sin-foto">Sin foto</TabsTrigger>
           <TabsTrigger value="sin-match">Fotos que no matchearon</TabsTrigger>
         </TabsList>
