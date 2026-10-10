@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f5f7"/><stop offset="1" stop-color="#dfe2e7"/></linearGradient><radialGradient id="sh" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs><rect width="400" height="300" fill="url(#bg)"/>
+<defs><linearGradient id="tube" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d1f22"/><stop offset=".5" stop-color="#50545b"/><stop offset="1" stop-color="#1a1c1f"/></linearGradient><linearGradient id="rod" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa0a8"/><stop offset=".5" stop-color="#f1f3f5"/><stop offset="1" stop-color="#8d939b"/></linearGradient></defs>
+<ellipse cx="200" cy="262" rx="140" ry="12" fill="url(#sh)"/>
+<g transform="rotate(-28 200 150)">
+<circle cx="62" cy="150" r="15" fill="none" stroke="#3a3d42" stroke-width="9"/>
+<rect x="75" y="144" width="95" height="12" fill="url(#rod)"/>
+<rect x="166" y="130" width="160" height="40" rx="8" fill="url(#tube)"/>
+<rect x="200" y="132" width="8" height="36" fill="#c8102e"/>
+<circle cx="340" cy="150" r="15" fill="none" stroke="#3a3d42" stroke-width="9"/></g>
+</svg>

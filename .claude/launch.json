@@ -1,0 +1,28 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev:web"],
+      "port": 5180
+    },
+    {
+      "name": "demo",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "web",
+        "exec",
+        "vite",
+        "preview",
+        "--outDir",
+        "dist-demo",
+        "--port",
+        "5182",
+        "--strictPort"
+      ],
+      "port": 5182
+    }
+  ]
+}

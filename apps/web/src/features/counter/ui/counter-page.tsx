@@ -1,0 +1,106 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router';
+import { restoreHistory, sendQuery, type ChatQuery } from '../domain/conversation';
+import type { Article } from '../domain/ports';
+import { parseSearchState, toSearchParams, type SearchState } from '../domain/search-state';
+import { ArticleDetail } from './article-detail';
+import { ChatComposer } from './chat-composer';
+import { ReplyBubble, UserBubble, WelcomeBubble } from './chat-messages';
+
+const STORAGE_KEY = 'mostrador-chat';
+
+// La conversación dura lo que la pestaña: sobrevive a recargar y a ir a otra pantalla.
+function loadHistory(): ChatQuery[] {
+  try {
+    return restoreHistory(JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '[]'));
+  } catch {
+    return [];
+  }
+}
+
+const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+/** Distancia al final de la página para seguir "pegado" a los mensajes nuevos. */
+const STICK_PX = 120;
+
+export function CounterPage() {
+  const [params, setParams] = useSearchParams();
+  const urlKey = params.toString();
+  const [history, setHistory] = useState(loadHistory);
+  const [draft, setDraft] = useState<SearchState>(() => ({ ...parseSearchState(params), q: '' }));
+  const [selected, setSelected] = useState<Article | null>(null);
+  const messages = useRef<HTMLDivElement>(null);
+  const stick = useRef(true);
+
+  const send = useCallback(
+    (state: SearchState) => {
+      stick.current = true;
+      setHistory((h) => sendQuery(h, state, { id: newId(), sentAt: Date.now() }));
+      // La última consulta queda en la URL para poder compartir el link.
+      setParams(toSearchParams(state), { replace: true });
+    },
+    [setParams],
+  );
+
+  // Un link compartido (?q=…) llega como un mensaje más; si ya es el último, no se repite.
+  const [seenUrl, setSeenUrl] = useState<string | null>(null);
+  if (seenUrl !== urlKey) {
+    setSeenUrl(urlKey);
+    const state = parseSearchState(params);
+    setHistory((h) => sendQuery(h, state, { id: newId(), sentAt: Date.now() }));
+  }
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    } catch {
+      // Sin almacenamiento (modo privado): la conversación se pierde al recargar.
+    }
+  }, [history]);
+
+  // Como en un chat: si estás abajo, lo nuevo te lleva al final; si subiste a leer, no.
+  useEffect(() => {
+    const el = messages.current;
+    if (!el) return;
+    const toBottom = () => {
+      if (stick.current) window.scrollTo({ top: document.documentElement.scrollHeight });
+    };
+    const onScroll = () => {
+      const { scrollHeight } = document.documentElement;
+      stick.current = scrollHeight - (window.scrollY + window.innerHeight) < STICK_PX;
+    };
+    const observer = new ResizeObserver(toBottom);
+    observer.observe(el);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  return (
+    <div className="flex flex-1 flex-col">
+      <div
+        ref={messages}
+        className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-end gap-3 px-3 py-4 sm:px-4"
+        aria-live="polite"
+      >
+        <WelcomeBubble onSend={(q) => send({ ...draft, q })} />
+        {history.map((query) => (
+          <div key={query.id} className="grid gap-3">
+            <UserBubble query={query} />
+            <ReplyBubble
+              query={query}
+              onOpen={setSelected}
+              onExpand={() => (stick.current = false)}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="sticky bottom-[calc(var(--nav-h)+env(safe-area-inset-bottom))] z-30 border-t bg-background/95 backdrop-blur">
+        <ChatComposer draft={draft} onDraftChange={setDraft} onSend={send} />
+      </div>
+      <ArticleDetail article={selected} onClose={() => setSelected(null)} />
+    </div>
+  );
+}

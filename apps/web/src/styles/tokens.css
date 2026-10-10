@@ -1,0 +1,67 @@
+/*
+ * Tokens de color de Mostrador Lois, con la identidad de Lois & Bogao (loisybogao.com):
+ * azul marino #012967 como color de marca y naranja #F85000 como acento.
+ * Es el ÚNICO archivo con valores de color: el resto del código usa las clases que salen de acá
+ * (bg-background, text-codigo, bg-marca…). La fuente de verdad es DESIGN.md.
+ */
+:root {
+  --background: oklch(0.985 0.003 260);
+  --foreground: oklch(0.21 0.03 262);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.03 262);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.03 262);
+  --accent: oklch(0.94 0.014 262);
+  --accent-foreground: oklch(0.3 0.117 259.5);
+  --muted: oklch(0.955 0.006 262);
+  --muted-foreground: oklch(0.47 0.025 262);
+  --border: oklch(0.89 0.01 262);
+  --input: oklch(0.86 0.012 262);
+  --ring: oklch(0.659 0.215 38.2);
+  --primary: oklch(0.3 0.117 259.5);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.94 0.016 262);
+  --secondary-foreground: oklch(0.3 0.117 259.5);
+  --destructive: oklch(0.55 0.21 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --aviso: oklch(0.8 0.16 85);
+  --aviso-foreground: oklch(0.3 0.08 70);
+  --exito: oklch(0.6 0.14 150);
+  --codigo: oklch(0.3 0.117 259.5);
+  --sin-foto: oklch(0.94 0.008 262);
+  --marca: oklch(0.3 0.117 259.5);
+  --marca-foreground: oklch(0.99 0 0);
+  --marca-muted: oklch(0.8 0.04 262);
+  --naranja: oklch(0.659 0.215 38.2);
+}
+
+.dark {
+  --background: oklch(0.17 0.025 262);
+  --foreground: oklch(0.95 0.006 262);
+  --card: oklch(0.21 0.03 262);
+  --card-foreground: oklch(0.95 0.006 262);
+  --popover: oklch(0.21 0.03 262);
+  --popover-foreground: oklch(0.95 0.006 262);
+  --accent: oklch(0.28 0.045 262);
+  --accent-foreground: oklch(0.95 0.006 262);
+  --muted: oklch(0.24 0.03 262);
+  --muted-foreground: oklch(0.72 0.025 262);
+  --border: oklch(0.31 0.035 262);
+  --input: oklch(0.34 0.035 262);
+  --ring: oklch(0.7 0.19 42);
+  --primary: oklch(0.68 0.13 255);
+  --primary-foreground: oklch(0.17 0.05 262);
+  --secondary: oklch(0.27 0.04 262);
+  --secondary-foreground: oklch(0.93 0.01 262);
+  --destructive: oklch(0.62 0.2 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --aviso: oklch(0.78 0.15 85);
+  --aviso-foreground: oklch(0.2 0.05 70);
+  --exito: oklch(0.7 0.14 150);
+  --codigo: oklch(0.98 0.003 262);
+  --sin-foto: oklch(0.25 0.03 262);
+  --marca: oklch(0.14 0.045 262);
+  --marca-foreground: oklch(0.97 0.004 262);
+  --marca-muted: oklch(0.72 0.03 262);
+  --naranja: oklch(0.7 0.19 42);
+}

@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 9 * * 1' # lunes 06:00 en Argentina
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Check requerido por la protección de ramas: no cambiarle el nombre.
+  verify:
+    name: verify
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - name: Tests unitarios con cobertura del dominio
+        run: pnpm test
+      - run: pnpm build
+
+  integration:
+    name: integration
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Supabase local con migraciones y seed
+        run: pnpm exec supabase start -x studio,mailpit,imgproxy
+      - name: Las migraciones son idempotentes
+        run: |
+          for f in supabase/migrations/*.sql; do
+            psql "postgresql://postgres:postgres@127.0.0.1:55422/postgres" -v ON_ERROR_STOP=1 -q -f "$f"
+          done
+      - name: Los tipos commiteados coinciden con las migraciones
+        run: |
+          pnpm db:generate
+          git diff --exit-code apps/web/src/shared/database.types.ts
+      - name: Tests de integración (RLS, RPC y contrato con n8n)
+        run: pnpm test:integration
+
+  # Canario: avisa antes de que una versión nueva de Node rompa algo. No bloquea.
+  verify-node-nuevo:
+    name: verify-node-nuevo
+    if: github.event_name == 'push' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: latest
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
