@@ -315,6 +315,21 @@ export type Database = {
           isSetofReturn: true;
         };
       };
+      mi_perfil: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          created_at: string;
+          nombre: string | null;
+          rol: string;
+          user_id: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'perfiles';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       normalizar_busqueda: { Args: { texto: string }; Returns: string };
       stats_fotos: {
         Args: Record<PropertyKey, never>;
