@@ -62,5 +62,21 @@ export function createSupabaseBot(client: SupabaseClient<Database>): BotPort {
         createdAt: q.created_at ?? '',
       }));
     },
+    async kpis() {
+      const { data, error } = await client.rpc('kpis_bot').single();
+      if (error) fail(error);
+      return {
+        today: Number(data?.consultas_hoy ?? 0),
+        week: Number(data?.consultas_semana ?? 0),
+        noResultsPct:
+          data?.porcentaje_sin_resultados == null ? null : Number(data.porcentaje_sin_resultados),
+        activeUsers: Number(data?.usuarios_activos ?? 0),
+      };
+    },
+    async missingSearches(days) {
+      const { data, error } = await client.rpc('ranking_sin_resultados', { p_dias: days });
+      if (error) fail(error);
+      return (data ?? []).map((r) => ({ text: r.texto, times: Number(r.veces), last: r.ultima }));
+    },
   };
 }
