@@ -239,8 +239,74 @@ export type Database = {
         Args: { codigo: string; descripcion: string; nombre: string; observaciones: string };
         Returns: string;
       };
+      buscar_articulos: {
+        Args: {
+          p_con_foto?: boolean;
+          p_familia?: string;
+          p_limit?: number;
+          p_offset?: number;
+          p_q?: string;
+        };
+        Returns: {
+          codigo: string | null;
+          descripcion: string | null;
+          familia_codigo: string | null;
+          familia_nombre: string | null;
+          id: number | null;
+          imagen_drive_id: string | null;
+          imagen_url: string | null;
+          nombre: string | null;
+          observaciones: string | null;
+          tiene_foto: boolean | null;
+        }[];
+        SetofOptions: {
+          from: '*';
+          to: 'v_articulos';
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
+      contar_articulos: {
+        Args: { p_con_foto?: boolean; p_familia?: string; p_q?: string };
+        Returns: number;
+      };
+      es_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      escapar_like: { Args: { texto: string }; Returns: string };
       f_unaccent: { Args: { texto: string }; Returns: string };
+      filtrar_articulos: {
+        Args: { p_con_foto?: boolean; p_familia?: string; p_q?: string };
+        Returns: {
+          codigo: string | null;
+          descripcion: string | null;
+          familia_codigo: string | null;
+          familia_nombre: string | null;
+          id: number | null;
+          imagen_drive_id: string | null;
+          imagen_url: string | null;
+          nombre: string | null;
+          observaciones: string | null;
+          tiene_foto: boolean | null;
+        }[];
+        SetofOptions: {
+          from: '*';
+          to: 'v_articulos';
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
       normalizar_busqueda: { Args: { texto: string }; Returns: string };
+      stats_fotos: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          con_foto: number;
+          es_total: boolean;
+          familia_codigo: string;
+          familia_nombre: string;
+          porcentaje: number;
+          total: number;
+        }[];
+      };
+      tiene_perfil: { Args: Record<PropertyKey, never>; Returns: boolean };
     };
     Enums: {
       [_ in never]: never;

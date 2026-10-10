@@ -22,3 +22,30 @@ export async function enTransaccion<T>(
     await client.query('rollback');
   }
 }
+
+/** Crea un usuario de Auth con su perfil. Solo dentro de una transacción de test. */
+export async function crearUsuario(
+  tx: pg.Client,
+  rol: 'vendedor' | 'admin' = 'vendedor',
+): Promise<string> {
+  const { rows } = await tx.query<{ id: string }>(
+    `insert into auth.users (id, email, aud, role)
+     values (gen_random_uuid(), gen_random_uuid() || '@test.local', 'authenticated', 'authenticated')
+     returning id`,
+  );
+  const id = rows[0]!.id;
+  await tx.query(
+    `insert into public.perfiles (user_id, rol) values ($1, $2)
+     on conflict (user_id) do update set rol = excluded.rol`,
+    [id, rol],
+  );
+  return id;
+}
+
+/** Desde acá, la transacción corre como ese usuario de la web (rol authenticated + JWT). */
+export async function actuarComo(tx: pg.Client, userId: string): Promise<void> {
+  await tx.query(`select set_config('request.jwt.claims', $1, true)`, [
+    JSON.stringify({ sub: userId, role: 'authenticated' }),
+  ]);
+  await tx.query('set local role authenticated');
+}
