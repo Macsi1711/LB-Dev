@@ -21,28 +21,20 @@ En vercel.com → **Add New → Project** → importar `Macsi1711/LB-Dev`:
 | `VITE_SUPABASE_URL`      | `https://<project-ref>.supabase.co`                                                                    |
 | `VITE_SUPABASE_ANON_KEY` | la clave **publishable** (`sb_publishable_…`). Nunca la `service_role`: la app no arranca si la ponés. |
 
-## 1 bis. Si Vercel no ve el repo (cuentas distintas)
+## 1 bis. Si la web de Vercel no muestra el repo
 
-Cuando la cuenta de Vercel no puede acceder al repo de GitHub, se despliega **sin la integración
-de Git**: GitHub Actions construye y publica con un token
-([`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml)). La cuenta de Vercel puede
-ser cualquiera (email, Google o GitHub). Los comandos se corren desde la raíz del repo; si
-`npx` se queja de la versión de Node, correlos desde otra carpeta con `--cwd`.
+Se puede crear e importar desde la terminal, que conecta el repo de GitHub igual. Corré los
+comandos desde otra carpeta (el `.npmrc` del repo exige Node 22) con `--cwd`:
 
-1. **Entrar a Vercel desde la terminal:** `npx vercel@latest login`.
-2. **Crear y vincular el proyecto:** `npx vercel@latest link`. A "Link to existing project?"
-   respondé que no; nombre `mostrador-lois`; directorio del código `./apps/web`. Queda un
-   `.vercel/project.json` (ignorado por git) con `orgId` y `projectId`.
-3. **Variables del proyecto** (Vercel → Settings → Environment Variables, Production): mientras
-   no esté el Supabase de la empresa, `VITE_DEMO=1`. Después, `VITE_SUPABASE_URL` y
-   `VITE_SUPABASE_ANON_KEY` (publishable), y se borra `VITE_DEMO`.
-4. **Token:** vercel.com/account/tokens → crear uno para "GitHub Actions LB-Dev".
-5. **Cargar en GitHub** (Settings → Secrets and variables → Actions):
-   - Variables: `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`, con los valores de `.vercel/project.json`.
-   - Secreto: `VERCEL_TOKEN`. Desde la terminal, `gh secret set VERCEL_TOKEN` lo pide sin
-     mostrarlo. **Nunca** se pega en un chat, un issue ni el repo.
-6. **Publicar:** cada push a `main` despliega solo. Para el primero, Actions → Deploy → _Run
-   workflow_. El link de producción queda en el resumen del job.
+```bash
+npx vercel@latest login
+npx vercel@latest link --cwd /ruta/a/LB-Dev
+```
+
+`link` crea el proyecto y conecta el repo. Después, en el panel de Vercel, revisá la
+configuración del paso 1 (Root Directory `apps/web`, Production Branch `main`) y las variables:
+la CLI arranca con el Root Directory en `./`. También crea un `.env.local` con un token
+temporal: queda ignorado por git y nunca se commitea.
 
 ## 2. Supabase → Authentication → URL Configuration
 
