@@ -1,0 +1,47 @@
+# Deploy a Vercel desde GitHub Actions, sin la integración de Git de Vercel: así la cuenta de
+# Vercel no necesita ver el repo. Cada push a main publica producción.
+#
+# Necesita (Settings → Secrets and variables → Actions):
+#   variables: VERCEL_ORG_ID y VERCEL_PROJECT_ID (salen de .vercel/project.json, no son secretos)
+#   secreto:   VERCEL_TOKEN (vercel.com/account/tokens; lo carga el dueño, nunca va al repo)
+# Mientras no estén cargadas, el job se saltea. Ver docs/deploy.md.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-produccion
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  produccion:
+    name: deploy
+    if: vars.VERCEL_PROJECT_ID != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      # Baja la configuración del proyecto (Root Directory y variables como VITE_DEMO o las de
+      # Supabase) y construye acá, con el mismo vercel.json que en local.
+      - run: pnpm dlx vercel@63.1.2 pull --yes --environment=production --token="$VERCEL_TOKEN"
+      - run: pnpm dlx vercel@63.1.2 build --prod --token="$VERCEL_TOKEN"
+      - name: Publicar
+        run: |
+          url=$(pnpm dlx vercel@63.1.2 deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          echo "Producción: $url" >> "$GITHUB_STEP_SUMMARY"
