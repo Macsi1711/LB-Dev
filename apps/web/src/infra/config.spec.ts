@@ -11,7 +11,24 @@ describe('loadConfig', () => {
     expect(loadConfig(ok)).toEqual({
       supabaseUrl: 'http://127.0.0.1:55421',
       supabaseKey: 'sb_publishable_abc',
+      n8nConsultaUrl: null,
     });
+  });
+
+  it('el webhook de n8n es opcional y tiene que ser https (salvo en localhost)', () => {
+    const url = 'https://n8n.example.com/webhook/lois-consulta-web';
+    expect(loadConfig({ ...ok, VITE_N8N_CONSULTA_URL: url }).n8nConsultaUrl).toBe(url);
+    expect(loadConfig({ ...ok, VITE_N8N_CONSULTA_URL: ' ' }).n8nConsultaUrl).toBeNull();
+    expect(
+      loadConfig({ ...ok, VITE_N8N_CONSULTA_URL: 'http://localhost:5678/webhook/x' })
+        .n8nConsultaUrl,
+    ).toBe('http://localhost:5678/webhook/x');
+    expect(() => loadConfig({ ...ok, VITE_N8N_CONSULTA_URL: 'http://n8n.example.com/x' })).toThrow(
+      'VITE_N8N_CONSULTA_URL tiene que ser https',
+    );
+    expect(() => loadConfig({ ...ok, VITE_N8N_CONSULTA_URL: 'n8n' })).toThrow(
+      'VITE_N8N_CONSULTA_URL no es una URL válida',
+    );
   });
 
   it('dice qué variable falta', () => {

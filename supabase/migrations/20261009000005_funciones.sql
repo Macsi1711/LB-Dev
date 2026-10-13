@@ -144,7 +144,7 @@ as $$
     count(*) filter (where v.tiene_foto),
     round(100.0 * count(*) filter (where v.tiene_foto) / nullif(count(*), 0), 1)
   from public.v_articulos v
-  left join public.familias f on f.codigo = v.familia_codigo
+  left join public.v_familias f on f.codigo = v.familia_codigo
   where coalesce(f.es_producto, true)
   group by grouping sets ((v.familia_codigo), ())
   order by grouping(v.familia_codigo) desc, 6 asc, 2

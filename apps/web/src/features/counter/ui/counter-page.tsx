@@ -1,11 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { restoreHistory, sendQuery, type ChatQuery } from '../domain/conversation';
+import { mediaErrorMessage, toMediaError, type MediaError, type MediaKind } from '../domain/media';
 import type { Article } from '../domain/ports';
 import { parseSearchState, toSearchParams, type SearchState } from '../domain/search-state';
 import { ArticleDetail } from './article-detail';
 import { ChatComposer } from './chat-composer';
-import { ReplyBubble, UserBubble, WelcomeBubble } from './chat-messages';
+import {
+  NoticeBubble,
+  PendingMediaBubbles,
+  ReplyBubble,
+  UserBubble,
+  WelcomeBubble,
+} from './chat-messages';
+import { useMediaPort } from './counter-context';
+import { shrinkPhoto } from './shrink-photo';
 
 const STORAGE_KEY = 'mostrador-chat';
 
@@ -31,16 +40,42 @@ export function CounterPage() {
   const [selected, setSelected] = useState<Article | null>(null);
   const messages = useRef<HTMLDivElement>(null);
   const stick = useRef(true);
+  const media = useMediaPort();
+  const [pending, setPending] = useState<MediaKind | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const send = useCallback(
-    (state: SearchState) => {
+    (state: SearchState, origin: Pick<ChatQuery, 'source' | 'heard'> = {}) => {
       stick.current = true;
-      setHistory((h) => sendQuery(h, state, { id: newId(), sentAt: Date.now() }));
+      setNotice(null);
+      setHistory((h) => sendQuery(h, state, { id: newId(), sentAt: Date.now(), ...origin }));
       // La última consulta queda en la URL para poder compartir el link.
       setParams(toSearchParams(state), { replace: true });
     },
     [setParams],
   );
+
+  // Audio o foto: n8n lo pasa a texto y se busca como si se hubiera escrito, con los filtros puestos.
+  async function understand(kind: MediaKind, file: Blob) {
+    if (!media) return;
+    stick.current = true;
+    setNotice(null);
+    setPending(kind);
+    try {
+      const upload = kind === 'photo' ? await shrinkPhoto(file) : file;
+      const { text, heard } = await media.understand(kind, upload);
+      send({ ...draft, q: text }, heard ? { source: kind, heard } : { source: kind });
+    } catch (e) {
+      setNotice(mediaErrorMessage(kind, toMediaError(e).reason));
+    } finally {
+      setPending(null);
+    }
+  }
+
+  const showError = (kind: MediaKind) => (error: MediaError) => {
+    stick.current = true;
+    setNotice(mediaErrorMessage(kind, error.reason));
+  };
 
   // Un link compartido (?q=…) llega como un mensaje más; si ya es el último, no se repite.
   const [seenUrl, setSeenUrl] = useState<string | null>(null);
@@ -96,9 +131,21 @@ export function CounterPage() {
             />
           </div>
         ))}
+        {pending && <PendingMediaBubbles kind={pending} />}
+        {notice && <NoticeBubble>{notice}</NoticeBubble>}
       </div>
       <div className="sticky bottom-[calc(var(--nav-h)+env(safe-area-inset-bottom))] z-30 border-t bg-background/95 backdrop-blur">
-        <ChatComposer draft={draft} onDraftChange={setDraft} onSend={send} />
+        <ChatComposer
+          draft={draft}
+          onDraftChange={setDraft}
+          onSend={send}
+          {...(media && {
+            onAudio: (audio: Blob) => void understand('audio', audio),
+            onPhoto: (photo: File) => void understand('photo', photo),
+          })}
+          onMediaError={showError('audio')}
+          busy={pending !== null}
+        />
       </div>
       <ArticleDetail article={selected} onClose={() => setSelected(null)} />
     </div>

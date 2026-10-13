@@ -25,3 +25,6 @@ dist-demo/
 
 # Vercel CLI: vínculo local con el proyecto y variables bajadas con `vercel pull`
 .vercel
+
+# Se genera con supabase/produccion/armar-sql-editor.sh
+supabase/produccion/sql-editor/2-migraciones.sql

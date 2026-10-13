@@ -45,6 +45,41 @@ describe('articulos: contrato con n8n', () => {
   });
 });
 
+describe('familias: la tabla que ya existe en producción', () => {
+  it('conserva "Código" y "Nombre" como text y suma es_producto', async () => {
+    const { rows } = await db.query<{ column_name: string; data_type: string }>(
+      `select column_name, data_type from information_schema.columns
+       where table_schema = 'public' and table_name = 'familias'`,
+    );
+    const columnas = Object.fromEntries(rows.map((r) => [r.column_name, r.data_type]));
+    expect(columnas).toMatchObject({ Código: 'text', Nombre: 'text', es_producto: 'boolean' });
+  });
+
+  it('v_familias da nombres limpios y una fila por código, aunque la tabla repita', async () => {
+    await inTransaction(db, async (tx) => {
+      await tx.query(`insert into familias ("Código", "Nombre") values ('PF', 'REPETIDA')`);
+      const { rows } = await tx.query(
+        `select codigo, nombre, es_producto from v_familias where codigo = 'PF'`,
+      );
+      expect(rows).toEqual([{ codigo: 'PF', nombre: 'PASTILLAS DE FRENO', es_producto: true }]);
+    });
+  });
+
+  it('sincronizar_familias agrega las que faltan sin duplicar las que ya están', async () => {
+    await inTransaction(db, async (tx) => {
+      await tx.query(`delete from familias where "Código" = 'AM'`);
+      const { rows } = await tx.query<{ nuevas: number }>(
+        'select sincronizar_familias() as nuevas',
+      );
+      expect(rows[0]?.nuevas).toBe(1);
+      const pf = await tx.query(`select count(*)::int as n from familias where "Código" = 'PF'`);
+      expect(pf.rows[0].n).toBe(1);
+      const dv = await tx.query(`select es_producto from familias where "Código" = 'DV'`);
+      expect(dv.rows).toEqual([{ es_producto: false }]);
+    });
+  });
+});
+
 describe('v_articulos', () => {
   it('limpia el código, saca el ID de Drive y marca si tiene foto', async () => {
     const { rows } = await db.query(

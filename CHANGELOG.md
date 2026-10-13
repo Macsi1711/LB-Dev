@@ -3,6 +3,29 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.3.0] - 2026-10-13
+
+### Agregado
+
+- **Mostrador con audio y foto**, como en el bot de Telegram. Con la caja vacía, el botón de
+  enviar pasa a ser el micrófono (hasta 1 minuto, con Cancelar); a la izquierda, la cámara saca
+  o elige la foto de una etiqueta, que se achica a 1600 px antes de mandarla. La web se la manda
+  al webhook "Lois Consulta web" de n8n, que devuelve el texto a buscar, y la búsqueda sigue en
+  la web, con RLS (ADR-005). La burbuja muestra lo que se escuchó o se leyó, y los errores
+  (sin permiso, no se entendió, sesión vencida) salen como aviso en el chat. Los botones
+  aparecen solo con `VITE_N8N_CONSULTA_URL` configurada; en el modo demo, siempre.
+- **Producción:** archivos para el SQL Editor de Supabase: respaldo de `articulos` y `familias`,
+  las 13 migraciones en un solo archivo, verificación con 16 chequeos y deshacer. También un
+  asistente que arma la conexión sin pegar la contraseña en el link.
+
+### Cambiado
+
+- **Familias:** las migraciones usan la tabla `familias` que ya existe en producción
+  (`"Código"`, `"Nombre"`) sin renombrarla y solo le suman `es_producto`. La web la lee por la
+  vista `v_familias`.
+- **"Solo con foto"** usa el ícono de imagen, para no confundirse con la cámara.
+- **Roadmap** actualizado con el estado de la base de la empresa.
+
 ## [0.2.0] - 2026-10-13
 
 ### Cambiado

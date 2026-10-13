@@ -5,7 +5,7 @@ with (security_invoker = true)
 as
 select v.*
 from public.v_articulos v
-left join public.familias f on f.codigo = v.familia_codigo
+left join public.v_familias f on f.codigo = v.familia_codigo
 where not v.tiene_foto
   and coalesce(f.es_producto, true);
 

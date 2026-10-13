@@ -1,8 +1,10 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { Camera, Mic } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { filterLabels, replySummary, type ChatQuery } from '../domain/conversation';
+import type { MediaKind } from '../domain/media';
 import type { Article } from '../domain/ports';
 import { PAGE_SIZE } from '../domain/search-state';
 import { ArticleCard } from './article-card';
@@ -50,12 +52,36 @@ export function WelcomeBubble({ onSend }: { onSend: (q: string) => void }) {
   );
 }
 
+const SOURCE = {
+  audio: { Icon: Mic, label: 'Audio', working: 'Escuchando el audio…' },
+  photo: { Icon: Camera, label: 'Foto', working: 'Leyendo la foto…' },
+} satisfies Record<MediaKind, unknown>;
+
+function SourceText({ source, children }: { source?: MediaKind; children: ReactNode }) {
+  if (!source) return <p className="break-words">{children}</p>;
+  const { Icon, label } = SOURCE[source];
+  return (
+    <p className="flex items-start gap-1.5 break-words">
+      <Icon className="mt-0.5 size-4 shrink-0" aria-label={label} role="img" />
+      <span className="min-w-0">{children}</span>
+    </p>
+  );
+}
+
+const userBubble =
+  'ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-primary-foreground shadow-xs';
+
 export function UserBubble({ query }: { query: ChatQuery }) {
   const familyName = useFamilyName(query.state.family);
   const labels = filterLabels(query.state, familyName);
   return (
-    <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-primary-foreground shadow-xs">
-      {query.state.q && <p className="break-words">{query.state.q}</p>}
+    <div className={userBubble}>
+      {query.state.q && <SourceText source={query.source}>{query.state.q}</SourceText>}
+      {query.heard && (
+        <p className="mt-0.5 text-sm break-words text-primary-foreground/80 italic">
+          «{query.heard}»
+        </p>
+      )}
       <div className="mt-0.5 flex flex-wrap items-center justify-end gap-1 text-xs text-primary-foreground/75">
         {labels.map((label) => (
           <span key={label} className="rounded-full bg-primary-foreground/15 px-2 py-0.5">
@@ -68,9 +94,9 @@ export function UserBubble({ query }: { query: ChatQuery }) {
   );
 }
 
-function TypingDots() {
+function TypingDots({ label = 'Buscando…' }: { label?: string }) {
   return (
-    <span className="flex h-6 items-center gap-1" role="status" aria-label="Buscando…">
+    <span className="flex h-6 items-center gap-1" role="status" aria-label={label}>
       {[0, 150, 300].map((delay) => (
         <span
           key={delay}
@@ -79,6 +105,29 @@ function TypingDots() {
         />
       ))}
     </span>
+  );
+}
+
+/** Un audio o una foto mientras n8n los pasa a texto. */
+export function PendingMediaBubbles({ kind }: { kind: MediaKind }) {
+  return (
+    <div className="grid gap-3">
+      <div className={userBubble}>
+        <SourceText source={kind}>{SOURCE[kind].label}</SourceText>
+      </div>
+      <BotBubble>
+        <TypingDots label={SOURCE[kind].working} />
+      </BotBubble>
+    </div>
+  );
+}
+
+/** Un aviso del chat, por ejemplo cuando no se entendió un audio. */
+export function NoticeBubble({ children }: { children: ReactNode }) {
+  return (
+    <BotBubble>
+      <p role="alert">{children}</p>
+    </BotBubble>
   );
 }
 

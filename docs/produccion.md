@@ -5,18 +5,30 @@ Cómo llevar las migraciones de `supabase/migrations/` a la base de la empresa s
 
 ## 0. Antes de empezar
 
-1. **Conexión.** En el panel de Supabase de la empresa: **Connect → Session pooler**. Copiá el
-   string y guardalo en `.env.produccion`, en la raíz del repo (git lo ignora):
+1. **Conexión.** Corré el asistente; pide el string de **Connect → Session pooler** (pegalo tal
+   cual, con `[YOUR-PASSWORD]`) y la contraseña sin mostrarla, la codifica y prueba la conexión
+   una sola vez:
 
    ```bash
-   touch .env.produccion && open -e .env.produccion
+   bash supabase/produccion/configurar.sh
    ```
 
-   ```
-   SUPABASE_DB_URL=postgresql://postgres.<ref>:<contraseña>@aws-0-<región>.pooler.supabase.com:5432/postgres?sslmode=require
+   Guarda `.env.produccion` en la raíz del repo (git lo ignora). La contraseña nunca va al repo ni
+   a un chat, y no se pega en el paso 1 (ese se ve en pantalla).
+
+   **Para la inspección alcanza un usuario de solo lectura** (no hace falta la contraseña de
+   `postgres`). En el SQL Editor, con una contraseña que elijas:
+
+   ```sql
+   do $$ begin create role lois_inspeccion; exception when duplicate_object then null; end $$;
+   alter role lois_inspeccion with login password '<elegila>';
+   alter role lois_inspeccion set default_transaction_read_only = on;
+   grant pg_read_all_data to lois_inspeccion;
    ```
 
-   La contraseña nunca va al repo ni a un chat. Si tiene `@ # / : ?`, va codificada (`@` → `%40`).
+   y en el paso 1 del asistente el usuario va como `lois_inspeccion.<ref>`. Ojo: ese usuario no
+   saltea RLS, así que en las tablas con RLS (como `articulos`) ve 0 filas; los conteos de las
+   secciones 11 a 13 se sacan en el SQL Editor. Al terminar: `drop role lois_inspeccion;`.
 
 2. **Docker abierto.** Los scripts usan el `psql` y el `pg_dump` de la imagen `postgres:17-alpine`
    si no los tenés instalados.
@@ -69,6 +81,33 @@ Primero respalda el schema `public` en `~/Respaldos-Lois/public-<fecha>.dump` (s
 sale vacío, no sigue) y después aplica las migraciones. Son aditivas: no borran ni renombran
 columnas de `articulos`, y cada una se puede volver a correr.
 
+### 4 bis. Aplicar desde el SQL Editor (sin la contraseña de `postgres`)
+
+El SQL Editor de Supabase ya entra como `postgres`. Los archivos están en
+[`supabase/produccion/sql-editor/`](../supabase/produccion/sql-editor/) y se pegan **de a uno**,
+en este orden, con Run (el editor muestra solo el resultado del final de cada uno):
+
+1. Armar el archivo de migraciones (no se commitea: se genera cada vez desde
+   `supabase/migrations/`):
+
+   ```bash
+   bash supabase/produccion/armar-sql-editor.sh
+   ```
+
+2. **`1-respaldo.sql`**: copia `articulos` y `familias` al schema `respaldo` (la API no lo
+   publica). Los pares `_hoy` / `_respaldo` tienen que dar igual; si no, frenar.
+3. **`2-migraciones.sql`**: las 13 migraciones juntas y el historial para la CLI. Va en un solo
+   envío: si una sentencia falla, no se aplica nada. Supabase puede avisar de operaciones
+   destructivas: son los `drop policy if exists`, no borran datos. Devuelve cuántas familias
+   agregó desde `articulos`.
+4. **`3-verificacion.sql`**: 16 chequeos que tienen que dar ✅. El 2 compara las 7 columnas del
+   contrato fila por fila contra el respaldo.
+5. Mandarle una consulta al bot por Telegram y probar la carga de una foto.
+
+Si algo sale mal ese mismo día, **`deshacer.sql`** saca todo lo que agregaron las migraciones y
+deja `articulos` y `familias` con sus columnas de antes (ver la sección 6). El respaldo se borra
+a mano cuando todo esté andando: `drop schema respaldo cascade;`.
+
 ## 5. Después de migrar
 
 1. **Contraseñas de los roles de n8n** (SQL editor de Supabase, las carga el dueño):
@@ -79,7 +118,8 @@ columnas de `articulos`, y cada una se puede volver a correr.
    muy pocos mails por hora.
 4. **Primer admin:** Authentication → Users → _Invite user_, y en el SQL editor:
    `update perfiles set rol = 'admin' where user_id = (select id from auth.users where email = '…');`
-5. **Familias nuevas:** la migración `0009` ya las carga. Si después aparecen otras en
+5. **Familias nuevas:** la migración `0009` agrega solo los códigos que faltan en la tabla
+   `familias` que ya existe (con `"Código"` y `"Nombre"`) y marca las internas. Si después aparecen otras en
    `articulos`, `select public.sincronizar_familias();`.
 6. **Verificación:**
    - Repetir la inspección: en la sección 7 todo tiene que estar en `true` y en la 8 tienen que
@@ -95,6 +135,11 @@ columnas de `articulos`, y cada una se puede volver a correr.
   rol que RLS ahora frena. Para volver al comportamiento anterior mientras se investiga, en el
   SQL editor: `alter table public.articulos disable row level security;`. La web sigue protegida
   por los permisos por columna. Cuando se arregle la credencial de n8n, se vuelve a habilitar.
+- **Volver atrás desde el SQL Editor:** pegar
+  [`sql-editor/deshacer.sql`](../supabase/produccion/sql-editor/deshacer.sql). Saca políticas,
+  vistas, funciones, tablas nuevas, roles de n8n y las columnas `id`, `actualizado_en` y
+  `es_producto`. No toca los datos de `articulos`. Borra lo que tengan las tablas nuevas: es para
+  el mismo día.
 - **Restaurar el respaldo** (solo con OK del dueño; pisa el schema `public`):
 
   ```bash
