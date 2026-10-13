@@ -72,6 +72,13 @@ color. En el código se usan como clases de Tailwind (`bg-background`, `text-cod
   (`primary`), y la respuesta como una burbuja a la izquierda (`card`): cuántos encontró, los
   primeros 5 resultados y "Ver los N" para el resto. Lo nuevo aparece abajo y la pantalla lo sigue,
   salvo que hayas subido a leer. La conversación dura lo que la pestaña.
+- **Audio y foto en el chat**, como en Telegram: a la izquierda de la caja, un botón de cámara
+  (abre la cámara trasera o la galería) y, a la derecha, el micrófono en el lugar del botón de
+  enviar mientras la caja está vacía. Grabando, la caja se reemplaza por una barra con un punto
+  `destructive` que late, el tiempo (`tabular-nums`, hasta 1:00), "Cancelar" y enviar. La burbuja
+  del vendedor muestra el ícono de micrófono o de cámara y lo que se entendió; mientras n8n lo
+  procesa, la respuesta muestra los puntitos de "escribiendo". Si no está configurado el webhook,
+  los dos botones no aparecen.
 - Margen lateral de 16 px en el celular. Nunca hay scroll horizontal de la página.
 
 ## Componentes
