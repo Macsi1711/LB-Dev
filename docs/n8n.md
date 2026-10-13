@@ -24,7 +24,8 @@ Lo verifica `apps/web/tests/integration/n8n-contract.int-spec.ts`.
    `n8n_bot`/`n8n_app`.
 3. **El prompt del bot** nunca tiene que generar `SELECT *`: `articulos` suma las columnas `id` y
    `actualizado_en`, y el `UNION ALL` del bot cuenta columnas.
-4. Aplicar: `pnpm exec supabase link --project-ref <ref>` y después `pnpm db:deploy`.
+4. Aplicar con la guía paso a paso de [produccion.md](produccion.md): inspección de solo
+   lectura, simulacro, respaldo y migraciones con el OK del dueño.
 
 ## Contraseñas de los roles
 

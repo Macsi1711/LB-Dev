@@ -42,12 +42,12 @@ describe('v_consultas_bot', () => {
     });
   });
 
-  it('un vendedor no ve consultas', async () => {
+  it('un vendedor también ve las consultas', async () => {
     await inTransaction(db, async (tx) => {
       await seedQueries(tx);
       await actAs(tx, await createUser(tx, 'vendedor'));
       const { rows } = await tx.query('select * from v_consultas_bot');
-      expect(rows).toEqual([]);
+      expect(rows.length).toBeGreaterThan(0);
     });
   });
 });
