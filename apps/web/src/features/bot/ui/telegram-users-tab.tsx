@@ -8,6 +8,7 @@ import { Switch } from '@/shared/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
 import { canManageTelegramUsers, type TelegramUser } from '../domain/telegram-user';
 import { useBotPort } from './bot-context';
+import { DeleteTelegramUserDialog } from './delete-telegram-user-dialog';
 import { TelegramUserDialog } from './telegram-user-dialog';
 
 export function TelegramUsersTab() {
@@ -16,6 +17,7 @@ export function TelegramUsersTab() {
   const canManage = canManageTelegramUsers(profile?.role ?? 'vendedor');
   const queryClient = useQueryClient();
   const [dialog, setDialog] = useState<{ user?: TelegramUser } | null>(null);
+  const [toDelete, setToDelete] = useState<TelegramUser | null>(null);
   const users = useQuery({ queryKey: ['usuarios-telegram'], queryFn: () => port.telegramUsers() });
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['usuarios-telegram'] });
 
@@ -23,11 +25,6 @@ export function TelegramUsersTab() {
     mutationFn: (u: TelegramUser) => port.updateTelegramUser(u.chatId, { active: !u.active }),
     onSuccess: refresh,
     onError: () => toast.error('No se pudo cambiar el estado.'),
-  });
-  const remove = useMutation({
-    mutationFn: (u: TelegramUser) => port.deleteTelegramUser(u.chatId),
-    onSuccess: refresh,
-    onError: () => toast.error('No se pudo borrar.'),
   });
 
   return (
@@ -96,10 +93,7 @@ export function TelegramUsersTab() {
                       variant="ghost"
                       size="icon"
                       aria-label={`Borrar ${u.name}`}
-                      onClick={() =>
-                        window.confirm(`¿Borrar a ${u.name}? Ya no va a poder usar el bot.`) &&
-                        remove.mutate(u)
-                      }
+                      onClick={() => setToDelete(u)}
                     >
                       <Trash2 />
                     </Button>
@@ -111,6 +105,7 @@ export function TelegramUsersTab() {
         </Table>
       )}
       {dialog && <TelegramUserDialog open user={dialog.user} onClose={() => setDialog(null)} />}
+      {toDelete && <DeleteTelegramUserDialog user={toDelete} onClose={() => setToDelete(null)} />}
     </div>
   );
 }
