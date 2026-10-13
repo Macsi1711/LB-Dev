@@ -1,4 +1,4 @@
-import { Camera, Mic, SendHorizontal } from 'lucide-react';
+import { Camera, Image, Mic, SendHorizontal } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -28,12 +28,15 @@ export function ChatComposer(props: {
   onSend: (state: SearchState) => void;
   /** Sin esto, no se puede mandar audio. */
   onAudio?: (audio: Blob) => void;
+  /** Sin esto, no se puede mandar una foto. */
+  onPhoto?: (photo: File) => void;
   onMediaError: (error: MediaError) => void;
   /** Mientras se procesa un audio o una foto. */
   busy: boolean;
 }) {
   const input = useRef<HTMLInputElement>(null);
-  const { draft, onDraftChange, onAudio } = props;
+  const photoInput = useRef<HTMLInputElement>(null);
+  const { draft, onDraftChange, onAudio, onPhoto } = props;
   const recorder = useAudioRecorder({
     onDone: (audio) => onAudio?.(audio),
     onError: props.onMediaError,
@@ -76,7 +79,7 @@ export function ChatComposer(props: {
           className="h-10 shrink-0 rounded-full"
           onClick={() => onDraftChange({ ...draft, withPhoto: !draft.withPhoto })}
         >
-          <Camera />
+          <Image />
           Solo con foto
         </Button>
       </div>
@@ -88,6 +91,33 @@ export function ChatComposer(props: {
         />
       ) : (
         <div className="flex items-center gap-2">
+          {onPhoto && (
+            <>
+              {/* Sin capture: el celular ofrece sacar la foto o elegirla de la galería. */}
+              <input
+                ref={photoInput}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = '';
+                  if (file) onPhoto(file);
+                }}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                disabled={props.busy}
+                aria-label="Mandar una foto"
+                onClick={() => photoInput.current?.click()}
+                className="size-12 shrink-0 rounded-full"
+              >
+                <Camera className="size-5" />
+              </Button>
+            </>
+          )}
           <Input
             ref={input}
             enterKeyHint="send"
