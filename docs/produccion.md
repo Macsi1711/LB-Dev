@@ -5,18 +5,30 @@ Cómo llevar las migraciones de `supabase/migrations/` a la base de la empresa s
 
 ## 0. Antes de empezar
 
-1. **Conexión.** En el panel de Supabase de la empresa: **Connect → Session pooler**. Copiá el
-   string y guardalo en `.env.produccion`, en la raíz del repo (git lo ignora):
+1. **Conexión.** Corré el asistente; pide el string de **Connect → Session pooler** (pegalo tal
+   cual, con `[YOUR-PASSWORD]`) y la contraseña sin mostrarla, la codifica y prueba la conexión
+   una sola vez:
 
    ```bash
-   touch .env.produccion && open -e .env.produccion
+   bash supabase/produccion/configurar.sh
    ```
 
-   ```
-   SUPABASE_DB_URL=postgresql://postgres.<ref>:<contraseña>@aws-0-<región>.pooler.supabase.com:5432/postgres?sslmode=require
+   Guarda `.env.produccion` en la raíz del repo (git lo ignora). La contraseña nunca va al repo ni
+   a un chat, y no se pega en el paso 1 (ese se ve en pantalla).
+
+   **Para la inspección alcanza un usuario de solo lectura** (no hace falta la contraseña de
+   `postgres`). En el SQL Editor, con una contraseña que elijas:
+
+   ```sql
+   do $$ begin create role lois_inspeccion; exception when duplicate_object then null; end $$;
+   alter role lois_inspeccion with login password '<elegila>';
+   alter role lois_inspeccion set default_transaction_read_only = on;
+   grant pg_read_all_data to lois_inspeccion;
    ```
 
-   La contraseña nunca va al repo ni a un chat. Si tiene `@ # / : ?`, va codificada (`@` → `%40`).
+   y en el paso 1 del asistente el usuario va como `lois_inspeccion.<ref>`. Ojo: ese usuario no
+   saltea RLS, así que en las tablas con RLS (como `articulos`) ve 0 filas; los conteos de las
+   secciones 11 a 13 se sacan en el SQL Editor. Al terminar: `drop role lois_inspeccion;`.
 
 2. **Docker abierto.** Los scripts usan el `psql` y el `pg_dump` de la imagen `postgres:17-alpine`
    si no los tenés instalados.
