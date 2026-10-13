@@ -53,11 +53,11 @@ $$;
 -- da solo lo necesario. Las policies de abajo deciden qué filas ve cada uno.
 revoke all on
   public.articulos, public.familias, public.perfiles, public.usuarios_telegram,
-  public.consultas_bot, public.fotos_sin_match, public.v_articulos
+  public.consultas_bot, public.fotos_sin_match, public.v_articulos, public.v_familias
 from anon, authenticated;
 
-grant select on public.articulos, public.familias, public.v_articulos, public.perfiles
-  to authenticated;
+grant select on public.articulos, public.familias, public.v_articulos, public.v_familias,
+  public.perfiles to authenticated;
 grant update ("Imagen") on public.articulos to authenticated;
 grant select, insert, update, delete on public.usuarios_telegram to authenticated;
 grant select on public.consultas_bot to authenticated;
