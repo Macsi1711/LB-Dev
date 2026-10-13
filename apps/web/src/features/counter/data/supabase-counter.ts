@@ -45,12 +45,13 @@ export function createSupabaseCounter(client: SupabaseClient<Database>): Counter
     },
     async families() {
       const { data, error } = await client
-        .from('familias')
+        .from('v_familias')
         .select('codigo, nombre')
         .eq('es_producto', true)
         .order('nombre');
       if (error) throw error;
-      return data.map((f) => ({ code: f.codigo, name: f.nombre }));
+      // La vista ya descarta los códigos vacíos; el filtro es para el tipo (las vistas son nullable).
+      return data.flatMap((f) => (f.codigo ? [{ code: f.codigo, name: f.nombre }] : []));
     },
   };
 }

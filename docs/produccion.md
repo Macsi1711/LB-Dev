@@ -91,7 +91,8 @@ columnas de `articulos`, y cada una se puede volver a correr.
    muy pocos mails por hora.
 4. **Primer admin:** Authentication → Users → _Invite user_, y en el SQL editor:
    `update perfiles set rol = 'admin' where user_id = (select id from auth.users where email = '…');`
-5. **Familias nuevas:** la migración `0009` ya las carga. Si después aparecen otras en
+5. **Familias nuevas:** la migración `0009` agrega solo los códigos que faltan en la tabla
+   `familias` que ya existe (con `"Código"` y `"Nombre"`) y marca las internas. Si después aparecen otras en
    `articulos`, `select public.sincronizar_familias();`.
 6. **Verificación:**
    - Repetir la inspección: en la sección 7 todo tiene que estar en `true` y en la 8 tienen que

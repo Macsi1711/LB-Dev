@@ -1,8 +1,21 @@
+-- Familias. En producción la tabla ya existe con "Código" y "Nombre" (con tilde y sin clave) y
+-- otros procesos la pueden usar: no se renombra nada, la web solo le suma es_producto.
 create table if not exists public.familias (
-  codigo       text primary key,          -- = articulos."codigo  familia"
-  nombre       text,
-  es_producto  boolean not null default true
+  "Código"  text,                         -- = articulos."codigo  familia"
+  "Nombre"  text
 );
+alter table public.familias add column if not exists es_producto boolean not null default true;
+create index if not exists familias_codigo_idx on public.familias ("Código");
+
+-- Nombres limpios para la web y una fila por código (la tabla no tiene clave y podría repetir).
+-- Si alguna fila repetida marca la familia como interna, gana esa.
+create or replace view public.v_familias
+with (security_invoker = true)
+as
+select f."Código" as codigo, min(f."Nombre") as nombre, bool_and(f.es_producto) as es_producto
+from public.familias f
+where nullif(trim(f."Código"), '') is not null
+group by f."Código";
 
 create table if not exists public.perfiles (
   user_id     uuid primary key references auth.users on delete cascade,

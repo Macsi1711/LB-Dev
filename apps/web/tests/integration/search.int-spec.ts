@@ -76,8 +76,9 @@ describe('stats_fotos', () => {
   it('devuelve el total primero y deja afuera las familias que no son producto', async () => {
     await inTransaction(db, async (tx) => {
       await tx.query(
-        `insert into familias (codigo, nombre, es_producto) values ('999', 'VARIOS', false)
-         on conflict (codigo) do update set es_producto = false`,
+        `insert into familias ("Código", "Nombre", es_producto)
+         select '999', 'VARIOS', false
+         where not exists (select 1 from familias where "Código" = '999')`,
       );
       const { rows } = await tx.query('select * from stats_fotos()');
       expect(rows[0]).toMatchObject({ es_total: true, familia_codigo: null });

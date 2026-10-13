@@ -9,17 +9,18 @@ as $$
 declare
   v_nuevas integer;
 begin
-  insert into public.familias (codigo, nombre)
+  -- La tabla no tiene clave (así está en producción): se agregan solo los códigos que faltan.
+  insert into public.familias ("Código", "Nombre")
   select distinct on (a."codigo  familia") a."codigo  familia", a."Nombre familia"
   from public.articulos a
   where nullif(trim(a."codigo  familia"), '') is not null
-  order by a."codigo  familia", a."Nombre familia" nulls last
-  on conflict (codigo) do nothing;
+    and not exists (select 1 from public.familias f where f."Código" = a."codigo  familia")
+  order by a."codigo  familia", a."Nombre familia" nulls last;
   get diagnostics v_nuevas = row_count;
 
   update public.familias
   set es_producto = false
-  where codigo in ('333', '444', '555', '555.001', '777', '777.001', '777.002', '888', '999', 'DV', 'VL');
+  where "Código" in ('333', '444', '555', '555.001', '777', '777.001', '777.002', '888', '999', 'DV', 'VL');
 
   return v_nuevas;
 end

@@ -62,7 +62,7 @@ order by 1;
 select nombre, to_regclass('public.' || nombre) is not null as ya_existe
 from unnest(array['familias', 'perfiles', 'usuarios_telegram', 'consultas_bot',
                   'fotos_sin_match', 'v_articulos', 'v_articulos_sin_foto',
-                  'v_consultas_bot']) as nombre;
+                  'v_consultas_bot', 'v_familias']) as nombre;
 select p.proname as funcion_que_ya_existe
 from pg_proc p
 where p.pronamespace = 'public'::regnamespace
