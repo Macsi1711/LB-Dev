@@ -1,0 +1,9 @@
+# Lo que la CLI de Vercel no sube (el .gitignore no siempre aplica).
+.env
+.env.*
+!.env.example
+node_modules
+supabase/.temp
+apps/web/dist
+apps/web/dist-demo
+apps/web/coverage
