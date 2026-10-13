@@ -14,6 +14,7 @@ import {
   WelcomeBubble,
 } from './chat-messages';
 import { useMediaPort } from './counter-context';
+import { shrinkPhoto } from './shrink-photo';
 
 const STORAGE_KEY = 'mostrador-chat';
 
@@ -61,7 +62,8 @@ export function CounterPage() {
     setNotice(null);
     setPending(kind);
     try {
-      const { text, heard } = await media.understand(kind, file);
+      const upload = kind === 'photo' ? await shrinkPhoto(file) : file;
+      const { text, heard } = await media.understand(kind, upload);
       send({ ...draft, q: text }, heard ? { source: kind, heard } : { source: kind });
     } catch (e) {
       setNotice(mediaErrorMessage(kind, toMediaError(e).reason));
@@ -137,7 +139,10 @@ export function CounterPage() {
           draft={draft}
           onDraftChange={setDraft}
           onSend={send}
-          {...(media && { onAudio: (audio: Blob) => void understand('audio', audio) })}
+          {...(media && {
+            onAudio: (audio: Blob) => void understand('audio', audio),
+            onPhoto: (photo: File) => void understand('photo', photo),
+          })}
           onMediaError={showError('audio')}
           busy={pending !== null}
         />
