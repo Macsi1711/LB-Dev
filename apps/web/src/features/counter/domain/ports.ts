@@ -1,3 +1,4 @@
+import type { MediaKind, Understood } from './media';
 import type { SearchState } from './search-state';
 
 export interface Article {
@@ -23,4 +24,9 @@ export interface CounterPort {
   count(state: SearchState): Promise<number>;
   /** Solo las familias de producto (es_producto). */
   families(): Promise<Family[]>;
+}
+
+/** Pasa un audio o una foto al texto a buscar. Falla con MediaError. */
+export interface MediaPort {
+  understand(kind: MediaKind, file: Blob): Promise<Understood>;
 }
