@@ -46,14 +46,14 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 4    | Mostrador como chat estilo Telegram / WhatsApp                              | ✅                    | #36, #37, #38 |
 | 4    | Arreglos del buscador y del celular                                         | ✅                    | #29, #33, #35 |
 | 4    | **Release v0.1.0**                                                          | ✅                    | #28           |
-| 5    | El vendedor ve todas las secciones; solo el admin gestiona usuarios del bot | 🟡                    | #39           |
-| 5    | `.vercelignore` para que la CLI no suba el `.env`                           | ⏳                    | —             |
-| 5    | **Release v0.2.0**                                                          | ⏳                    | —             |
+| 5    | El vendedor ve todas las secciones; solo el admin gestiona usuarios del bot | ✅                    | #39           |
+| 5    | `.vercelignore` para que la CLI no suba el `.env`                           | ✅                    | #41           |
+| 5    | **Release v0.2.0**                                                          | ✅                    | release/0.2.0 |
 | 6    | Acceso al Supabase de la empresa (invitación a la org o conector)           | 🔒 dueño              | —             |
 | 6    | Inspección solo lectura: esquema real, códigos duplicados, rol de n8n       | 🔒 acceso             | —             |
 | 6    | Plan de migración y aplicación de las migraciones, **con OK del dueño**     | 🔒 acceso             | —             |
 | 6    | Primer admin, contraseñas de los roles de n8n y URLs de Auth                | 🔒 acceso             | —             |
-| 6    | Proyecto en Vercel (permiso de GitHub o deploy por CLI)                     | 🔒 dueño              | —             |
+| 6    | Proyecto en Vercel (permiso de GitHub o deploy por CLI)                     | ✅ `mostrador-lois`   | #41           |
 | 6    | Variables reales en Vercel, sin modo demo                                   | 🔒 acceso             | —             |
 | 6    | Fotos de Drive compartidas con "cualquiera con el link"                     | ⏳ verificar          | —             |
 | 6    | Prueba de punta a punta con los flujos de n8n andando                       | 🔒 acceso             | —             |
@@ -65,4 +65,4 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 8    | Alta de usuarios de la web desde la app (función en el servidor)            | 💡                    | —             |
 | 8    | Logo e ícono para instalar la app en el celular                             | 💡                    | —             |
 | 8    | Tests end-to-end en el navegador                                            | 💡                    | —             |
-| 8    | Confirmación propia al borrar en el demo publicado                          | 💡                    | —             |
+| 8    | Confirmación propia al borrar en el demo publicado                          | ✅                    | #43           |

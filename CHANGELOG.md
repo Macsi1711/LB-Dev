@@ -3,13 +3,26 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
-## [Sin publicar]
+## [0.2.0] - 2026-10-13
 
 ### Cambiado
 
 - **Permisos:** los vendedores ven y usan todas las secciones (Mostrador, Fotos y Bot). Lo único
   que queda solo para el admin es agregar, cambiar o sacar usuarios del bot. La migración
   `20261009000013_vendedor_ve_todo.sql` ajusta RLS y no toca el contrato con n8n.
+
+### Arreglado
+
+- **Bot → Usuarios:** "Borrar" pide confirmación con un diálogo propio. Antes usaba la del
+  navegador, que algunos visores bloquean, y el botón no hacía nada.
+
+### Agregado
+
+- **Producción:** guía paso a paso (`docs/produccion.md`) y scripts para inspeccionar la base de
+  la empresa en solo lectura, simular las migraciones y aplicarlas con respaldo previo.
+- **Deploy:** proyecto `mostrador-lois` en Vercel conectado al repo, `.vercelignore` y la guía para
+  crearlo desde la terminal.
+- **Roadmap:** fases y estado de cada entregable hasta la 1.0.
 
 ## [0.1.0] - 2026-10-10
 
@@ -37,4 +50,5 @@ Primera versión de Mostrador Lois.
   contrato con n8n.
 - **Deploy:** configuración de Vercel y guía de puesta en producción.
 
+[0.2.0]: https://github.com/Macsi1711/LB-Dev/releases/tag/v0.2.0
 [0.1.0]: https://github.com/Macsi1711/LB-Dev/releases/tag/v0.1.0
