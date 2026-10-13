@@ -1,27 +1,43 @@
-import { Camera, SendHorizontal } from 'lucide-react';
+import { Camera, Mic, SendHorizontal } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { canSend } from '../domain/conversation';
+import type { MediaError } from '../domain/media';
 import type { SearchState } from '../domain/search-state';
 import { FamilyFilter } from './family-filter';
+import { RecordingBar } from './recording-bar';
+import { useAudioRecorder } from './use-audio-recorder';
 
 const isTyping = (el: Element | null) =>
   el instanceof HTMLInputElement ||
   el instanceof HTMLTextAreaElement ||
   el?.getAttribute('role') === 'combobox';
 
+const roundButton =
+  'size-12 shrink-0 rounded-full bg-naranja text-marca-foreground hover:bg-naranja/90';
+
 /**
  * Caja para escribir, abajo como en Telegram o WhatsApp. Los filtros quedan puestos para los
- * mensajes que siguen. Atajos: "/" enfoca y Esc borra lo escrito.
+ * mensajes que siguen. Atajos: "/" enfoca y Esc borra lo escrito. Con la caja vacía, el botón de
+ * enviar pasa a ser el micrófono (si hay webhook para audio).
  */
 export function ChatComposer(props: {
   draft: SearchState;
   onDraftChange: (draft: SearchState) => void;
   onSend: (state: SearchState) => void;
+  /** Sin esto, no se puede mandar audio. */
+  onAudio?: (audio: Blob) => void;
+  onMediaError: (error: MediaError) => void;
+  /** Mientras se procesa un audio o una foto. */
+  busy: boolean;
 }) {
   const input = useRef<HTMLInputElement>(null);
-  const { draft, onDraftChange } = props;
+  const { draft, onDraftChange, onAudio } = props;
+  const recorder = useAudioRecorder({
+    onDone: (audio) => onAudio?.(audio),
+    onError: props.onMediaError,
+  });
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -33,6 +49,9 @@ export function ChatComposer(props: {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+
+  // Con una familia elegida y sin texto se puede mandar igual (para recorrer la familia).
+  const showMic = !!onAudio && draft.q.trim() === '' && !draft.family;
 
   return (
     <form
@@ -61,29 +80,50 @@ export function ChatComposer(props: {
           Solo con foto
         </Button>
       </div>
-      <div className="flex items-center gap-2">
-        <Input
-          ref={input}
-          enterKeyHint="send"
-          autoFocus
-          autoComplete="off"
-          aria-label="Buscar artículos"
-          placeholder="Código, pieza o modelo…"
-          value={draft.q}
-          onChange={(e) => onDraftChange({ ...draft, q: e.target.value })}
-          onKeyDown={(e) => e.key === 'Escape' && onDraftChange({ ...draft, q: '' })}
-          className="h-12 rounded-full bg-card px-4 text-base md:text-base"
+      {recorder.recording ? (
+        <RecordingBar
+          elapsed={recorder.elapsed}
+          onCancel={recorder.cancel}
+          onSend={recorder.send}
         />
-        <Button
-          type="submit"
-          size="icon"
-          disabled={!canSend(draft)}
-          aria-label="Enviar"
-          className="size-12 shrink-0 rounded-full bg-naranja text-marca-foreground hover:bg-naranja/90"
-        >
-          <SendHorizontal className="size-5" />
-        </Button>
-      </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <Input
+            ref={input}
+            enterKeyHint="send"
+            autoFocus
+            autoComplete="off"
+            aria-label="Buscar artículos"
+            placeholder="Código, pieza o modelo…"
+            value={draft.q}
+            onChange={(e) => onDraftChange({ ...draft, q: e.target.value })}
+            onKeyDown={(e) => e.key === 'Escape' && onDraftChange({ ...draft, q: '' })}
+            className="h-12 rounded-full bg-card px-4 text-base md:text-base"
+          />
+          {showMic ? (
+            <Button
+              type="button"
+              size="icon"
+              disabled={props.busy}
+              aria-label="Grabar audio"
+              onClick={() => void recorder.start()}
+              className={roundButton}
+            >
+              <Mic className="size-5" />
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!canSend(draft)}
+              aria-label="Enviar"
+              className={roundButton}
+            >
+              <SendHorizontal className="size-5" />
+            </Button>
+          )}
+        </div>
+      )}
     </form>
   );
 }
