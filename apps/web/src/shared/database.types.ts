@@ -96,20 +96,20 @@ export type Database = {
       };
       familias: {
         Row: {
-          codigo: string;
+          Código: string | null;
           es_producto: boolean;
-          nombre: string | null;
+          Nombre: string | null;
         };
         ComputedFields: never;
         Insert: {
-          codigo: string;
+          Código?: string | null;
           es_producto?: boolean;
-          nombre?: string | null;
+          Nombre?: string | null;
         };
         Update: {
-          codigo?: string;
+          Código?: string | null;
           es_producto?: boolean;
-          nombre?: string | null;
+          Nombre?: string | null;
         };
         Relationships: [];
       };
@@ -260,6 +260,15 @@ export type Database = {
           sql_generado: string | null;
           texto: string | null;
           usuario_nombre: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
+      v_familias: {
+        Row: {
+          codigo: string | null;
+          es_producto: boolean | null;
+          nombre: string | null;
         };
         ComputedFields: never;
         Relationships: [];

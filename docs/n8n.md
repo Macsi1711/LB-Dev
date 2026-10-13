@@ -10,6 +10,9 @@
 | Fotos | `n8n_app` | `UPDATE articulos SET "Imagen" = … WHERE upper(trim("Codigo")) = ANY(…) RETURNING "Codigo", "Nombre artículo", "Imagen"` | `articulos`         |
 | Fotos | `n8n_app` | `INSERT … ON CONFLICT (drive_id) DO NOTHING`                                                                             | `fotos_sin_match`   |
 
+`familias` ya existe en producción con `"Código"` y `"Nombre"` (con tilde y sin clave): tampoco
+se renombra. La web solo le agrega `es_producto` y la lee por la vista `v_familias`.
+
 `"Imagen"` siempre tiene el formato `https://drive.google.com/file/d/<ID>/view?usp=drivesdk`.
 Lo verifica `apps/web/tests/integration/n8n-contract.int-spec.ts`.
 
