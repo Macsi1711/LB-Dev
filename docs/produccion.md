@@ -81,6 +81,33 @@ Primero respalda el schema `public` en `~/Respaldos-Lois/public-<fecha>.dump` (s
 sale vacío, no sigue) y después aplica las migraciones. Son aditivas: no borran ni renombran
 columnas de `articulos`, y cada una se puede volver a correr.
 
+### 4 bis. Aplicar desde el SQL Editor (sin la contraseña de `postgres`)
+
+El SQL Editor de Supabase ya entra como `postgres`. Los archivos están en
+[`supabase/produccion/sql-editor/`](../supabase/produccion/sql-editor/) y se pegan **de a uno**,
+en este orden, con Run (el editor muestra solo el resultado del final de cada uno):
+
+1. Armar el archivo de migraciones (no se commitea: se genera cada vez desde
+   `supabase/migrations/`):
+
+   ```bash
+   bash supabase/produccion/armar-sql-editor.sh
+   ```
+
+2. **`1-respaldo.sql`**: copia `articulos` y `familias` al schema `respaldo` (la API no lo
+   publica). Los pares `_hoy` / `_respaldo` tienen que dar igual; si no, frenar.
+3. **`2-migraciones.sql`**: las 13 migraciones juntas y el historial para la CLI. Va en un solo
+   envío: si una sentencia falla, no se aplica nada. Supabase puede avisar de operaciones
+   destructivas: son los `drop policy if exists`, no borran datos. Devuelve cuántas familias
+   agregó desde `articulos`.
+4. **`3-verificacion.sql`**: 16 chequeos que tienen que dar ✅. El 2 compara las 7 columnas del
+   contrato fila por fila contra el respaldo.
+5. Mandarle una consulta al bot por Telegram y probar la carga de una foto.
+
+Si algo sale mal ese mismo día, **`deshacer.sql`** saca todo lo que agregaron las migraciones y
+deja `articulos` y `familias` con sus columnas de antes (ver la sección 6). El respaldo se borra
+a mano cuando todo esté andando: `drop schema respaldo cascade;`.
+
 ## 5. Después de migrar
 
 1. **Contraseñas de los roles de n8n** (SQL editor de Supabase, las carga el dueño):
@@ -108,6 +135,11 @@ columnas de `articulos`, y cada una se puede volver a correr.
   rol que RLS ahora frena. Para volver al comportamiento anterior mientras se investiga, en el
   SQL editor: `alter table public.articulos disable row level security;`. La web sigue protegida
   por los permisos por columna. Cuando se arregle la credencial de n8n, se vuelve a habilitar.
+- **Volver atrás desde el SQL Editor:** pegar
+  [`sql-editor/deshacer.sql`](../supabase/produccion/sql-editor/deshacer.sql). Saca políticas,
+  vistas, funciones, tablas nuevas, roles de n8n y las columnas `id`, `actualizado_en` y
+  `es_producto`. No toca los datos de `articulos`. Borra lo que tengan las tablas nuevas: es para
+  el mismo día.
 - **Restaurar el respaldo** (solo con OK del dueño; pisa el schema `public`):
 
   ```bash
