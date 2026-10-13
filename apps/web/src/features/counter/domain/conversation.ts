@@ -1,3 +1,4 @@
+import type { MediaKind } from './media';
 import type { SearchState } from './search-state';
 
 /** Un mensaje del vendedor en el chat del Mostrador; la respuesta se calcula al mostrarlo. */
@@ -6,7 +7,13 @@ export interface ChatQuery {
   state: SearchState;
   /** Epoch en ms. */
   sentAt: number;
+  /** Si vino de un audio o de una foto; sin esto, se escribió. */
+  source?: MediaKind;
+  /** Lo que se escuchó o se leyó. */
+  heard?: string;
 }
+
+type QueryMeta = Pick<ChatQuery, 'id' | 'sentAt' | 'source' | 'heard'>;
 
 export const MAX_HISTORY = 30;
 
@@ -22,14 +29,14 @@ const sameSearch = (a: SearchState, b: SearchState) =>
   a.family === b.family &&
   a.withPhoto === b.withPhoto;
 
-/** Agrega la consulta al final, sin repetir la última y guardando las últimas MAX_HISTORY. */
-export function sendQuery(
-  history: ChatQuery[],
-  state: SearchState,
-  meta: { id: string; sentAt: number },
-): ChatQuery[] {
+/**
+ * Agrega la consulta al final y guarda las últimas MAX_HISTORY. No repite un texto igual al
+ * último (pasa al recargar con el link); un audio o una foto se agregan siempre.
+ */
+export function sendQuery(history: ChatQuery[], state: SearchState, meta: QueryMeta): ChatQuery[] {
   const last = history.at(-1);
-  if (!canSend(state) || (last && sameSearch(last.state, state))) return history;
+  if (!canSend(state)) return history;
+  if (!meta.source && last && sameSearch(last.state, state)) return history;
   const next = [...history, { ...meta, state: { ...state, q: clean(state.q) } }];
   return next.slice(-MAX_HISTORY);
 }
@@ -38,6 +45,8 @@ const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'obj
 
 function isChatQuery(v: unknown): v is ChatQuery {
   if (!isRecord(v) || typeof v.id !== 'string' || typeof v.sentAt !== 'number') return false;
+  if (v.source !== undefined && v.source !== 'audio' && v.source !== 'photo') return false;
+  if (v.heard !== undefined && typeof v.heard !== 'string') return false;
   const s = v.state;
   return (
     isRecord(s) &&

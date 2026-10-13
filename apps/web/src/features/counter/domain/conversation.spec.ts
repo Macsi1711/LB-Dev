@@ -63,7 +63,36 @@ describe('sendQuery', () => {
   });
 });
 
+describe('sendQuery con audio o foto', () => {
+  it('guarda de dónde vino y lo que se escuchó', () => {
+    const history = sendQuery([], state('pastilla onix'), {
+      id: 'a',
+      sentAt: 1,
+      source: 'audio',
+      heard: '¿Tenés pastillas para el Onix?',
+    });
+    expect(history[0]).toMatchObject({ source: 'audio', heard: '¿Tenés pastillas para el Onix?' });
+  });
+
+  it('un audio o una foto se agrega aunque diga lo mismo que el mensaje anterior', () => {
+    const history = [query('a', state('onix'))];
+    expect(sendQuery(history, state('onix'), { id: 'b', sentAt: 2, source: 'photo' })).toHaveLength(
+      2,
+    );
+  });
+});
+
 describe('restoreHistory', () => {
+  it('recupera audios y fotos, y descarta un origen desconocido', () => {
+    const audio = { ...query('a', state('onix')), source: 'audio', heard: 'onix' };
+    const photo = { ...query('b', state('BUJ-10')), source: 'photo' };
+    expect(restoreHistory([audio, photo, { ...query('c', state('x')), source: 'video' }])).toEqual([
+      audio,
+      photo,
+    ]);
+    expect(restoreHistory([{ ...audio, heard: 3 }])).toEqual([]);
+  });
+
   it('recupera lo guardado y descarta lo que no tiene la forma esperada', () => {
     const ok = query('a', state('onix', { family: 'PF' }));
     expect(
