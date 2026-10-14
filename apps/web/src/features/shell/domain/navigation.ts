@@ -3,14 +3,14 @@ import type { Role } from '@/shared/roles';
 export interface NavItem {
   path: string;
   label: string;
-  icon: 'search' | 'image' | 'bot';
+  icon: 'search' | 'image' | 'chart';
   roles: readonly Role[];
 }
 
 const ITEMS: readonly NavItem[] = [
   { path: '/', label: 'Mostrador', icon: 'search', roles: ['vendedor', 'admin'] },
   { path: '/fotos', label: 'Fotos', icon: 'image', roles: ['vendedor', 'admin'] },
-  { path: '/bot', label: 'Bot', icon: 'bot', roles: ['vendedor', 'admin'] },
+  { path: '/metricas', label: 'Métricas', icon: 'chart', roles: ['vendedor', 'admin'] },
 ];
 
 export function navigationFor(role: Role): NavItem[] {
