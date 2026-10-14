@@ -150,8 +150,8 @@ export function ReplyBubble(props: {
     placeholderData: keepPreviousData,
   });
   const total = useQuery({
-    queryKey: ['articulos-total', state],
-    queryFn: () => port.count(state),
+    queryKey: ['articulos-resumen', state],
+    queryFn: () => port.summary(state),
   });
 
   if (results.isError)
@@ -171,11 +171,11 @@ export function ReplyBubble(props: {
     );
 
   const articles = results.data.pages.flat();
-  const count = total.data ?? articles.length;
+  const count = total.data?.total ?? articles.length;
   const visible = expanded ? articles : articles.slice(0, PREVIEW);
   return (
     <BotBubble className={cn(visible.length > 0 && 'w-full')}>
-      <p>{replySummary(count, state, familyName)}</p>
+      <p>{replySummary(count, state, familyName, total.data?.approximate)}</p>
       {visible.length > 0 && (
         <div className="mt-1 grid divide-y">
           {visible.map((a) => (

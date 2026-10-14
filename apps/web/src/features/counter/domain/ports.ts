@@ -14,6 +14,11 @@ export interface Article {
   hasPhoto: boolean;
 }
 
+export interface SearchSummary {
+  total: number;
+  approximate: boolean;
+}
+
 export interface Family {
   code: string;
   name: string | null;
@@ -21,7 +26,8 @@ export interface Family {
 
 export interface CounterPort {
   search(state: SearchState, offset: number, limit: number): Promise<Article[]>;
-  count(state: SearchState): Promise<number>;
+  /** Cuántos devuelve search() y si son lo más parecido en vez de lo pedido. */
+  summary(state: SearchState): Promise<SearchSummary>;
   /** Solo las familias de producto (es_producto). */
   families(): Promise<Family[]>;
 }
