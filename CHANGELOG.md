@@ -3,6 +3,19 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.3.1] - 2026-10-14
+
+### Cambiado
+
+- **Búsqueda en lenguaje natural:** "pastilla de freno para onix" o "¿tenés pastillas de
+  freno?" encuentran lo que corresponde. La búsqueda ignora signos y palabras de relleno ("de",
+  "para", "tenés"…), pasa a singular y entiende las abreviaturas del catálogo (trasera → TRAS.,
+  delantera → DEL., izquierda → IZQ.). Nunca deja afuera un artículo que antes aparecía.
+- **Lo más parecido:** si no hay nada con todas las palabras, el chat muestra los artículos que
+  más se acercan (con tolerancia a errores de tipeo) y lo avisa: "No encontré «…» tal cual. Esto
+  es lo más parecido". Migración `20261014000014_busqueda_natural.sql`, ya aplicada en la base de
+  la empresa.
+
 ## [0.3.0] - 2026-10-13
 
 ### Agregado
