@@ -42,6 +42,7 @@ export function createSupabaseBot(client: SupabaseClient<Database>): BotPort {
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
       if (filters.onlyNoResults) query = query.eq('cantidad', 0);
+      if (filters.channel) query = query.eq('canal', filters.channel);
       if (filters.user === UNAUTHORIZED) query = query.is('usuario_nombre', null);
       else if (filters.user !== null) query = query.eq('chat_id', filters.user);
       if (filters.source) query = query.eq('fuente', filters.source);
@@ -52,10 +53,15 @@ export function createSupabaseBot(client: SupabaseClient<Database>): BotPort {
       if (error) fail(error);
       return (data ?? []).map((q) => ({
         id: q.id ?? 0,
+        channel: q.canal === 'web' ? ('web' as const) : ('telegram' as const),
         chatId: q.chat_id,
         userName: q.usuario_nombre,
         source: q.fuente as QuerySource | null,
         text: q.texto,
+        heard: q.escuchado,
+        family: q.familia,
+        withPhoto: q.solo_con_foto,
+        approximate: q.aproximada,
         sql: q.sql_generado,
         results: q.cantidad,
         error: q.error,

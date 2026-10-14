@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dateRange, resultsLabel, userLabel } from './queries';
+import { channelLabel, dateRange, queryTags, resultsLabel, userLabel } from './queries';
 
 describe('dateRange', () => {
   it('convierte las fechas del filtro a un rango en hora argentina, con el "hasta" inclusive', () => {
@@ -32,5 +32,23 @@ describe('resultsLabel', () => {
     expect(resultsLabel(1)).toBe('1 resultado');
     expect(resultsLabel(2)).toBe('2 resultados');
     expect(resultsLabel(1500)).toBe('1.500 resultados');
+  });
+});
+
+describe('channelLabel', () => {
+  it('dice por dónde llegó la consulta', () => {
+    expect(channelLabel('web')).toBe('Web');
+    expect(channelLabel('telegram')).toBe('Telegram');
+  });
+});
+
+describe('queryTags', () => {
+  it('lista los filtros de la consulta y si la respuesta fue lo más parecido', () => {
+    expect(queryTags({ family: 'PF', withPhoto: true, approximate: true })).toEqual([
+      'Familia PF',
+      'Solo con foto',
+      'Lo más parecido',
+    ]);
+    expect(queryTags({ family: null, withPhoto: null, approximate: null })).toEqual([]);
   });
 });

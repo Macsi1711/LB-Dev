@@ -1,3 +1,4 @@
+import type { QueryLog } from './conversation';
 import type { MediaKind, Understood } from './media';
 import type { SearchState } from './search-state';
 
@@ -30,6 +31,8 @@ export interface CounterPort {
   summary(state: SearchState): Promise<SearchSummary>;
   /** Solo las familias de producto (es_producto). */
   families(): Promise<Family[]>;
+  /** Guarda el mensaje en las métricas. */
+  record(log: QueryLog): Promise<void>;
 }
 
 /** Pasa un audio o una foto al texto a buscar. Falla con MediaError. */

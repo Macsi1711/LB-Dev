@@ -44,6 +44,17 @@ export function createSupabaseCounter(client: SupabaseClient<Database>): Counter
       const row = data[0];
       return { total: Number(row?.total ?? 0), approximate: row?.aproximada ?? false };
     },
+    async record(log) {
+      const { error } = await client.rpc('registrar_consulta', {
+        p_q: log.q ?? '',
+        p_familia: log.family ?? undefined,
+        p_con_foto: log.withPhoto || undefined,
+        p_fuente: log.source,
+        p_escuchado: log.heard ?? undefined,
+        p_error: log.error ?? undefined,
+      });
+      if (error) throw error;
+    },
     async families() {
       const { data, error } = await client
         .from('v_familias')
