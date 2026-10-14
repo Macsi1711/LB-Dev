@@ -3,6 +3,14 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.4.1] - 2026-10-14
+
+### Cambiado
+
+- **La sección Bot pasa a llamarse Métricas** (`/metricas`, con ícono de gráfico): muestra las
+  consultas de la web y de Telegram. Los links viejos a `/bot` siguen andando. La pestaña
+  "Usuarios" pasa a "Usuarios de Telegram".
+
 ## [0.4.0] - 2026-10-14
 
 ### Agregado

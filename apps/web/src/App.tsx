@@ -36,7 +36,9 @@ const router = createRouter([
             element: <RequireRole />,
             children: [
               { path: '/fotos', element: <PhotosScreen /> },
-              { path: '/bot', element: <BotScreen /> },
+              { path: '/metricas', element: <BotScreen /> },
+              // Los links viejos a la sección Bot siguen andando.
+              { path: '/bot', element: <Navigate to="/metricas" replace /> },
             ],
           },
         ],
