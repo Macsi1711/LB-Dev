@@ -1,5 +1,9 @@
 -- Consultas del bot con el nombre del usuario. usuario_nombre en null = "no autorizado".
-create or replace view public.v_consultas_bot
+-- Se borra y se crea (no create or replace) para que esta migración se pueda volver a correr
+-- después de la 0015, que le agrega columnas: Postgres no deja sacarle columnas a una vista.
+-- La vista no guarda datos y nada depende de ella.
+drop view if exists public.v_consultas_bot;
+create view public.v_consultas_bot
 with (security_invoker = true)
 as
 select
