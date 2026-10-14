@@ -62,35 +62,53 @@ export type Database = {
       };
       consultas_bot: {
         Row: {
+          aproximada: boolean | null;
+          canal: string;
           cantidad: number | null;
           chat_id: number | null;
           created_at: string;
           error: string | null;
+          escuchado: string | null;
+          familia: string | null;
           fuente: string | null;
           id: number;
+          solo_con_foto: boolean | null;
           sql_generado: string | null;
           texto: string | null;
+          user_id: string | null;
         };
         ComputedFields: never;
         Insert: {
+          aproximada?: boolean | null;
+          canal?: string;
           cantidad?: number | null;
           chat_id?: number | null;
           created_at?: string;
           error?: string | null;
+          escuchado?: string | null;
+          familia?: string | null;
           fuente?: string | null;
           id?: never;
+          solo_con_foto?: boolean | null;
           sql_generado?: string | null;
           texto?: string | null;
+          user_id?: string | null;
         };
         Update: {
+          aproximada?: boolean | null;
+          canal?: string;
           cantidad?: number | null;
           chat_id?: number | null;
           created_at?: string;
           error?: string | null;
+          escuchado?: string | null;
+          familia?: string | null;
           fuente?: string | null;
           id?: never;
+          solo_con_foto?: boolean | null;
           sql_generado?: string | null;
           texto?: string | null;
+          user_id?: string | null;
         };
         Relationships: [];
       };
@@ -251,14 +269,20 @@ export type Database = {
       };
       v_consultas_bot: {
         Row: {
+          aproximada: boolean | null;
+          canal: string | null;
           cantidad: number | null;
           chat_id: number | null;
           created_at: string | null;
           error: string | null;
+          escuchado: string | null;
+          familia: string | null;
           fuente: string | null;
           id: number | null;
+          solo_con_foto: boolean | null;
           sql_generado: string | null;
           texto: string | null;
+          user_id: string | null;
           usuario_nombre: string | null;
         };
         ComputedFields: never;
@@ -379,6 +403,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      nombre_usuario_web: { Args: { p_user_id: string }; Returns: string };
       normalizar_busqueda: { Args: { texto: string }; Returns: string };
       puntuar_parecidos: {
         Args: { p_con_foto?: boolean; p_familia?: string; p_q?: string };
@@ -395,6 +420,17 @@ export type Database = {
           ultima: string;
           veces: number;
         }[];
+      };
+      registrar_consulta: {
+        Args: {
+          p_con_foto?: boolean;
+          p_error?: string;
+          p_escuchado?: string;
+          p_familia?: string;
+          p_fuente?: string;
+          p_q: string;
+        };
+        Returns: undefined;
       };
       resumen_busqueda: {
         Args: { p_con_foto?: boolean; p_familia?: string; p_q?: string };
