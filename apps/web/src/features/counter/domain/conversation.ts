@@ -64,9 +64,20 @@ export function restoreHistory(raw: unknown): ChatQuery[] {
 const articles = (n: number) =>
   `${n.toLocaleString('es-AR')} ${n === 1 ? 'artículo' : 'artículos'}`;
 
-/** La primera línea de la respuesta del chat. */
-export function replySummary(total: number, state: SearchState, familyName?: string | null) {
+/**
+ * La primera línea de la respuesta del chat. `approximate`: no había nada con todas las palabras
+ * y la búsqueda trajo lo más parecido.
+ */
+export function replySummary(
+  total: number,
+  state: SearchState,
+  familyName?: string | null,
+  approximate = false,
+) {
   const q = clean(state.q);
+  if (approximate && total > 0 && q) {
+    return `No encontré «${q}» tal cual. Esto es lo más parecido (${articles(total)}):`;
+  }
   if (total === 0) {
     if (!q) return 'No hay artículos con esos filtros.';
     const filtered = state.family || state.withPhoto;

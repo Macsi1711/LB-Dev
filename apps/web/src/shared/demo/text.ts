@@ -8,7 +8,7 @@ export function normalize(text: string | null | undefined): string {
     .trim();
 }
 
-function trigrams(text: string): Set<string> {
+export function trigrams(text: string): Set<string> {
   const padded = `  ${text} `;
   const set = new Set<string>();
   for (let i = 0; i < padded.length - 2; i++) set.add(padded.slice(i, i + 3));
