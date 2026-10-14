@@ -72,6 +72,69 @@ describe('buscar_articulos', () => {
   });
 });
 
+describe('búsqueda en lenguaje natural', () => {
+  async function terms(q: string) {
+    const { rows } = await db.query<{ t: string[] }>('select terminos_busqueda($1) as t', [q]);
+    return [...rows[0]!.t].sort();
+  }
+
+  async function summary(q: string) {
+    const { rows } = await db.query<{ total: string; aproximada: boolean }>(
+      'select * from resumen_busqueda($1)',
+      [q],
+    );
+    return { total: Number(rows[0]!.total), aproximada: rows[0]!.aproximada };
+  }
+
+  it('saca las palabras de relleno, los signos y los plurales', async () => {
+    expect(await terms('¿Tenés pastillas de freno para el Onix?')).toEqual([
+      'freno',
+      'onix',
+      'pastilla',
+    ]);
+    expect(await terms('motores, llaves y filtros')).toEqual(['filtro', 'llav', 'motor']);
+  });
+
+  it('respeta los códigos y las medidas', async () => {
+    expect(await terms('120-33 rosca 3/4')).toEqual(['120-33', '3/4', 'rosca']);
+  });
+
+  it('si todo es relleno, busca lo que se escribió', async () => {
+    expect(await terms('para')).toEqual(['para']);
+  });
+
+  it('encuentra con frases como las del mostrador', async () => {
+    expect((await search('pastilla de freno para onix')).sort()).toEqual(['854000', '854001']);
+    expect((await search('tenés pastillas de freno?')).sort()).toEqual([
+      '8540',
+      '854000',
+      '854001',
+      '854100',
+    ]);
+    expect(await search('filtros de aceite para kangoo')).toEqual(['120-34']);
+  });
+
+  it('entiende las abreviaturas del catálogo', async () => {
+    expect(await search('pastilla trasera onix')).toEqual(['854001']);
+    expect((await search('pastilla delantera chevrolet')).sort()).toEqual(['854000']);
+  });
+
+  it('si no hay nada con todas las palabras, muestra lo más parecido y lo avisa', async () => {
+    const codes = await search('pastiya onix');
+    expect(codes.slice(0, 2).sort()).toEqual(['854000', '854001']);
+    expect(await summary('pastiya onix')).toEqual({ total: codes.length, aproximada: true });
+  });
+
+  it('lo exacto no se marca como aproximado', async () => {
+    expect(await summary('pastilla onix')).toEqual({ total: 2, aproximada: false });
+  });
+
+  it('si no se parece a nada, no inventa', async () => {
+    expect(await search('xyzw')).toEqual([]);
+    expect(await summary('xyzw')).toEqual({ total: 0, aproximada: false });
+  });
+});
+
 describe('stats_fotos', () => {
   it('devuelve el total primero y deja afuera las familias que no son producto', async () => {
     await inTransaction(db, async (tx) => {
