@@ -3,6 +3,26 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.4.0] - 2026-10-14
+
+### Agregado
+
+- **Métricas de la web:** cada mensaje del chat del Mostrador se guarda en las métricas con quién
+  lo hizo, el texto, los filtros (familia, solo con foto), si vino de un audio o una foto y lo
+  que se entendió, cuántos resultados hubo y si fue "lo más parecido". Los audios y fotos que no
+  se entendieron también, con el error. La web pasa a ser el canal principal y Telegram queda de
+  respaldo.
+- **Sección Bot:** cada consulta muestra el canal (web o Telegram), lo escuchado, los filtros y la
+  etiqueta "Lo más parecido", con un filtro nuevo por canal.
+
+### Cambiado
+
+- **Usuarios activos** cuenta a quienes consultaron en los últimos 7 días, por la web o por
+  Telegram (antes eran los usuarios habilitados del bot).
+- Migración `20261014000015_consultas_web.sql`, ya aplicada en la base de la empresa. La `0011`
+  ahora borra y crea la vista de consultas, para que todas las migraciones se puedan volver a
+  correr.
+
 ## [0.3.1] - 2026-10-14
 
 ### Cambiado
