@@ -3,6 +3,8 @@ import {
   canSend,
   filterLabels,
   MAX_HISTORY,
+  failedMediaLog,
+  queryLog,
   replySummary,
   restoreHistory,
   sendQuery,
@@ -144,5 +146,41 @@ describe('filterLabels', () => {
       'Con foto',
     ]);
     expect(filterLabels(state('onix', { family: 'PF' }))).toEqual(['PF']);
+  });
+});
+
+describe('queryLog', () => {
+  it('arma lo que se guarda en las métricas a partir del mensaje', () => {
+    expect(queryLog(query('a', state('onix', { family: 'PF', withPhoto: true })))).toEqual({
+      q: 'onix',
+      family: 'PF',
+      withPhoto: true,
+      source: 'texto',
+      heard: null,
+      error: null,
+    });
+  });
+
+  it('un audio o una foto guardan su origen y lo que se entendió', () => {
+    const audio = {
+      ...query('a', state('pastilla onix')),
+      source: 'audio' as const,
+      heard: '¿Pastillas?',
+    };
+    expect(queryLog(audio)).toMatchObject({ source: 'audio', heard: '¿Pastillas?' });
+    expect(queryLog({ ...query('b', state('x')), source: 'photo' })).toMatchObject({
+      source: 'foto',
+    });
+  });
+
+  it('un audio o una foto que no se entendieron se guardan con el error y los filtros', () => {
+    expect(failedMediaLog('photo', state('', { family: 'BU' }), 'No pude leer la foto.')).toEqual({
+      q: null,
+      family: 'BU',
+      withPhoto: false,
+      source: 'foto',
+      heard: null,
+      error: 'No pude leer la foto.',
+    });
   });
 });

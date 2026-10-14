@@ -94,3 +94,38 @@ export function filterLabels(state: SearchState, familyName?: string | null): st
   if (state.withPhoto) labels.push('Con foto');
   return labels;
 }
+
+/** Lo que se guarda en las métricas por cada mensaje (registrar_consulta en la base). */
+export interface QueryLog {
+  q: string | null;
+  family: string | null;
+  withPhoto: boolean;
+  source: 'texto' | 'audio' | 'foto';
+  heard: string | null;
+  error: string | null;
+}
+
+const LOG_SOURCE = { audio: 'audio', photo: 'foto' } as const;
+
+export function queryLog(query: ChatQuery): QueryLog {
+  return {
+    q: query.state.q || null,
+    family: query.state.family,
+    withPhoto: query.state.withPhoto,
+    source: query.source ? LOG_SOURCE[query.source] : 'texto',
+    heard: query.heard ?? null,
+    error: null,
+  };
+}
+
+/** Un audio o una foto que no se pudieron pasar a texto también cuentan en las métricas. */
+export function failedMediaLog(kind: MediaKind, state: SearchState, error: string): QueryLog {
+  return {
+    q: null,
+    family: state.family,
+    withPhoto: state.withPhoto,
+    source: LOG_SOURCE[kind],
+    heard: null,
+    error,
+  };
+}

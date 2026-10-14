@@ -30,8 +30,9 @@ export function createDemoBot(): BotPort {
     async recentQueries(f, offset, limit) {
       const range = dateRange(f.from, f.to);
       return demoBotQueries
-        .map((q) => ({ ...q, userName: userName(q.chatId) }))
+        .map((q) => ({ ...q, userName: q.userName ?? userName(q.chatId) }))
         .filter((q) => !f.onlyNoResults || q.results === 0)
+        .filter((q) => !f.channel || q.channel === f.channel)
         .filter(
           (q) => f.user === null || (f.user === UNAUTHORIZED ? !q.userName : q.chatId === f.user),
         )
@@ -54,7 +55,9 @@ export function createDemoBot(): BotPort {
         noResultsPct: counted.length
           ? (100 * counted.filter((q) => q.results === 0).length) / counted.length
           : null,
-        activeUsers: demoTelegramUsers.filter((u) => u.active).length,
+        activeUsers: new Set(
+          week.filter((q) => q.error !== 'no autorizado').map((q) => q.userName ?? q.chatId),
+        ).size,
       };
     },
     async missingSearches(days) {
