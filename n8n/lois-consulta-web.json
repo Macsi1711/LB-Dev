@@ -1,0 +1,267 @@
+{
+  "name": "Lois Consulta web",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lois-consulta-web",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://mostrador-lois.vercel.app,http://localhost:5173,http://localhost:5180"
+        }
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "id": "524a41ae-4f84-4117-ab75-bf2efb59a717",
+      "webhookId": "7b8f0cf9-e56e-4d78-9def-ea26fb74f160"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://<PROJECT_REF>.supabase.co/auth/v1/user",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "<CLAVE_PUBLISHABLE>" },
+            {
+              "name": "Authorization",
+              "value": "={{ $('Webhook').first().json.headers.authorization }}"
+            }
+          ]
+        },
+        "options": { "response": { "response": { "neverError": true } } }
+      },
+      "name": "Validar sesión",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 300],
+      "id": "8a24975b-6dfc-4150-923c-5a56789440a2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1cb5b0e2-8f5d-49fe-bb6e-b993c882f68c",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "name": "¿Usuario de la web?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [440, 300],
+      "id": "aa3b92c5-da0e-4e83-95eb-993102249ba8"
+    },
+    {
+      "parameters": {
+        "jsCode": "// El archivo llega en el Webhook (campo \"archivo\" del formulario) y el tipo en el cuerpo.\nconst wh = $('Webhook').first();\nconst binary = wh.binary ?? {};\nconst key = Object.keys(binary)[0];\nconst tipo = String(wh.json.body?.tipo ?? '').toLowerCase();\nreturn [{ json: { tipo: key ? tipo : 'sin-archivo' }, binary: key ? { data: binary[key] } : {} }];\n"
+      },
+      "name": "Recuperar archivo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 200],
+      "id": "cf2a5ca2-532b-42bd-8643-146a31c576ec"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "47f102ca-f332-4b27-ae5c-88a91fb3bf66",
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "audio",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "AUDIO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a31521c2-7e01-441d-9289-0867b78181ba",
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "foto",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "FOTO"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": { "fallbackOutput": "extra" }
+      },
+      "name": "¿Audio o foto?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [880, 200],
+      "id": "8dc1192c-d4f9-47cc-8ca7-0b91faa2c792"
+    },
+    {
+      "parameters": { "resource": "audio", "operation": "transcribe", "options": {} },
+      "name": "Transcribir audio",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [1100, 60],
+      "id": "e1aa21b1-6d62-41bb-9d7c-790b8ca1dfe9",
+      "credentials": { "openAiApi": { "id": "c9Ptnzu7SSjC1qx2", "name": "Lois&Boago" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// La búsqueda de la web entiende frases (\"che, ¿tenés pastillas para el Onix?\"): va la transcripción tal cual.\nconst text = String($json.text ?? '').trim();\nreturn [{ json: { texto: text, transcripcion: text } }];\n"
+      },
+      "name": "Respuesta audio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 60],
+      "id": "17e4105d-b76c-4ddd-8fc7-406c88981994"
+    },
+    {
+      "parameters": { "operation": "binaryToPropery", "options": {} },
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [1100, 220],
+      "id": "a6800221-928e-4526-aeb7-0a3b1d83ceee"
+    },
+    {
+      "parameters": { "operation": "toBinary", "sourceProperty": "data", "options": {} },
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [1320, 220],
+      "id": "cc23d630-0fb7-40b1-b6ec-20215816e634"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "text": "=Sos un lector de etiquetas de repuestos automotores. Mirá la foto (una etiqueta, una caja o un código) y devolvé SOLO un JSON válido, sin markdown ni texto extra, con dos campos:\n- \"texto\": lo que hay que buscar en el catálogo. Si se ve un código de artículo, OEM o SKU, poné solo ese código. Si no, la pieza y la marca o el modelo del auto, en hasta 6 palabras, sin verbos ni saludos. Ejemplos: \"pastilla freno onix\", \"filtro aceite gol trend\", \"liquido frenos dot 4\".\n- \"leido\": lo que leíste en la etiqueta, en una línea corta.\nSi no se puede leer nada útil, devolvé {\"texto\": \"\", \"leido\": \"\"}. No inventes códigos.",
+        "inputType": "base64",
+        "options": {}
+      },
+      "name": "Leer foto",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [1540, 220],
+      "id": "597d6d1c-aeb6-432e-82de-5316436d6943",
+      "credentials": { "openAiApi": { "id": "c9Ptnzu7SSjC1qx2", "name": "Lois&Boago" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// La IA devuelve {\"texto\", \"leido\"}; si no vino JSON, se usa lo que dijo como texto.\nconst raw = String($json.content ?? $json.text ?? '').trim();\nlet texto = raw;\nlet leido = '';\ntry {\n  const j = JSON.parse(raw.replace(/^```(?:json)?\\s*|\\s*```$/g, ''));\n  texto = String(j.texto ?? '');\n  leido = String(j.leido ?? '');\n} catch (e) {}\nreturn [{ json: { texto: texto.trim(), transcripcion: (leido || texto).trim() } }];\n"
+      },
+      "name": "Respuesta foto",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1760, 220],
+      "id": "987b639e-b598-4938-8b1a-fff39d94c8c3"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ texto: $json.texto, transcripcion: $json.transcripcion }) }}",
+        "options": {}
+      },
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1980, 140],
+      "id": "7e35dc39-94cd-4d8d-bdee-3c8cabf18e2b"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"error\": \"no autorizado\"}",
+        "options": { "responseCode": 401 }
+      },
+      "name": "Sin sesión (401)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [660, 420],
+      "id": "7f417aff-b7d2-482e-b5da-d92f27189f88"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"error\": \"falta el archivo o el tipo\"}",
+        "options": { "responseCode": 400 }
+      },
+      "name": "Falta el archivo (400)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1100, 380],
+      "id": "fcf956b3-e6f2-4df5-a57c-c0ee9a166eed"
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Validar sesión", "type": "main", "index": 0 }]] },
+    "Validar sesión": { "main": [[{ "node": "¿Usuario de la web?", "type": "main", "index": 0 }]] },
+    "¿Usuario de la web?": {
+      "main": [
+        [{ "node": "Recuperar archivo", "type": "main", "index": 0 }],
+        [{ "node": "Sin sesión (401)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Recuperar archivo": { "main": [[{ "node": "¿Audio o foto?", "type": "main", "index": 0 }]] },
+    "¿Audio o foto?": {
+      "main": [
+        [{ "node": "Transcribir audio", "type": "main", "index": 0 }],
+        [{ "node": "Extract from File", "type": "main", "index": 0 }],
+        [{ "node": "Falta el archivo (400)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Transcribir audio": { "main": [[{ "node": "Respuesta audio", "type": "main", "index": 0 }]] },
+    "Respuesta audio": { "main": [[{ "node": "Responder", "type": "main", "index": 0 }]] },
+    "Extract from File": { "main": [[{ "node": "Convert to File", "type": "main", "index": 0 }]] },
+    "Convert to File": { "main": [[{ "node": "Leer foto", "type": "main", "index": 0 }]] },
+    "Leer foto": { "main": [[{ "node": "Respuesta foto", "type": "main", "index": 0 }]] },
+    "Respuesta foto": { "main": [[{ "node": "Responder", "type": "main", "index": 0 }]] }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1", "binaryMode": "separate" },
+  "active": false
+}
