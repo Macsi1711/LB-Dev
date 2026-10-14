@@ -76,15 +76,40 @@ const queries: Q[] = [
   [222222222, 'audio', 'lampara h7', 1, null, 7000],
   [111111111, 'texto', 'radiador gol trend', 0, null, 9000],
 ];
-export const demoBotQueries = queries.map(([chatId, source, text, results, error, minutes], i) => ({
-  id: i + 1,
-  chatId,
-  source,
-  text,
-  sql: error
-    ? null
-    : `SELECT "Codigo", "Nombre artículo" FROM articulos WHERE "Nombre artículo" ILIKE '%${text.toUpperCase()}%' LIMIT 20`,
-  results,
-  error,
-  createdAt: ago(minutes),
-}));
+export interface DemoBotQuery {
+  id: number;
+  chatId: number | null;
+  channel: 'web' | 'telegram';
+  /** Solo las de la web; las de Telegram toman el nombre de la lista blanca. */
+  userName?: string;
+  source: Q[1];
+  text: string;
+  heard: string | null;
+  family: string | null;
+  withPhoto: boolean | null;
+  approximate: boolean | null;
+  sql: string | null;
+  results: number | null;
+  error: string | null;
+  createdAt: string;
+}
+
+export const demoBotQueries: DemoBotQuery[] = queries.map(
+  ([chatId, source, text, results, error, minutes], i) => ({
+    id: i + 1,
+    chatId,
+    channel: 'telegram',
+    source,
+    text,
+    heard: null,
+    family: null,
+    withPhoto: null,
+    approximate: null,
+    sql: error
+      ? null
+      : `SELECT "Codigo", "Nombre artículo" FROM articulos WHERE "Nombre artículo" ILIKE '%${text.toUpperCase()}%' LIMIT 20`,
+    results,
+    error,
+    createdAt: ago(minutes),
+  }),
+);

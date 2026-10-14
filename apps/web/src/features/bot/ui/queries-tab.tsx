@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { Camera, MessageSquare, Mic } from 'lucide-react';
+import { Camera, Globe, MessageSquare, Mic, Send } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
@@ -7,10 +7,13 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Switch } from '@/shared/ui/switch';
 import {
+  channelLabel,
+  queryTags,
   resultsLabel,
   UNAUTHORIZED,
   userLabel,
   type BotQuery,
+  type QueryChannel,
   type QueryFilters,
   type QuerySource,
 } from '../domain/queries';
@@ -18,11 +21,14 @@ import { useBotPort } from './bot-context';
 
 const PAGE = 50;
 const SOURCE_ICON = { texto: MessageSquare, foto: Camera, audio: Mic } as const;
+const CHANNEL_ICON = { web: Globe, telegram: Send } as const;
 const when = new Intl.DateTimeFormat('es-AR', { dateStyle: 'short', timeStyle: 'short' });
 const selectClass = 'h-9 rounded-md border border-input bg-background px-2 text-sm';
 
 function QueryRow({ q }: { q: BotQuery }) {
   const Icon = q.source ? SOURCE_ICON[q.source] : MessageSquare;
+  const Channel = CHANNEL_ICON[q.channel];
+  const tags = queryTags(q);
   return (
     <details className="rounded-md border bg-card px-3 py-2">
       <summary className="flex cursor-pointer flex-wrap items-center gap-x-3 gap-y-1 text-sm">
@@ -34,8 +40,23 @@ function QueryRow({ q }: { q: BotQuery }) {
         ) : (
           <Badge variant="destructive">{userLabel(q)}</Badge>
         )}
+        <Channel
+          className="size-4 text-muted-foreground"
+          aria-label={channelLabel(q.channel)}
+          role="img"
+        />
         <Icon className="size-4 text-muted-foreground" aria-label={q.source ?? 'texto'} />
-        <span className="min-w-0 flex-1 basis-48">{q.text}</span>
+        <span className="min-w-0 flex-1 basis-48">
+          {q.text}
+          {q.heard && (
+            <span className="block text-xs text-muted-foreground italic">«{q.heard}»</span>
+          )}
+        </span>
+        {tags.map((tag) => (
+          <Badge key={tag} variant="outline">
+            {tag}
+          </Badge>
+        ))}
         {q.results !== null && (
           <Badge variant={q.results === 0 ? 'destructive' : 'secondary'} className="tabular-nums">
             {resultsLabel(q.results)}
@@ -43,9 +64,15 @@ function QueryRow({ q }: { q: BotQuery }) {
         )}
         {q.error && <span className="text-xs text-destructive">{q.error}</span>}
       </summary>
-      <pre className="mt-2 overflow-x-auto rounded bg-muted p-2 font-mono text-xs whitespace-pre-wrap">
-        {q.sql || 'Sin SQL generado.'}
-      </pre>
+      {q.channel === 'web' ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Consulta desde la web: búsqueda del Mostrador, sin SQL generado.
+        </p>
+      ) : (
+        <pre className="mt-2 overflow-x-auto rounded bg-muted p-2 font-mono text-xs whitespace-pre-wrap">
+          {q.sql || 'Sin SQL generado.'}
+        </pre>
+      )}
       {q.chatId !== null && (
         <p className="mt-1 font-mono text-xs text-muted-foreground">chat_id {q.chatId}</p>
       )}
@@ -57,6 +84,7 @@ export function QueriesTab() {
   const port = useBotPort();
   const [filters, setFilters] = useState<QueryFilters>({
     onlyNoResults: false,
+    channel: null,
     user: null,
     source: null,
     from: null,
@@ -84,6 +112,16 @@ export function QueriesTab() {
           <Label htmlFor="sin-resultados">Solo sin resultados</Label>
         </div>
         <select
+          aria-label="Canal"
+          className={selectClass}
+          value={filters.channel ?? ''}
+          onChange={(e) => set({ channel: (e.target.value || null) as QueryChannel | null })}
+        >
+          <option value="">Web y Telegram</option>
+          <option value="web">Web</option>
+          <option value="telegram">Telegram</option>
+        </select>
+        <select
           aria-label="Usuario"
           className={selectClass}
           value={filters.user ?? ''}
@@ -99,7 +137,7 @@ export function QueriesTab() {
           }
         >
           <option value="">Todos los usuarios</option>
-          <option value={UNAUTHORIZED}>No autorizados</option>
+          <option value={UNAUTHORIZED}>Telegram: no autorizados</option>
           {users.data?.map((u) => (
             <option key={u.chatId} value={u.chatId}>
               {u.name}

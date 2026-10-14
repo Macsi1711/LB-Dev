@@ -4,6 +4,7 @@ import {
   demoFamilyName,
   type DemoArticle,
 } from '@/shared/demo/catalog';
+import { demoBotQueries } from '@/shared/demo/extras';
 import { searchTerms, termMatches } from '@/shared/demo/search';
 import { normalize, similarity } from '@/shared/demo/text';
 import { driveViewUrl } from '../domain/drive';
@@ -77,6 +78,26 @@ export function createDemoCounter(): CounterPort {
     summary: async (state) => {
       const { list, approximate } = results(state);
       return { total: list.length, approximate };
+    },
+    async record(log) {
+      const state = { q: log.q ?? '', family: log.family, withPhoto: log.withPhoto };
+      const found = log.error ? null : results(state);
+      demoBotQueries.unshift({
+        id: demoBotQueries.length + 1,
+        chatId: null,
+        channel: 'web',
+        userName: 'Admin (demo)',
+        source: log.source,
+        text: log.q ?? '',
+        heard: log.heard,
+        family: log.family,
+        withPhoto: log.withPhoto,
+        approximate: found?.approximate ?? null,
+        sql: null,
+        results: found ? found.list.length : null,
+        error: log.error,
+        createdAt: new Date().toISOString(),
+      });
     },
     families: async () =>
       demoFamilies.filter((f) => f.isProduct).map((f) => ({ code: f.code, name: f.name })),

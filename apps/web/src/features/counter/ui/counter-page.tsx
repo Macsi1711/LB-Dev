@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { restoreHistory, sendQuery, type ChatQuery } from '../domain/conversation';
+import {
+  failedMediaLog,
+  queryLog,
+  restoreHistory,
+  sendQuery,
+  type ChatQuery,
+  type QueryLog,
+} from '../domain/conversation';
 import { mediaErrorMessage, toMediaError, type MediaError, type MediaKind } from '../domain/media';
 import type { Article } from '../domain/ports';
 import { parseSearchState, toSearchParams, type SearchState } from '../domain/search-state';
@@ -13,7 +20,7 @@ import {
   UserBubble,
   WelcomeBubble,
 } from './chat-messages';
-import { useMediaPort } from './counter-context';
+import { useCounterPort, useMediaPort } from './counter-context';
 import { shrinkPhoto } from './shrink-photo';
 
 const STORAGE_KEY = 'mostrador-chat';
@@ -41,18 +48,29 @@ export function CounterPage() {
   const messages = useRef<HTMLDivElement>(null);
   const stick = useRef(true);
   const media = useMediaPort();
+  const port = useCounterPort();
   const [pending, setPending] = useState<MediaKind | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
+  // Las métricas no frenan el chat: si no se pudo guardar, la consulta se muestra igual.
+  const record = useCallback(
+    (log: QueryLog) => void port.record(log).catch(() => undefined),
+    [port],
+  );
 
   const send = useCallback(
     (state: SearchState, origin: Pick<ChatQuery, 'source' | 'heard'> = {}) => {
       stick.current = true;
       setNotice(null);
-      setHistory((h) => sendQuery(h, state, { id: newId(), sentAt: Date.now(), ...origin }));
+      const next = sendQuery(history, state, { id: newId(), sentAt: Date.now(), ...origin });
+      if (next === history) return;
+      setHistory(next);
+      const sent = next.at(-1);
+      if (sent) record(queryLog(sent));
       // La última consulta queda en la URL para poder compartir el link.
       setParams(toSearchParams(state), { replace: true });
     },
-    [setParams],
+    [history, record, setParams],
   );
 
   // Audio o foto: n8n lo pasa a texto y se busca como si se hubiera escrito, con los filtros puestos.
@@ -66,7 +84,9 @@ export function CounterPage() {
       const { text, heard } = await media.understand(kind, upload);
       send({ ...draft, q: text }, heard ? { source: kind, heard } : { source: kind });
     } catch (e) {
-      setNotice(mediaErrorMessage(kind, toMediaError(e).reason));
+      const message = mediaErrorMessage(kind, toMediaError(e).reason);
+      setNotice(message);
+      record(failedMediaLog(kind, draft, message));
     } finally {
       setPending(null);
     }
