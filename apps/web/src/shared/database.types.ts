@@ -380,12 +380,27 @@ export type Database = {
         };
       };
       normalizar_busqueda: { Args: { texto: string }; Returns: string };
+      puntuar_parecidos: {
+        Args: { p_con_foto?: boolean; p_familia?: string; p_q?: string };
+        Returns: {
+          coincidencias: number;
+          id: number;
+          parecido: number;
+        }[];
+      };
       ranking_sin_resultados: {
         Args: { p_dias?: number; p_limit?: number };
         Returns: {
           texto: string;
           ultima: string;
           veces: number;
+        }[];
+      };
+      resumen_busqueda: {
+        Args: { p_con_foto?: boolean; p_familia?: string; p_q?: string };
+        Returns: {
+          aproximada: boolean;
+          total: number;
         }[];
       };
       sincronizar_familias: { Args: Record<PropertyKey, never>; Returns: number };
@@ -410,6 +425,7 @@ export type Database = {
           tiene_foto: boolean;
         }[];
       };
+      terminos_busqueda: { Args: { p_q: string }; Returns: string[] };
       tiene_perfil: { Args: Record<PropertyKey, never>; Returns: boolean };
     };
     Enums: {

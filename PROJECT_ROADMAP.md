@@ -64,6 +64,8 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | Fotos de Drive compartidas con "cualquiera con el link"                                               | ⏳ verificar          | —             |
 | 6    | Consultas con audio y foto en el chat del Mostrador ([ADR-005](docs/adr/005-audio-y-foto-por-n8n.md)) | ✅                    | #49–#53       |
 | 6    | **Release v0.3.0**                                                                                    | ✅                    | release/0.3.0 |
+| 6    | Búsqueda en lenguaje natural y lo más parecido                                                        | ✅                    | #55, #56      |
+| 6    | **Release v0.3.1**                                                                                    | ✅                    | release/0.3.1 |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ⏳ dueño              | —             |
 | 6    | Prueba de punta a punta con los flujos de n8n andando                                                 | 🔒 migraciones y n8n  | —             |
 | 6    | Plan de Vercel para uso comercial (Pro)                                                               | ⏳ decisión del dueño | —             |

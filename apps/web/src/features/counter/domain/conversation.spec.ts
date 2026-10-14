@@ -128,6 +128,12 @@ describe('replySummary', () => {
     );
     expect(replySummary(0, state('', { family: 'PF' }))).toBe('No hay artículos con esos filtros.');
   });
+
+  it('si no encontró todo junto, aclara que muestra lo más parecido', () => {
+    expect(replySummary(3, state('pastiya onix'), null, true)).toBe(
+      'No encontré «pastiya onix» tal cual. Esto es lo más parecido (3 artículos):',
+    );
+  });
 });
 
 describe('filterLabels', () => {

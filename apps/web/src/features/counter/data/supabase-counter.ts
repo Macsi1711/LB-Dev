@@ -38,10 +38,11 @@ export function createSupabaseCounter(client: SupabaseClient<Database>): Counter
       if (error) throw error;
       return data.map(toArticle);
     },
-    async count(state) {
-      const { data, error } = await client.rpc('contar_articulos', filters(state));
+    async summary(state) {
+      const { data, error } = await client.rpc('resumen_busqueda', filters(state));
       if (error) throw error;
-      return Number(data);
+      const row = data[0];
+      return { total: Number(row?.total ?? 0), approximate: row?.aproximada ?? false };
     },
     async families() {
       const { data, error } = await client
