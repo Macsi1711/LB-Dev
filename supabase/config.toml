@@ -38,7 +38,8 @@ enable_signup = false
 enabled = false
 
 [storage]
-enabled = false
+# Fotos de los artículos (ADR-008). Va por Kong (55421): no suma puertos.
+enabled = true
 
 [edge_runtime]
 enabled = false
