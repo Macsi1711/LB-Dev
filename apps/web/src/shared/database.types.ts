@@ -162,6 +162,37 @@ export type Database = {
         };
         Relationships: [];
       };
+      fotos_subidas: {
+        Row: {
+          articulo_id: number;
+          codigo: string | null;
+          created_at: string;
+          drive_id: string;
+          id: number;
+          imagen_anterior: string | null;
+          user_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          articulo_id: number;
+          codigo?: string | null;
+          created_at?: string;
+          drive_id: string;
+          id?: never;
+          imagen_anterior?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          articulo_id?: number;
+          codigo?: string | null;
+          created_at?: string;
+          drive_id?: string;
+          id?: never;
+          imagen_anterior?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       perfiles: {
         Row: {
           created_at: string;
@@ -305,6 +336,27 @@ export type Database = {
       };
       asignar_foto: {
         Args: { p_articulo_id: number; p_foto_id: number };
+        Returns: {
+          codigo: string | null;
+          descripcion: string | null;
+          familia_codigo: string | null;
+          familia_nombre: string | null;
+          id: number | null;
+          imagen_drive_id: string | null;
+          imagen_url: string | null;
+          nombre: string | null;
+          observaciones: string | null;
+          tiene_foto: boolean | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'v_articulos';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      asignar_imagen_drive: {
+        Args: { p_articulo_id: number; p_drive_id: string };
         Returns: {
           codigo: string | null;
           descripcion: string | null;
