@@ -108,3 +108,24 @@ producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_UR
 **Errores:** 401 sin sesión, 400 si falta el archivo o el tipo, 413 si el archivo pasa el límite
 de n8n y 500 para el resto. La web muestra un aviso y deja escribir. El webhook no escribe en
 `consultas_bot`: la consulta la registra la web con `registrar_consulta()`, con el canal `web`.
+
+## Webhook "Lois Subir foto" (cargar la foto de un artículo desde la web)
+
+La web manda una foto y el código del artículo; n8n la sube a Drive y devuelve el id del archivo.
+La web la asigna con `asignar_imagen_drive()`. Decisión en el
+[ADR-007](adr/007-fotos-desde-la-web.md). El flujo está en
+[`n8n/lois-subir-foto.json`](../n8n/lois-subir-foto.json) (mismos marcadores que el de audio y foto).
+
+**Antes de activarlo:** crear en Drive la subcarpeta **"Fotos desde la web"** adentro de _Lois base
+de datos_ y elegirla en el nodo _Subir a Drive_ (_Parent Folder_). Tiene que ser una subcarpeta:
+"Lois Fotos" mira la carpeta principal y procesaría la foto otra vez. La URL de producción va en
+`VITE_N8N_FOTOS_URL` en Vercel.
+
+**Pedido:** `POST` con `Authorization: Bearer <token>` y `multipart/form-data` con `archivo`
+(`image/jpeg`, hasta 1600 px) y `codigo` (el código del artículo, para el nombre del archivo).
+
+**Qué hace:** valida la sesión como el webhook de audio y foto, sube la foto como
+`<codigo> web <fecha>.jpg`, la comparte como "cualquiera con el link" y responde
+`{ "drive_id": "<id>" }`.
+
+**Errores:** 401 sin sesión, 400 si falta la foto o el código, 500 si falla Drive.
