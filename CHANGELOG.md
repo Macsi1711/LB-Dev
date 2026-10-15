@@ -5,6 +5,14 @@ semántico.
 
 ## [Sin publicar]
 
+### Arreglado
+
+- **Búsqueda mucho más rápida para los vendedores:** con los permisos por fila, Postgres no podía
+  usar el índice y recorría todos los artículos en cada búsqueda (0,5–2 s con 1 CPU). Ahora
+  `filtrar_articulos()` y `puntuar_parecidos()` corren como dueño y chequean el perfil a mano: de
+  ~550 ms a ~20 ms la exacta y de ~1,3 s a ~1 ms sin resultados (migración
+  `20261016000018_busqueda_usa_indice.sql`). Lo encontró la prueba de carga local.
+
 ### Agregado
 
 - **Fotos en Supabase Storage, primer paso (ADR-008):** bucket público `fotos`, columna
