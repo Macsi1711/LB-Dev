@@ -23,6 +23,25 @@ export function createSupabasePhotos(client: SupabaseClient<Database>): PhotosPo
   }
 
   return {
+    async findArticles(q) {
+      const { data, error } = await client.rpc('buscar_articulos', { p_q: q, p_limit: 8 });
+      if (error) throw error;
+      return data.map((r) => ({
+        id: r.id ?? 0,
+        code: r.codigo ?? '',
+        name: r.nombre,
+        familyName: r.familia_nombre,
+        hasPhoto: r.tiene_foto ?? false,
+        driveId: r.imagen_drive_id,
+      }));
+    },
+    async assignDrivePhoto(articleId, driveId) {
+      const { error } = await client.rpc('asignar_imagen_drive', {
+        p_articulo_id: articleId,
+        p_drive_id: driveId,
+      });
+      if (error) throw error;
+    },
     async stats() {
       const { data, error } = await client.rpc('stats_fotos');
       if (error) throw error;

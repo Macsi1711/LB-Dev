@@ -81,6 +81,25 @@ export function createDemoPhotos(): PhotosPort {
       article.photo = photo.driveId;
       photo.resolved = true;
     },
+    async findArticles(q) {
+      const words = normalize(q).split(' ').filter(Boolean);
+      return demoArticles
+        .filter((a) => words.every((w) => normalize(`${a.code} ${a.name}`).includes(w)))
+        .slice(0, 8)
+        .map((a) => ({
+          id: a.id,
+          code: a.code,
+          name: a.name,
+          familyName: demoFamilyName(a.family),
+          hasPhoto: !!a.photo,
+          driveId: a.photo,
+        }));
+    },
+    async assignDrivePhoto(articleId, driveId) {
+      const article = demoArticles.find((a) => a.id === articleId);
+      if (!article) throw new Error('El artículo no existe');
+      article.photo = driveId;
+    },
     async dismissPhoto(photoId) {
       const photo = demoUnmatchedPhotos.find((p) => p.id === photoId);
       if (photo) photo.resolved = true;

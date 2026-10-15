@@ -21,7 +21,7 @@ import {
   WelcomeBubble,
 } from './chat-messages';
 import { useCounterPort, useMediaPort } from './counter-context';
-import { shrinkPhoto } from './shrink-photo';
+import { shrinkPhoto } from '@/shared/lib/shrink-photo';
 
 const STORAGE_KEY = 'mostrador-chat';
 
