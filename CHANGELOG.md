@@ -3,6 +3,15 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [Sin publicar]
+
+### Agregado
+
+- **Fotos en Supabase Storage, primer paso (ADR-008):** bucket público `fotos`, columna
+  `articulos.foto` y `asignar_foto_subida()` para asignar una foto ya subida. Un artículo tiene
+  foto si está en Storage o tiene link de Drive. `"Imagen"` y el bot no cambian todavía
+  (migración `20261015000017_fotos_storage.sql`, falta aplicarla en producción).
+
 ## [0.5.0] - 2026-10-15
 
 ### Agregado
