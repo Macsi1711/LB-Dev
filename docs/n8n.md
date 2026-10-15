@@ -67,27 +67,33 @@ Si se agregan familias nuevas en `articulos`, corré `select public.sincronizar_
 La web le manda un audio o una foto y n8n le devuelve **el texto a buscar**. La búsqueda la hace
 la web. Decisión en el [ADR-005](adr/005-audio-y-foto-por-n8n.md).
 
+El flujo está en [`n8n/lois-consulta-web.json`](../n8n/lois-consulta-web.json). Para cargarlo en
+otro n8n: **Import from File**, reemplazar `<PROJECT_REF>` y `<CLAVE_PUBLISHABLE>` en el nodo
+_Validar sesión_ (salen de Supabase → Settings → API Keys; la publishable no es secreta), elegir la
+credencial de OpenAI del bot en _Transcribir audio_ y _Leer foto_, y activarlo. La URL de
+producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_URL` en Vercel.
+
 **Pedido**
 
-- `POST` a la URL del webhook (va en `VITE_N8N_CONSULTA_URL` de la web).
+- `POST` a la URL del webhook.
 - Header `Authorization: Bearer <token de Supabase del usuario>`.
 - Cuerpo `multipart/form-data`:
   - `tipo`: `audio` o `foto`.
   - `archivo`: el audio (`audio/webm`, `audio/mp4` u `audio/ogg`, hasta 60 s) o la foto
     (`image/jpeg`, hasta 1600 px).
-- CORS: permitir `https://mostrador-lois.vercel.app` y, para desarrollo,
-  `http://localhost:5173`.
+- CORS: `https://mostrador-lois.vercel.app` y, para desarrollo, `http://localhost:5173` y
+  `http://localhost:5180`.
 
 **Qué hace el flujo**
 
-1. **Valida la sesión:** `POST <SUPABASE_URL>/rest/v1/rpc/tiene_perfil` con los headers
-   `apikey: <clave publishable>` y el mismo `Authorization`. Si no devuelve `true`, responde 401.
-2. **Audio:** el mismo nodo de transcripción del bot. **Foto:** el mismo nodo de imágenes del bot,
-   con la consigna "leé la etiqueta, la caja o el código: devolvé el código del artículo si
-   aparece y, si no, la pieza, la marca y el modelo".
-3. **Pasa a palabras de búsqueda:** código si hay; si no, pieza + marca o modelo, sin saludos ni
-   verbos, hasta 6 palabras. Por ejemplo, de "che, ¿tenés pastillas de freno para el Onix?" sale
-   `pastilla freno onix`.
+1. **Valida la sesión** ([ADR-006](adr/006-validacion-sesion-webhook.md)):
+   `GET <SUPABASE_URL>/auth/v1/user` con `apikey: <clave publishable>` y el mismo
+   `Authorization`. Si la respuesta no trae el `id` del usuario, responde 401.
+2. **Audio:** el nodo de transcripción de OpenAI del bot. La transcripción va tal cual como texto a
+   buscar: la búsqueda de la web ya ignora el relleno ("che, ¿tenés…?") y pasa a singular.
+3. **Foto:** la misma cadena del bot (_Extract from File_ → _Convert to File_ → análisis de
+   imagen con gpt-4o-mini). La consigna pide un JSON `{"texto", "leido"}`: el código si se ve y,
+   si no, la pieza y la marca o el modelo en hasta 6 palabras.
 4. **Responde 200** con JSON:
 
    ```json
@@ -97,8 +103,29 @@ la web. Decisión en el [ADR-005](adr/005-audio-y-foto-por-n8n.md).
    }
    ```
 
-   `texto` vacío si no entendió nada. `transcripcion` es opcional (en una foto, lo que leyó).
+   `texto` vacío si no entendió nada. En una foto, `transcripcion` es lo que leyó.
 
-**Errores:** 401 sin sesión o sin perfil, 413 si el archivo pasa los 10 MB, 500 para el resto.
-La web muestra un aviso y deja escribir. No se registra en `consultas_bot`, que es solo del bot
-de Telegram.
+**Errores:** 401 sin sesión, 400 si falta el archivo o el tipo, 413 si el archivo pasa el límite
+de n8n y 500 para el resto. La web muestra un aviso y deja escribir. El webhook no escribe en
+`consultas_bot`: la consulta la registra la web con `registrar_consulta()`, con el canal `web`.
+
+## Webhook "Lois Subir foto" (cargar la foto de un artículo desde la web)
+
+La web manda una foto y el código del artículo; n8n la sube a Drive y devuelve el id del archivo.
+La web la asigna con `asignar_imagen_drive()`. Decisión en el
+[ADR-007](adr/007-fotos-desde-la-web.md). El flujo está en
+[`n8n/lois-subir-foto.json`](../n8n/lois-subir-foto.json) (mismos marcadores que el de audio y foto).
+
+**Antes de activarlo:** crear en Drive la subcarpeta **"Fotos desde la web"** adentro de _Lois base
+de datos_ y elegirla en el nodo _Subir a Drive_ (_Parent Folder_). Tiene que ser una subcarpeta:
+"Lois Fotos" mira la carpeta principal y procesaría la foto otra vez. La URL de producción va en
+`VITE_N8N_FOTOS_URL` en Vercel.
+
+**Pedido:** `POST` con `Authorization: Bearer <token>` y `multipart/form-data` con `archivo`
+(`image/jpeg`, hasta 1600 px) y `codigo` (el código del artículo, para el nombre del archivo).
+
+**Qué hace:** valida la sesión como el webhook de audio y foto, sube la foto como
+`<codigo> web <fecha>.jpg`, la comparte como "cualquiera con el link" y responde
+`{ "drive_id": "<id>" }`.
+
+**Errores:** 401 sin sesión, 400 si falta la foto o el código, 500 si falla Drive.

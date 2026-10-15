@@ -2,7 +2,6 @@
 export type MediaKind = 'audio' | 'photo';
 
 export const MAX_AUDIO_SECONDS = 60;
-export const MAX_PHOTO_SIDE = 1600;
 
 export interface Understood {
   /** Lo que se busca, listo para la caja del chat. */
@@ -49,12 +48,6 @@ const AUDIO_TYPES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio
 /** El primer formato que el navegador sabe grabar; null deja que elija él. */
 export function pickAudioType(isSupported: (type: string) => boolean): string | null {
   return AUDIO_TYPES.find(isSupported) ?? null;
-}
-
-/** Medidas para achicar una foto sin deformarla; nunca la agranda. */
-export function fitWithin(width: number, height: number, max: number) {
-  const scale = Math.min(1, max / Math.max(width, height));
-  return { width: Math.round(width * scale), height: Math.round(height * scale) };
 }
 
 export function mediaErrorMessage(kind: MediaKind, reason: MediaErrorReason): string {

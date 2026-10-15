@@ -1,11 +1,13 @@
 import { loadConfig } from './config';
 import { getSupabase } from './supabase';
 
+const token = async () =>
+  (await getSupabase().auth.getSession()).data.session?.access_token ?? null;
+
+const webhook = (url: string | null) => (url ? { url, getToken: token } : null);
+
 /** Webhook de n8n para audio y foto, con el token de la sesión; null si no está configurado. */
-export function getConsultaWebhook() {
-  const url = loadConfig(import.meta.env).n8nConsultaUrl;
-  if (!url) return null;
-  const getToken = async () =>
-    (await getSupabase().auth.getSession()).data.session?.access_token ?? null;
-  return { url, getToken };
-}
+export const getConsultaWebhook = () => webhook(loadConfig(import.meta.env).n8nConsultaUrl);
+
+/** Webhook de n8n para subir la foto de un artículo; null si no está configurado. */
+export const getFotosWebhook = () => webhook(loadConfig(import.meta.env).n8nFotosUrl);

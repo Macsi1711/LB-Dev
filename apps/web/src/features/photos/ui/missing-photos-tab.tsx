@@ -1,17 +1,24 @@
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { Download } from 'lucide-react';
+import { Camera, Download } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { downloadText } from '@/shared/lib/download';
 import { Button } from '@/shared/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
 import { missingPhotosCsv } from '../domain/coverage';
-import type { CoverageStat } from '../domain/ports';
+import type { CoverageStat, UploadTarget } from '../domain/ports';
 import { usePhotosPort } from './photos-context';
 
 const PAGE = 100;
 
-export function MissingPhotosTab({ families }: { families: CoverageStat[] }) {
+export function MissingPhotosTab({
+  families,
+  onAddPhoto,
+}: {
+  families: CoverageStat[];
+  /** Sin esto (no hay webhook de fotos), no aparece el botón "Agregar foto". */
+  onAddPhoto?: (article: UploadTarget) => void;
+}) {
   const port = usePhotosPort();
   const [family, setFamily] = useState<string | null>(null);
   const withMissing = families.filter((f) => f.total > f.withPhoto);
@@ -67,6 +74,7 @@ export function MissingPhotosTab({ families }: { families: CoverageStat[] }) {
               <TableHead>Código</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead className="hidden sm:table-cell">Familia</TableHead>
+              {onAddPhoto && <TableHead className="w-0" />}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -77,6 +85,18 @@ export function MissingPhotosTab({ families }: { families: CoverageStat[] }) {
                 <TableCell className="hidden text-muted-foreground sm:table-cell">
                   {r.familyName}
                 </TableCell>
+                {onAddPhoto && (
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onAddPhoto({ ...r, hasPhoto: false, driveId: null })}
+                    >
+                      <Camera />
+                      <span className="hidden sm:inline">Agregar foto</span>
+                    </Button>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
