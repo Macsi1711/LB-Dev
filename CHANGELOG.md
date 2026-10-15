@@ -10,7 +10,10 @@ semántico.
 - **Fotos en Supabase Storage, primer paso (ADR-008):** bucket público `fotos`, columna
   `articulos.foto` y `asignar_foto_subida()` para asignar una foto ya subida. Un artículo tiene
   foto si está en Storage o tiene link de Drive. `"Imagen"` y el bot no cambian todavía
-  (migración `20261015000017_fotos_storage.sql`, falta aplicarla en producción).
+  (migración `20261015000017_fotos_storage.sql`, ya aplicada).
+- **Fotos de Drive a Storage:** `apps/web/scripts/migrar-fotos-drive.mjs` las pasa una sola vez,
+  en memoria y con la sesión de un usuario de la web (`docs/produccion.md`, sección 7). Ya se
+  corrió: 442 de 443 fotos están en Storage.
 
 ## [0.5.0] - 2026-10-15
 

@@ -149,3 +149,22 @@ a mano cuando todo esté andando: `drop schema respaldo cascade;`.
   ```
 
   `SUPABASE_DB_URL` tiene que estar exportada en esa terminal (sale de `.env.produccion`).
+
+## 7. Pasar las fotos de Drive a Storage (una sola vez)
+
+Paso 2 del [ADR-008](adr/008-fotos-en-storage.md). Lo corre el dueño en su compu, con su usuario
+de la web (mail y contraseña se escriben en la terminal) y la URL y la clave publishable de
+producción (no son secretas: son las de `VITE_SUPABASE_*` en Vercel):
+
+```bash
+SUPABASE_URL=https://<ref>.supabase.co SUPABASE_KEY=<clave publishable> node apps/web/scripts/migrar-fotos-drive.mjs --probar
+```
+
+`--probar` baja las fotos y muestra el resumen sin subir nada; sin `--probar`, pregunta antes de
+subir. Baja cada foto por su link público ya achicada por Google (800 px y miniatura de 320), en
+memoria, la sube al bucket `fotos` y la asigna con `asignar_foto_subida()`. `"Imagen"` no se toca.
+Sube de a una porque el plan gratis tiene pocas conexiones. Si algo falla, se vuelve a correr:
+solo intenta con los artículos que todavía no tienen foto en Storage. Una foto que no está
+compartida como "cualquiera con el link" no se puede bajar y queda listada.
+
+Se corrió el 2026-10-15: 442 de 443 fotos pasaron; la de `3PK848A` no está compartida en Drive.
