@@ -3,6 +3,8 @@ export interface Config {
   supabaseKey: string;
   /** Webhook de n8n para consultar con audio y foto (ADR-005). Sin él, el chat es solo texto. */
   n8nConsultaUrl: string | null;
+  /** Webhook de n8n para subir la foto de un artículo (ADR-007). Sin él, no se suben fotos. */
+  n8nFotosUrl: string | null;
 }
 
 type Env = Record<string, string | undefined>;
@@ -48,5 +50,6 @@ export function loadConfig(env: Env): Config {
     supabaseUrl,
     supabaseKey,
     n8nConsultaUrl: optionalHttpsUrl(env, 'VITE_N8N_CONSULTA_URL'),
+    n8nFotosUrl: optionalHttpsUrl(env, 'VITE_N8N_FOTOS_URL'),
   };
 }
