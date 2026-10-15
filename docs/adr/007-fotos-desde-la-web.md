@@ -1,6 +1,6 @@
 # ADR-007: subir fotos desde la web a una subcarpeta de Drive, a través de n8n
 
-- **Estado:** aceptado
+- **Estado:** reemplazado por [ADR-008](008-fotos-en-storage.md)
 - **Fecha:** 2026-10-15
 
 ## Contexto
