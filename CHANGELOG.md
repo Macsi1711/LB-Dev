@@ -3,6 +3,19 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.5.0] - 2026-10-15
+
+### Agregado
+
+- **Agregar foto desde la web:** Fotos → _Agregar foto_ para buscar un artículo, sacarle o elegir
+  una foto y guardarla. n8n la sube a Drive (subcarpeta _Fotos desde la web_, flujo "Lois Subir
+  foto") y la web la asigna con el link del formato de siempre, así el bot también la manda. Si el
+  artículo ya tenía foto, pide confirmar el reemplazo. En "Sin foto", cada artículo tiene un botón
+  _Agregar foto_. Queda un historial (`fotos_subidas`) con quién subió cada foto y cuál había
+  antes (ADR-007, migración `20261015000016_fotos_web.sql`, ya aplicada).
+- **Flujos de n8n en el repo:** `n8n/lois-consulta-web.json` y `n8n/lois-subir-foto.json`, con su
+  documentación en `docs/n8n.md` (ADR-006: cómo validan la sesión).
+
 ## [0.4.1] - 2026-10-14
 
 ### Cambiado
