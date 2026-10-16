@@ -49,11 +49,9 @@ export interface PhotosPort {
   dismissPhoto(photoId: number): Promise<void>;
   /** Busca artículos para asignarles una foto (misma búsqueda que el Mostrador). */
   findArticles(q: string): Promise<UploadTarget[]>;
-  /** Escribe en el artículo la foto ya subida a Drive (rpc asignar_imagen_drive). */
-  assignDrivePhoto(articleId: number, driveId: string): Promise<void>;
-}
-
-/** Sube una foto a Drive y devuelve su id. Falla con UploadError. */
-export interface PhotoUploadPort {
-  upload(code: string, photo: Blob): Promise<string>;
+  /**
+   * Sube la foto (grande y miniatura, JPEG) a Supabase Storage y se la asigna al artículo
+   * (rpc asignar_foto_subida). Falla con UploadError.
+   */
+  savePhoto(articleId: number, photo: { full: Blob; mini: Blob }): Promise<void>;
 }

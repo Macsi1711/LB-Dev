@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from '@/shared/ui/dialog';
 import { Input } from '@/shared/ui/input';
-import type { PhotoUploadPort, UploadTarget } from '../domain/ports';
+import type { UploadTarget } from '../domain/ports';
 import { isImage, toUploadError, UploadError, uploadErrorMessage } from '../domain/upload';
 import { usePhotosPort } from './photos-context';
 
@@ -72,9 +72,12 @@ function ArticlePicker({ onPick }: { onPick: (a: UploadTarget) => void }) {
   );
 }
 
-/** Elegir un artículo, sacarle o elegir una foto y guardarla en Drive (ADR-007). */
+/** Lado mayor de la foto y de la miniatura que se suben a Storage (ADR-008). */
+const FULL_SIDE = 800;
+const MINI_SIDE = 320;
+
+/** Elegir un artículo, sacarle o elegir una foto y guardarla en Supabase Storage (ADR-008). */
 export function AddPhotoTab(props: {
-  upload: PhotoUploadPort;
   target: UploadTarget | null;
   onTargetChange: (target: UploadTarget | null) => void;
 }) {
@@ -91,14 +94,17 @@ export function AddPhotoTab(props: {
 
   const save = useMutation({
     mutationFn: async ({ article, file }: { article: UploadTarget; file: File }) => {
-      let small: Blob;
+      let full: Blob;
+      let mini: Blob;
       try {
-        small = await shrinkPhoto(file);
+        [full, mini] = await Promise.all([
+          shrinkPhoto(file, FULL_SIDE),
+          shrinkPhoto(file, MINI_SIDE),
+        ]);
       } catch {
         throw new UploadError('not-image');
       }
-      const driveId = await props.upload.upload(article.code, small);
-      await port.assignDrivePhoto(article.id, driveId);
+      await port.savePhoto(article.id, { full, mini });
       return article;
     },
     onSuccess: async (article) => {
@@ -192,7 +198,7 @@ export function AddPhotoTab(props: {
           <DialogHeader>
             <DialogTitle>¿Reemplazar la foto de {target?.code}?</DialogTitle>
             <DialogDescription>
-              La foto anterior no se borra: queda en Drive y en el historial.
+              La foto anterior no se borra: queda guardada en el historial.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

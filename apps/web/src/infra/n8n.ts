@@ -8,6 +8,3 @@ const webhook = (url: string | null) => (url ? { url, getToken: token } : null);
 
 /** Webhook de n8n para audio y foto, con el token de la sesión; null si no está configurado. */
 export const getConsultaWebhook = () => webhook(loadConfig(import.meta.env).n8nConsultaUrl);
-
-/** Webhook de n8n para subir la foto de un artículo; null si no está configurado. */
-export const getFotosWebhook = () => webhook(loadConfig(import.meta.env).n8nFotosUrl);

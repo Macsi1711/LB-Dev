@@ -96,10 +96,13 @@ export function createDemoPhotos(): PhotosPort {
           storagePhoto: null,
         }));
     },
-    async assignDrivePhoto(articleId, driveId) {
+    // No sube nada: le pone una ilustración de la misma familia para que el artículo muestre algo.
+    async savePhoto(articleId) {
       const article = demoArticles.find((a) => a.id === articleId);
       if (!article) throw new Error('El artículo no existe');
-      article.photo = driveId;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const sameFamily = demoArticles.find((a) => a.photo && a.family === article.family);
+      article.photo = sameFamily?.photo ?? demoArticles.find((a) => a.photo)?.photo ?? null;
     },
     async dismissPhoto(photoId) {
       const photo = demoUnmatchedPhotos.find((p) => p.id === photoId);
