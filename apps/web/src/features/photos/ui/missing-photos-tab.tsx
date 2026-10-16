@@ -90,9 +90,7 @@ export function MissingPhotosTab({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        onAddPhoto({ ...r, hasPhoto: false, driveId: null, storagePhoto: null })
-                      }
+                      onClick={() => onAddPhoto({ ...r, hasPhoto: false, storagePhoto: null })}
                     >
                       <Camera />
                       <span className="hidden sm:inline">Agregar foto</span>

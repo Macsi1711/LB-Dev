@@ -7,7 +7,6 @@ import { AddPhotoTab } from './add-photo-tab';
 import { CoverageCard } from './coverage-card';
 import { MissingPhotosTab } from './missing-photos-tab';
 import { usePhotosPort } from './photos-context';
-import { UnmatchedPhotosTab } from './unmatched-photos-tab';
 
 export function PhotosPage() {
   const port = usePhotosPort();
@@ -32,16 +31,12 @@ export function PhotosPage() {
         <TabsList className="max-w-full justify-start overflow-x-auto">
           <TabsTrigger value="agregar">Agregar foto</TabsTrigger>
           <TabsTrigger value="sin-foto">Sin foto</TabsTrigger>
-          <TabsTrigger value="sin-match">Fotos que no matchearon</TabsTrigger>
         </TabsList>
         <TabsContent value="agregar">
           <AddPhotoTab target={target} onTargetChange={setTarget} />
         </TabsContent>
         <TabsContent value="sin-foto">
           <MissingPhotosTab families={stats.data?.families ?? []} onAddPhoto={addPhoto} />
-        </TabsContent>
-        <TabsContent value="sin-match">
-          <UnmatchedPhotosTab />
         </TabsContent>
       </Tabs>
     </div>

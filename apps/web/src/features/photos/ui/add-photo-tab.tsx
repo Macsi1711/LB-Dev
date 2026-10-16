@@ -129,7 +129,6 @@ export function AddPhotoTab(props: {
         {target ? (
           <div className="flex items-center gap-3 rounded-md border bg-card p-2">
             <ArticleThumbnail
-              driveId={target.driveId}
               storagePhoto={target.storagePhoto}
               className="w-20 shrink-0 rounded"
             />

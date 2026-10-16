@@ -4,14 +4,13 @@ import { cn } from '@/shared/lib/utils';
 import type { StoragePhoto } from '@/shared/lib/storage-photo';
 import { photoCandidates } from '../domain/photo';
 
-/** Foto del artículo con fallback: Storage → Drive → googleusercontent → placeholder "Sin foto". */
+/** Foto del artículo: miniatura → foto grande → placeholder "Sin foto". */
 export function ArticleThumbnail(props: {
-  driveId: string | null;
-  storagePhoto?: StoragePhoto | null;
+  storagePhoto: StoragePhoto | null;
   width?: number;
   className?: string;
 }) {
-  const urls = photoCandidates(props.storagePhoto ?? null, props.driveId, props.width);
+  const urls = photoCandidates(props.storagePhoto, props.width);
   const [attempt, setAttempt] = useState(0);
   const url = urls[attempt];
 

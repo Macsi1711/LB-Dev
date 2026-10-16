@@ -15,8 +15,6 @@ export function toArticle(row: ArticleRow, client: SupabaseClient<Database>): Ar
     notes: row.observaciones?.trim() || null,
     familyCode: row.familia_codigo,
     familyName: row.familia_nombre,
-    photoUrl: row.imagen_url,
-    driveId: row.imagen_drive_id,
     storagePhoto: storagePhoto(client, row.foto),
     hasPhoto: row.tiene_foto ?? false,
   };

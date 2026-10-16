@@ -12,7 +12,7 @@ import { CopyCodeButton } from './copy-code-button';
 export function ArticleDetail(props: { article: Article | null; onClose: () => void }) {
   const desktop = useMediaQuery('(min-width: 1024px)');
   const a = props.article;
-  const link = a ? photoLink(a.storagePhoto, a.driveId) : null;
+  const link = a ? photoLink(a.storagePhoto) : null;
 
   return (
     <Sheet open={!!a} onOpenChange={(open) => !open && props.onClose()}>
@@ -35,12 +35,7 @@ export function ArticleDetail(props: { article: Article | null; onClose: () => v
               </SheetDescription>
             </SheetHeader>
             <div className="grid grid-cols-1 gap-4 px-4 pb-6">
-              <ArticleThumbnail
-                driveId={a.driveId}
-                storagePhoto={a.storagePhoto}
-                width={1000}
-                className="rounded-md"
-              />
+              <ArticleThumbnail storagePhoto={a.storagePhoto} width={1000} className="rounded-md" />
               {a.notes && (
                 <div
                   className="flex gap-2 rounded-md border border-aviso bg-aviso/15 p-3"
