@@ -18,6 +18,10 @@ semántico.
   artículo sin foto ahí muestra "Sin foto"), "Abrir foto" abre solo la de Storage y se va la
   pestaña "Fotos que no matchearon", que mostraba lo que dejaba "Lois Fotos" en la carpeta de
   Drive.
+- **"Tiene foto" = foto en Supabase Storage:** un link de Drive solo ya no cuenta, así la
+  cobertura, "Sin foto" y "Solo con foto" coinciden con lo que se ve (migración
+  `20261016000020_tiene_foto_storage.sql`). El contrato con n8n (`docs/n8n.md`) y `CLAUDE.md` dicen
+  que Drive ya no se usa; "Lois Fotos" y "Lois Subir foto" quedan retirados.
 
 ### Arreglado
 

@@ -32,7 +32,6 @@ describe('asignar_imagen_drive (foto subida desde la web)', () => {
         codigo: '854000',
         imagen_url: `https://drive.google.com/file/d/${DRIVE_ID}/view?usp=drivesdk`,
         imagen_drive_id: DRIVE_ID,
-        tiene_foto: true,
       });
       const log = await tx.query('select * from fotos_subidas order by id desc limit 1');
       expect(log.rows[0]).toMatchObject({

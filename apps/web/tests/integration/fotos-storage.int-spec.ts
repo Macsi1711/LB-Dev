@@ -94,7 +94,7 @@ describe('asignar_foto_subida', () => {
       const id = await articleId(tx, '854000');
       const path = `${id}/AbCdEf12.jpg`;
       await stored(tx, path);
-      const before = await tx.query('select "Imagen" from articulos where id = $1', [id]);
+      const before = await tx.query('select "Imagen", foto from articulos where id = $1', [id]);
       const user = await createUser(tx);
       await actAs(tx, user);
       const { rows } = await tx.query('select * from asignar_foto_subida($1, $2)', [id, path]);
@@ -108,7 +108,7 @@ describe('asignar_foto_subida', () => {
       expect(log.rows[0]).toMatchObject({
         codigo: '854000',
         foto: path,
-        foto_anterior: null,
+        foto_anterior: before.rows[0].foto,
         drive_id: null,
         user_id: user,
       });

@@ -2,7 +2,8 @@
 
 **Mostrador Lois** es la web para buscar artículos de Lois y Bogao desde el mostrador y para
 administrar las fotos y el bot de Telegram. El backend es Supabase (Postgres + Auth + RLS), sin
-API propia. La misma base la usan **dos flujos de n8n en producción**.
+API propia. La misma base la usan **flujos de n8n en producción**: el bot de Telegram (canal
+secundario: el principal es la web) y el que pasa audio y foto a texto para la web.
 
 ## Antes de tocar algo, leé
 
@@ -16,9 +17,10 @@ API propia. La misma base la usan **dos flujos de n8n en producción**.
 ## Reglas
 
 - **Contrato con n8n:** no se renombran, borran ni cambian de tipo las columnas de `articulos`.
-  `"Imagen"` se escribe siempre con el formato
-  `https://drive.google.com/file/d/<ID>/view?usp=drivesdk`. Los tests de
-  `n8n-contract.int-spec.ts` lo verifican.
+  Las fotos están en Supabase Storage (`articulos.foto`, bucket `fotos`, ADR-008): **Drive ya no
+  se usa para nada**. `"Imagen"` queda sin uso; si se escribiera, va con el formato
+  `https://drive.google.com/file/d/<ID>/view?usp=drivesdk` (lo verifica
+  `n8n-contract.int-spec.ts`).
 - **Migraciones:** van en `supabase/migrations/`, son idempotentes (`if not exists`,
   `create or replace`, `drop policy if exists`) y siempre van con `pnpm db:generate`.
   Nunca se aplican a un proyecto remoto sin el OK explícito del dueño.

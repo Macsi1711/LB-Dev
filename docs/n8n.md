@@ -2,19 +2,26 @@
 
 ## Contrato (no romper)
 
-| Flujo | Rol       | Operación                                                                                                                | Objeto              |
-| ----- | --------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------- |
-| Bot   | `n8n_bot` | SELECT con SQL libre generado por la IA                                                                                  | `articulos`         |
-| Bot   | `n8n_app` | `select activo from usuarios_telegram where chat_id = $1`                                                                | `usuarios_telegram` |
-| Bot   | `n8n_app` | INSERT                                                                                                                   | `consultas_bot`     |
-| Fotos | `n8n_app` | `UPDATE articulos SET "Imagen" = … WHERE upper(trim("Codigo")) = ANY(…) RETURNING "Codigo", "Nombre artículo", "Imagen"` | `articulos`         |
-| Fotos | `n8n_app` | `INSERT … ON CONFLICT (drive_id) DO NOTHING`                                                                             | `fotos_sin_match`   |
+| Flujo | Rol       | Operación                                                                                                 | Objeto              |
+| ----- | --------- | --------------------------------------------------------------------------------------------------------- | ------------------- |
+| Bot   | `n8n_bot` | SELECT con SQL libre generado por la IA                                                                   | `articulos`         |
+| Bot   | `n8n_app` | `select activo from usuarios_telegram where chat_id = $1`                                                 | `usuarios_telegram` |
+| Bot   | `n8n_app` | INSERT                                                                                                    | `consultas_bot`     |
+| Bot   | `n8n_bot` | `select trim("Codigo") as codigo, foto from articulos where foto is not null and trim("Codigo") = any(…)` | `articulos`         |
+
+**Retirados (ADR-008):** el flujo "Lois Fotos" (escribía `"Imagen"` y `fotos_sin_match` desde la
+carpeta de Drive) y el webhook "Lois Subir foto". Las fotos se cargan solo desde la web y van a
+Supabase Storage.
 
 `familias` ya existe en producción con `"Código"` y `"Nombre"` (con tilde y sin clave): tampoco
 se renombra. La web solo le agrega `es_producto` y la lee por la vista `v_familias`.
 
-`"Imagen"` siempre tiene el formato `https://drive.google.com/file/d/<ID>/view?usp=drivesdk`.
-Lo verifica `apps/web/tests/integration/n8n-contract.int-spec.ts`.
+**Fotos:** están en Supabase Storage, bucket público `fotos`. `articulos.foto` tiene la ruta de la
+foto grande (`<id>/<token>.jpg`) y la miniatura está al lado (`<id>/<token>.mini.jpg`). El link
+público es `<SUPABASE_URL>/storage/v1/object/public/fotos/<foto>`. `"Imagen"` queda en la tabla con
+el link de Drive de antes (no se borran columnas): ya no se usa para las fotos ni se escribe; si
+alguien la escribiera, el formato sigue siendo `https://drive.google.com/file/d/<ID>/view?usp=drivesdk` (lo
+verifica `apps/web/tests/integration/n8n-contract.int-spec.ts`).
 
 ## Antes de aplicar las migraciones en producción
 
@@ -57,8 +64,11 @@ Como cadena: `postgresql://n8n_bot.<project-ref>:<contraseña>@<host-del-pooler>
   chequear la lista blanca con `Lois - app`. Al final de cada camino, insertar en
   `consultas_bot` (chat_id, fuente, texto, sql_generado, cantidad, error). Si el usuario no está
   autorizado, insertar con `error = 'no autorizado'`.
-- **Lois Fotos:** _Escribir link en articulos_ pasa a `Lois - app`. El Code _Sin artículo_ se
-  reemplaza por el INSERT en `fotos_sin_match` de la tabla de arriba.
+- **Lois SQL, fotos (ADR-008):** después de _Execute a SQL query1_, _Buscar fotos en Storage_ trae
+  `foto` de los códigos que devolvió el SQL (una sola consulta) y _Sumar fotos de Storage_ le suma
+  a cada resultado su `foto_url` pública. Tiene foto el que tiene `foto_url`; Telegram la toma
+  directo del link (_Enviar foto de Storage_). Sin Drive: no hay nodos de Google Drive ni
+  credencial. El flujo está en [`n8n/lois-sql.json`](../n8n/lois-sql.json).
 
 Si se agregan familias nuevas en `articulos`, corré `select public.sincronizar_familias();`.
 
@@ -109,23 +119,8 @@ producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_UR
 de n8n y 500 para el resto. La web muestra un aviso y deja escribir. El webhook no escribe en
 `consultas_bot`: la consulta la registra la web con `registrar_consulta()`, con el canal `web`.
 
-## Webhook "Lois Subir foto" (cargar la foto de un artículo desde la web)
+## Webhook "Lois Subir foto" (retirado)
 
-La web manda una foto y el código del artículo; n8n la sube a Drive y devuelve el id del archivo.
-La web la asigna con `asignar_imagen_drive()`. Decisión en el
-[ADR-007](adr/007-fotos-desde-la-web.md). El flujo está en
-[`n8n/lois-subir-foto.json`](../n8n/lois-subir-foto.json) (mismos marcadores que el de audio y foto).
-
-**Antes de activarlo:** crear en Drive la subcarpeta **"Fotos desde la web"** adentro de _Lois base
-de datos_ y elegirla en el nodo _Subir a Drive_ (_Parent Folder_). Tiene que ser una subcarpeta:
-"Lois Fotos" mira la carpeta principal y procesaría la foto otra vez. La URL de producción va en
-`VITE_N8N_FOTOS_URL` en Vercel.
-
-**Pedido:** `POST` con `Authorization: Bearer <token>` y `multipart/form-data` con `archivo`
-(`image/jpeg`, hasta 1600 px) y `codigo` (el código del artículo, para el nombre del archivo).
-
-**Qué hace:** valida la sesión como el webhook de audio y foto, sube la foto como
-`<codigo> web <fecha>.jpg`, la comparte como "cualquiera con el link" y responde
-`{ "drive_id": "<id>" }`.
-
-**Errores:** 401 sin sesión, 400 si falta la foto o el código, 500 si falla Drive.
+Subía a Drive la foto que se cargaba desde la web (ADR-007). Desde el ADR-008 la web sube directo a
+Supabase Storage y asigna con `asignar_foto_subida()`, sin n8n: el flujo se desactiva y
+`VITE_N8N_FOTOS_URL` ya no existe.
