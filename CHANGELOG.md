@@ -3,7 +3,7 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
-## [Sin publicar]
+## [0.6.0] - 2026-10-16
 
 ### Arreglado
 
@@ -11,11 +11,11 @@ semántico.
   usar el índice y recorría todos los artículos en cada búsqueda (0,5–2 s con 1 CPU). Ahora
   `filtrar_articulos()` y `puntuar_parecidos()` corren como dueño y chequean el perfil a mano: de
   ~550 ms a ~20 ms la exacta y de ~1,3 s a ~1 ms sin resultados (migración
-  `20261016000018_busqueda_usa_indice.sql`). Lo encontró la prueba de carga local.
+  `20261016000018_busqueda_usa_indice.sql`, ya aplicada). Lo encontró la prueba de carga local.
 - **Cada consulta busca una sola vez:** `buscar_articulos()` trae directo la página de exactos
   (antes armaba la lista entera para saber si había) y `registrar_consulta()` usa la cantidad que
   la web ya mostró (antes volvía a buscar para contar). Con 20 vendedores simulados y 1 CPU, los
-  errores bajan del 6,5 % al 0,1 % (migración `20261016000019_busqueda_una_vez.sql`).
+  errores bajan del 6,5 % al 0,1 % (migración `20261016000019_busqueda_una_vez.sql`, ya aplicada).
 
 ### Agregado
 
