@@ -8,14 +8,10 @@ Un término nuevo entra en la misma PR que lo introduce.
 | Código (del artículo)     | `"Codigo"` / `codigo`                                                  | `code`                        |
 | Familia                   | `familias` (`"Código"`, `"Nombre"`), `v_familias`, `"codigo  familia"` | `family`                      |
 | Familia de producto       | `familias.es_producto`                                                 | `isProduct`                   |
-| Foto                      | `"Imagen"` / `imagen_url`                                              | `photoUrl`                    |
-| ID de Drive               | `imagen_drive_id`, `drive_id`                                          | `driveId`                     |
-| Miniatura                 | —                                                                      | `thumbnail`                   |
+| Foto                      | `articulos.foto` (bucket `fotos` de Storage)                           | `storagePhoto.full`           |
+| Miniatura                 | `<foto>.mini.jpg` en el bucket `fotos`                                 | `storagePhoto.mini`           |
+| Agregar foto              | `asignar_foto_subida()`                                                | `savePhoto`                   |
 | Observaciones             | `observaciones`                                                        | `notes`                       |
-| Foto que no matcheó       | `fotos_sin_match`                                                      | `UnmatchedPhoto`              |
-| Candidatos (de n8n)       | `fotos_sin_match.candidatos`                                           | `candidates`                  |
-| Asignar foto              | `asignar_foto()`                                                       | `assignPhoto`                 |
-| Descartar foto            | `fotos_sin_match.resuelto = true`                                      | `dismissPhoto`                |
 | Perfil                    | `perfiles`                                                             | `Profile`                     |
 | Vendedor / Admin          | `perfiles.rol` = `vendedor` / `admin`                                  | `role: 'vendedor' \| 'admin'` |
 | Usuario habilitado (bot)  | `usuarios_telegram`                                                    | `TelegramUser`                |

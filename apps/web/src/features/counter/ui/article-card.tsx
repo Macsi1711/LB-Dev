@@ -16,11 +16,7 @@ export function ArticleCard({
       className="flex min-w-0 cursor-pointer items-center gap-3 rounded-md py-2 hover:bg-accent"
       onClick={() => onOpen(article)}
     >
-      <ArticleThumbnail
-        driveId={article.driveId}
-        storagePhoto={article.storagePhoto}
-        className="w-20 shrink-0 rounded-md"
-      />
+      <ArticleThumbnail storagePhoto={article.storagePhoto} className="w-20 shrink-0 rounded-md" />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex items-center gap-1">
           <button

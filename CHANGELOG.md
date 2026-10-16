@@ -14,6 +14,10 @@ semántico.
   (800 px y una miniatura de 320 px), la sube al bucket `fotos` y la asigna con
   `asignar_foto_subida()`, sin n8n ni Drive. La pestaña aparece siempre y la ayuda ya no manda a
   la carpeta de Drive. Se va `VITE_N8N_FOTOS_URL` y el código que subía por n8n.
+- **La web ya no usa Drive (ADR-008, paso 5):** las fotos salen solo de Supabase Storage (un
+  artículo sin foto ahí muestra "Sin foto"), "Abrir foto" abre solo la de Storage y se va la
+  pestaña "Fotos que no matchearon", que mostraba lo que dejaba "Lois Fotos" en la carpeta de
+  Drive.
 
 ### Arreglado
 

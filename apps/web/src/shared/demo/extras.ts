@@ -1,33 +1,6 @@
-// Fotos sin match y datos del bot para el modo demo. Inventados.
+// Datos del bot para el modo demo. Inventados.
 
 const ago = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString();
-
-export const demoUnmatchedPhotos = [
-  {
-    id: 1,
-    driveId: 'demo/pastilla-freno',
-    file: '854001 copia.jpg',
-    candidates: '854001 COPIA|854001COPIA',
-    createdAt: ago(30),
-    resolved: false,
-  },
-  {
-    id: 2,
-    driveId: 'demo/filtro-aceite',
-    file: 'filtro hilux.png',
-    candidates: 'FILTRO HILUX|FILTROHILUX',
-    createdAt: ago(240),
-    resolved: false,
-  },
-  {
-    id: 3,
-    driveId: 'demo/amortiguador',
-    file: 'AMO620.jpeg',
-    candidates: 'AMO620',
-    createdAt: ago(1500),
-    resolved: false,
-  },
-];
 
 export const demoTelegramUsers = [
   {
