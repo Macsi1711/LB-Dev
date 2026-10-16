@@ -52,6 +52,9 @@ export function createSupabaseCounter(client: SupabaseClient<Database>): Counter
         p_fuente: log.source,
         p_escuchado: log.heard ?? undefined,
         p_error: log.error ?? undefined,
+        // Con la cantidad que ya mostró la web, la base no vuelve a buscar para contar.
+        p_cantidad: log.total ?? undefined,
+        p_aproximada: log.approximate ?? undefined,
       });
       if (error) throw error;
     },

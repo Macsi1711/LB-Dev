@@ -1,4 +1,5 @@
 import type { MediaKind } from './media';
+import type { SearchSummary } from './ports';
 import type { SearchState } from './search-state';
 
 /** Un mensaje del vendedor en el chat del Mostrador; la respuesta se calcula al mostrarlo. */
@@ -103,11 +104,14 @@ export interface QueryLog {
   source: 'texto' | 'audio' | 'foto';
   heard: string | null;
   error: string | null;
+  /** Cuántos encontró, si la web ya lo sabe; si no (null), la base vuelve a buscar para contar. */
+  total: number | null;
+  approximate: boolean | null;
 }
 
 const LOG_SOURCE = { audio: 'audio', photo: 'foto' } as const;
 
-export function queryLog(query: ChatQuery): QueryLog {
+export function queryLog(query: ChatQuery, summary?: SearchSummary): QueryLog {
   return {
     q: query.state.q || null,
     family: query.state.family,
@@ -115,6 +119,8 @@ export function queryLog(query: ChatQuery): QueryLog {
     source: query.source ? LOG_SOURCE[query.source] : 'texto',
     heard: query.heard ?? null,
     error: null,
+    total: summary?.total ?? null,
+    approximate: summary?.approximate ?? null,
   };
 }
 
@@ -127,5 +133,7 @@ export function failedMediaLog(kind: MediaKind, state: SearchState, error: strin
     source: LOG_SOURCE[kind],
     heard: null,
     error,
+    total: null,
+    approximate: null,
   };
 }

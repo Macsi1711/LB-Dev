@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import {
@@ -21,6 +22,7 @@ import {
   WelcomeBubble,
 } from './chat-messages';
 import { useCounterPort, useMediaPort } from './counter-context';
+import { summaryQuery } from './summary-query';
 import { shrinkPhoto } from '@/shared/lib/shrink-photo';
 
 const STORAGE_KEY = 'mostrador-chat';
@@ -49,6 +51,7 @@ export function CounterPage() {
   const stick = useRef(true);
   const media = useMediaPort();
   const port = useCounterPort();
+  const queryClient = useQueryClient();
   const [pending, setPending] = useState<MediaKind | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -66,11 +69,18 @@ export function CounterPage() {
       if (next === history) return;
       setHistory(next);
       const sent = next.at(-1);
-      if (sent) record(queryLog(sent));
+      // Es el mismo pedido que muestra la respuesta (no se repite): con lo que encontró, la base
+      // no vuelve a buscar para las métricas. Si falla, la base cuenta sola.
+      if (sent) {
+        queryClient.fetchQuery(summaryQuery(port, sent.state)).then(
+          (summary) => record(queryLog(sent, summary)),
+          () => record(queryLog(sent)),
+        );
+      }
       // La última consulta queda en la URL para poder compartir el link.
       setParams(toSearchParams(state), { replace: true });
     },
-    [history, record, setParams],
+    [history, port, queryClient, record, setParams],
   );
 
   // Audio o foto: n8n lo pasa a texto y se busca como si se hubiera escrito, con los filtros puestos.
