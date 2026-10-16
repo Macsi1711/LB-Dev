@@ -108,3 +108,23 @@ describe('kpis_bot con la web', () => {
     });
   });
 });
+
+describe('registrar_consulta con la cantidad que ya sabe la web (migración 0019)', () => {
+  it('la usa tal cual y no vuelve a buscar', async () => {
+    await inTransaction(db, async (tx) => {
+      await actAs(tx, await createUser(tx));
+      await tx.query(
+        `select registrar_consulta('pastiya onix', p_cantidad => 7, p_aproximada => true)`,
+      );
+      expect(await lastWebQuery(tx)).toMatchObject({ cantidad: 7, aproximada: true });
+    });
+  });
+
+  it('si no viene o no tiene sentido, cuenta en la base como antes', async () => {
+    await inTransaction(db, async (tx) => {
+      await actAs(tx, await createUser(tx));
+      await tx.query(`select registrar_consulta('pastiya onix', p_cantidad => -1)`);
+      expect(await lastWebQuery(tx)).toMatchObject({ cantidad: 2, aproximada: true });
+    });
+  });
+});

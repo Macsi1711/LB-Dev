@@ -81,6 +81,11 @@ describe('buscar_articulos', () => {
     );
     expect(page1.rowCount).toBe(3);
     expect(page2.rowCount).toBe(1);
+    // Pasado el final de los exactos no salta a "lo más parecido": la lista terminó.
+    const past = await seller.query(
+      `select codigo from buscar_articulos('pastilla', null, null, 3, 6)`,
+    );
+    expect(past.rowCount).toBe(0);
   });
 });
 
