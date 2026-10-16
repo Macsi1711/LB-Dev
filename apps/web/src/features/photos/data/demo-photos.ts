@@ -93,6 +93,7 @@ export function createDemoPhotos(): PhotosPort {
           familyName: demoFamilyName(a.family),
           hasPhoto: !!a.photo,
           driveId: a.photo,
+          storagePhoto: null,
         }));
     },
     async assignDrivePhoto(articleId, driveId) {

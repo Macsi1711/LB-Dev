@@ -3,6 +3,7 @@ import { useMediaQuery } from '@/shared/lib/use-media-query';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
+import { photoLink } from '../domain/photo';
 import type { Article } from '../domain/ports';
 import { ArticleThumbnail } from './article-thumbnail';
 import { CopyCodeButton } from './copy-code-button';
@@ -11,6 +12,7 @@ import { CopyCodeButton } from './copy-code-button';
 export function ArticleDetail(props: { article: Article | null; onClose: () => void }) {
   const desktop = useMediaQuery('(min-width: 1024px)');
   const a = props.article;
+  const link = a ? photoLink(a.storagePhoto, a.driveId) : null;
 
   return (
     <Sheet open={!!a} onOpenChange={(open) => !open && props.onClose()}>
@@ -31,7 +33,12 @@ export function ArticleDetail(props: { article: Article | null; onClose: () => v
               <SheetDescription className="text-base text-foreground">{a.name}</SheetDescription>
             </SheetHeader>
             <div className="grid gap-4 px-4 pb-6">
-              <ArticleThumbnail driveId={a.driveId} width={1000} className="rounded-md" />
+              <ArticleThumbnail
+                driveId={a.driveId}
+                storagePhoto={a.storagePhoto}
+                width={1000}
+                className="rounded-md"
+              />
               {a.notes && (
                 <div
                   className="flex gap-2 rounded-md border border-aviso bg-aviso/15 p-3"
@@ -59,11 +66,11 @@ export function ArticleDetail(props: { article: Article | null; onClose: () => v
               </dl>
               <div className="grid gap-2 sm:grid-cols-2">
                 <CopyCodeButton code={a.code} label="Copiar código" />
-                {a.hasPhoto && a.photoUrl && (
+                {a.hasPhoto && link && (
                   <Button variant="outline" asChild>
-                    <a href={a.photoUrl} target="_blank" rel="noreferrer">
+                    <a href={link} target="_blank" rel="noreferrer">
                       <ExternalLink />
-                      Abrir foto en Drive
+                      Abrir foto
                     </a>
                   </Button>
                 )}

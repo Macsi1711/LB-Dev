@@ -1,15 +1,17 @@
 import { ImageOff } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/shared/lib/utils';
-import { thumbnailCandidates } from '../domain/drive';
+import type { StoragePhoto } from '@/shared/lib/storage-photo';
+import { photoCandidates } from '../domain/photo';
 
-/** Miniatura de Drive con fallback: Drive → googleusercontent → placeholder "Sin foto". */
+/** Foto del artículo con fallback: Storage → Drive → googleusercontent → placeholder "Sin foto". */
 export function ArticleThumbnail(props: {
   driveId: string | null;
+  storagePhoto?: StoragePhoto | null;
   width?: number;
   className?: string;
 }) {
-  const urls = props.driveId ? thumbnailCandidates(props.driveId, props.width) : [];
+  const urls = photoCandidates(props.storagePhoto ?? null, props.driveId, props.width);
   const [attempt, setAttempt] = useState(0);
   const url = urls[attempt];
 

@@ -3,6 +3,14 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [Sin publicar]
+
+### Cambiado
+
+- **La web muestra las fotos desde Supabase Storage (ADR-008, paso 4):** las tarjetas usan la
+  miniatura y el detalle la foto grande; si un artículo todavía no tiene foto en Storage, usa la de
+  Drive como antes. El botón del detalle pasa a llamarse "Abrir foto".
+
 ## [0.6.0] - 2026-10-16
 
 ### Arreglado
