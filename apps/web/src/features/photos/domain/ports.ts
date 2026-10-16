@@ -1,3 +1,4 @@
+import type { StoragePhoto } from '@/shared/lib/storage-photo';
 import type { CodeSuggestion, UnmatchedPhoto } from './unmatched';
 
 export interface CoverageStat {
@@ -28,6 +29,7 @@ export interface UploadTarget {
   familyName: string | null;
   hasPhoto: boolean;
   driveId: string | null;
+  storagePhoto: StoragePhoto | null;
 }
 
 export interface PhotosPort {

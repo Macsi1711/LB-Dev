@@ -21,6 +21,7 @@ const toArticle = (a: DemoArticle): Article => ({
   familyName: demoFamilyName(a.family),
   photoUrl: a.photo ? driveViewUrl(a.photo) : null,
   driveId: a.photo,
+  storagePhoto: null,
   hasPhoto: !!a.photo,
 });
 

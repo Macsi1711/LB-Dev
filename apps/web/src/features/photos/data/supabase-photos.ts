@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/shared/database.types';
+import { storagePhoto } from '@/shared/lib/storage-photo';
 import type { MissingPhotoArticle, PhotosPort } from '../domain/ports';
 
 const PAGE = 1000; // máximo de filas por pedido de PostgREST
@@ -33,6 +34,7 @@ export function createSupabasePhotos(client: SupabaseClient<Database>): PhotosPo
         familyName: r.familia_nombre,
         hasPhoto: r.tiene_foto ?? false,
         driveId: r.imagen_drive_id,
+        storagePhoto: storagePhoto(client, r.foto),
       }));
     },
     async assignDrivePhoto(articleId, driveId) {

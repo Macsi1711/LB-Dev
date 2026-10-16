@@ -122,7 +122,11 @@ export function AddPhotoTab(props: {
         <h2 className="font-semibold">1. Elegí el artículo</h2>
         {target ? (
           <div className="flex items-center gap-3 rounded-md border bg-card p-2">
-            <ArticleThumbnail driveId={target.driveId} className="w-20 shrink-0 rounded" />
+            <ArticleThumbnail
+              driveId={target.driveId}
+              storagePhoto={target.storagePhoto}
+              className="w-20 shrink-0 rounded"
+            />
             <div className="min-w-0 flex-1">
               <p className="font-mono font-semibold text-codigo">{target.code}</p>
               <p className="truncate text-sm">{target.name}</p>
