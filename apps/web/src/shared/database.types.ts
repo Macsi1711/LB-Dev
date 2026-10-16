@@ -514,6 +514,8 @@ export type Database = {
       };
       registrar_consulta: {
         Args: {
+          p_aproximada?: boolean;
+          p_cantidad?: number;
           p_con_foto?: boolean;
           p_error?: string;
           p_escuchado?: string;

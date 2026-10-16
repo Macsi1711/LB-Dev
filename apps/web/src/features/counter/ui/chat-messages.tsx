@@ -9,6 +9,7 @@ import type { Article } from '../domain/ports';
 import { PAGE_SIZE } from '../domain/search-state';
 import { ArticleCard } from './article-card';
 import { useCounterPort } from './counter-context';
+import { summaryQuery } from './summary-query';
 import { useFamilyName } from './family-filter';
 
 /** Cuántos resultados entran en la burbuja antes de "Ver todos". */
@@ -149,10 +150,7 @@ export function ReplyBubble(props: {
       last.length < PAGE_SIZE ? undefined : pages.length * PAGE_SIZE,
     placeholderData: keepPreviousData,
   });
-  const total = useQuery({
-    queryKey: ['articulos-resumen', state],
-    queryFn: () => port.summary(state),
-  });
+  const total = useQuery(summaryQuery(port, state));
 
   if (results.isError)
     return (
