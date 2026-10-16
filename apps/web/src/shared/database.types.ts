@@ -29,6 +29,7 @@ export type Database = {
           Codigo: string | null;
           'codigo  familia': string | null;
           Descripción: string | null;
+          foto: string | null;
           id: number;
           Imagen: string | null;
           'Nombre artículo': string | null;
@@ -41,6 +42,7 @@ export type Database = {
           Codigo?: string | null;
           'codigo  familia'?: string | null;
           Descripción?: string | null;
+          foto?: string | null;
           id?: never;
           Imagen?: string | null;
           'Nombre artículo'?: string | null;
@@ -52,6 +54,7 @@ export type Database = {
           Codigo?: string | null;
           'codigo  familia'?: string | null;
           Descripción?: string | null;
+          foto?: string | null;
           id?: never;
           Imagen?: string | null;
           'Nombre artículo'?: string | null;
@@ -167,7 +170,9 @@ export type Database = {
           articulo_id: number;
           codigo: string | null;
           created_at: string;
-          drive_id: string;
+          drive_id: string | null;
+          foto: string | null;
+          foto_anterior: string | null;
           id: number;
           imagen_anterior: string | null;
           user_id: string | null;
@@ -177,7 +182,9 @@ export type Database = {
           articulo_id: number;
           codigo?: string | null;
           created_at?: string;
-          drive_id: string;
+          drive_id?: string | null;
+          foto?: string | null;
+          foto_anterior?: string | null;
           id?: never;
           imagen_anterior?: string | null;
           user_id?: string | null;
@@ -186,7 +193,9 @@ export type Database = {
           articulo_id?: number;
           codigo?: string | null;
           created_at?: string;
-          drive_id?: string;
+          drive_id?: string | null;
+          foto?: string | null;
+          foto_anterior?: string | null;
           id?: never;
           imagen_anterior?: string | null;
           user_id?: string | null;
@@ -248,6 +257,7 @@ export type Database = {
           descripcion: string | null;
           familia_codigo: string | null;
           familia_nombre: string | null;
+          foto: string | null;
           id: number | null;
           imagen_drive_id: string | null;
           imagen_url: string | null;
@@ -261,6 +271,7 @@ export type Database = {
           descripcion?: string | null;
           familia_codigo?: string | null;
           familia_nombre?: string | null;
+          foto?: string | null;
           id?: number | null;
           imagen_drive_id?: never;
           imagen_url?: string | null;
@@ -273,6 +284,7 @@ export type Database = {
           descripcion?: string | null;
           familia_codigo?: string | null;
           familia_nombre?: string | null;
+          foto?: string | null;
           id?: number | null;
           imagen_drive_id?: never;
           imagen_url?: string | null;
@@ -288,6 +300,7 @@ export type Database = {
           descripcion: string | null;
           familia_codigo: string | null;
           familia_nombre: string | null;
+          foto: string | null;
           id: number | null;
           imagen_drive_id: string | null;
           imagen_url: string | null;
@@ -341,6 +354,29 @@ export type Database = {
           descripcion: string | null;
           familia_codigo: string | null;
           familia_nombre: string | null;
+          foto: string | null;
+          id: number | null;
+          imagen_drive_id: string | null;
+          imagen_url: string | null;
+          nombre: string | null;
+          observaciones: string | null;
+          tiene_foto: boolean | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'v_articulos';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      asignar_foto_subida: {
+        Args: { p_articulo_id: number; p_ruta: string };
+        Returns: {
+          codigo: string | null;
+          descripcion: string | null;
+          familia_codigo: string | null;
+          familia_nombre: string | null;
+          foto: string | null;
           id: number | null;
           imagen_drive_id: string | null;
           imagen_url: string | null;
@@ -362,6 +398,7 @@ export type Database = {
           descripcion: string | null;
           familia_codigo: string | null;
           familia_nombre: string | null;
+          foto: string | null;
           id: number | null;
           imagen_drive_id: string | null;
           imagen_url: string | null;
@@ -389,6 +426,7 @@ export type Database = {
           descripcion: string | null;
           familia_codigo: string | null;
           familia_nombre: string | null;
+          foto: string | null;
           id: number | null;
           imagen_drive_id: string | null;
           imagen_url: string | null;
@@ -417,6 +455,7 @@ export type Database = {
           descripcion: string | null;
           familia_codigo: string | null;
           familia_nombre: string | null;
+          foto: string | null;
           id: number | null;
           imagen_drive_id: string | null;
           imagen_url: string | null;
@@ -475,6 +514,8 @@ export type Database = {
       };
       registrar_consulta: {
         Args: {
+          p_aproximada?: boolean;
+          p_cantidad?: number;
           p_con_foto?: boolean;
           p_error?: string;
           p_escuchado?: string;

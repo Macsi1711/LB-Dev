@@ -158,6 +158,17 @@ describe('queryLog', () => {
       source: 'texto',
       heard: null,
       error: null,
+      total: null,
+      approximate: null,
+    });
+  });
+
+  it('guarda cuántos encontró si la web ya lo sabe, para que la base no repita la búsqueda', () => {
+    const summary = { total: 146, approximate: true };
+    expect(queryLog(query('a', state('pastila onyx')), summary)).toMatchObject({
+      q: 'pastila onyx',
+      total: 146,
+      approximate: true,
     });
   });
 
@@ -181,6 +192,8 @@ describe('queryLog', () => {
       source: 'foto',
       heard: null,
       error: 'No pude leer la foto.',
+      total: null,
+      approximate: null,
     });
   });
 });

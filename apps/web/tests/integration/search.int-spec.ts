@@ -1,17 +1,28 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { connect, inTransaction } from './db';
+import { actAs, connect, inTransaction } from './db';
+
+// Las búsquedas corren como el vendedor del seed, igual que desde la web: sin perfil no
+// devuelven nada (migración 0018).
+const SELLER = 'a0000000-0000-4000-8000-000000000002';
 
 let db: pg.Client;
+let seller: pg.Client;
 beforeAll(async () => {
   db = await connect();
+  seller = await connect();
+  await seller.query(`select set_config('request.jwt.claims', $1, false)`, [
+    JSON.stringify({ sub: SELLER, role: 'authenticated' }),
+  ]);
+  await seller.query('set role authenticated');
 });
 afterAll(async () => {
   await db.end();
+  await seller.end();
 });
 
 async function search(q: string, family: string | null = null, withPhoto: boolean | null = null) {
-  const { rows } = await db.query<{ codigo: string }>(
+  const { rows } = await seller.query<{ codigo: string }>(
     'select codigo from buscar_articulos($1, $2, $3)',
     [q, family, withPhoto],
   );
@@ -53,22 +64,28 @@ describe('buscar_articulos', () => {
       await tx.query(
         `insert into articulos ("Codigo", "Nombre artículo") values ('T1', 'KIT 50% OFF'), ('T2', 'KIT 500')`,
       );
+      await actAs(tx, SELLER);
       const { rows } = await tx.query('select codigo from buscar_articulos($1)', ['50%']);
       expect(rows).toEqual([{ codigo: 'T1' }]);
     });
   });
 
   it('pagina y cuenta con los mismos filtros', async () => {
-    const count = await db.query<{ n: string }>(`select contar_articulos('pastilla') as n`);
+    const count = await seller.query<{ n: string }>(`select contar_articulos('pastilla') as n`);
     expect(Number(count.rows[0]!.n)).toBe(4);
-    const page1 = await db.query(
+    const page1 = await seller.query(
       `select codigo from buscar_articulos('pastilla', null, null, 3, 0)`,
     );
-    const page2 = await db.query(
+    const page2 = await seller.query(
       `select codigo from buscar_articulos('pastilla', null, null, 3, 3)`,
     );
     expect(page1.rowCount).toBe(3);
     expect(page2.rowCount).toBe(1);
+    // Pasado el final de los exactos no salta a "lo más parecido": la lista terminó.
+    const past = await seller.query(
+      `select codigo from buscar_articulos('pastilla', null, null, 3, 6)`,
+    );
+    expect(past.rowCount).toBe(0);
   });
 });
 
@@ -79,7 +96,7 @@ describe('búsqueda en lenguaje natural', () => {
   }
 
   async function summary(q: string) {
-    const { rows } = await db.query<{ total: string; aproximada: boolean }>(
+    const { rows } = await seller.query<{ total: string; aproximada: boolean }>(
       'select * from resumen_busqueda($1)',
       [q],
     );

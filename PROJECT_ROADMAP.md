@@ -72,6 +72,12 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | **Release v0.4.1**                                                                                    | ✅                    | release/0.4.1 |
 | 6    | Agregar foto a un artículo desde la web (Drive por n8n)                                               | ✅                    | #64–#67       |
 | 6    | **Release v0.5.0**                                                                                    | ✅                    | release/0.5.0 |
+| 6    | Fotos en Storage: bucket, columna `foto` y asignación ([ADR-008](docs/adr/008-fotos-en-storage.md))   | ✅                    | #69, #70      |
+| 6    | Pasar las fotos de Drive a Storage (442 de 443)                                                       | ✅                    | #71           |
+| 6    | Búsqueda más rápida: usa el índice y busca una sola vez (prueba de carga local)                       | ✅                    | #72, #73      |
+| 6    | **Release v0.6.0**                                                                                    | ✅                    | release/0.6.0 |
+| 6    | El bot y la web leen las fotos de Storage y se apaga Drive                                            | ⏳                    | —             |
+| 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño              | —             |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ⏳ dueño              | —             |
 | 6    | Prueba de punta a punta con los flujos de n8n andando                                                 | 🔒 migraciones y n8n  | —             |
 | 6    | Plan de Vercel para uso comercial (Pro)                                                               | ⏳ decisión del dueño | —             |

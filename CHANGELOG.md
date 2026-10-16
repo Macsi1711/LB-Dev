@@ -3,6 +3,30 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.6.0] - 2026-10-16
+
+### Arreglado
+
+- **Búsqueda mucho más rápida para los vendedores:** con los permisos por fila, Postgres no podía
+  usar el índice y recorría todos los artículos en cada búsqueda (0,5–2 s con 1 CPU). Ahora
+  `filtrar_articulos()` y `puntuar_parecidos()` corren como dueño y chequean el perfil a mano: de
+  ~550 ms a ~20 ms la exacta y de ~1,3 s a ~1 ms sin resultados (migración
+  `20261016000018_busqueda_usa_indice.sql`, ya aplicada). Lo encontró la prueba de carga local.
+- **Cada consulta busca una sola vez:** `buscar_articulos()` trae directo la página de exactos
+  (antes armaba la lista entera para saber si había) y `registrar_consulta()` usa la cantidad que
+  la web ya mostró (antes volvía a buscar para contar). Con 20 vendedores simulados y 1 CPU, los
+  errores bajan del 6,5 % al 0,1 % (migración `20261016000019_busqueda_una_vez.sql`, ya aplicada).
+
+### Agregado
+
+- **Fotos en Supabase Storage, primer paso (ADR-008):** bucket público `fotos`, columna
+  `articulos.foto` y `asignar_foto_subida()` para asignar una foto ya subida. Un artículo tiene
+  foto si está en Storage o tiene link de Drive. `"Imagen"` y el bot no cambian todavía
+  (migración `20261015000017_fotos_storage.sql`, ya aplicada).
+- **Fotos de Drive a Storage:** `apps/web/scripts/migrar-fotos-drive.mjs` las pasa una sola vez,
+  en memoria y con la sesión de un usuario de la web (`docs/produccion.md`, sección 7). Ya se
+  corrió: 442 de 443 fotos están en Storage.
+
 ## [0.5.0] - 2026-10-15
 
 ### Agregado
