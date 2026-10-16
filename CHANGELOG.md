@@ -3,25 +3,25 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
-## [Sin publicar]
+## [0.7.0] - 2026-10-16
 
 ### Cambiado
 
-- **La web muestra las fotos desde Supabase Storage (ADR-008, paso 4):** las tarjetas usan la
-  miniatura y el detalle la foto grande; si un artículo todavía no tiene foto en Storage, usa la de
-  Drive como antes. El botón del detalle pasa a llamarse "Abrir foto".
-- **"Agregar foto" sube directo a Supabase Storage (ADR-008, paso 4):** la web achica la foto
-  (800 px y una miniatura de 320 px), la sube al bucket `fotos` y la asigna con
-  `asignar_foto_subida()`, sin n8n ni Drive. La pestaña aparece siempre y la ayuda ya no manda a
-  la carpeta de Drive. Se va `VITE_N8N_FOTOS_URL` y el código que subía por n8n.
-- **La web ya no usa Drive (ADR-008, paso 5):** las fotos salen solo de Supabase Storage (un
-  artículo sin foto ahí muestra "Sin foto"), "Abrir foto" abre solo la de Storage y se va la
-  pestaña "Fotos que no matchearon", que mostraba lo que dejaba "Lois Fotos" en la carpeta de
-  Drive.
-- **"Tiene foto" = foto en Supabase Storage:** un link de Drive solo ya no cuenta, así la
-  cobertura, "Sin foto" y "Solo con foto" coinciden con lo que se ve (migración
-  `20261016000020_tiene_foto_storage.sql`). El contrato con n8n (`docs/n8n.md`) y `CLAUDE.md` dicen
-  que Drive ya no se usa; "Lois Fotos" y "Lois Subir foto" quedan retirados.
+- **Las fotos son solo de Supabase Storage y Drive ya no se usa (ADR-008, pasos 4 y 5):**
+  - La web muestra las fotos desde Storage: las tarjetas usan la miniatura y el detalle la foto
+    grande. Un artículo sin foto en Storage muestra "Sin foto". El botón del detalle pasa a
+    llamarse "Abrir foto".
+  - **"Agregar foto" sube directo a Storage:** la web achica la foto (800 px y una miniatura de
+    320 px), la sube al bucket `fotos` y la asigna con `asignar_foto_subida()`, sin n8n ni Drive.
+    La pestaña aparece siempre y la ayuda ya no manda a la carpeta de Drive.
+  - Se van la pestaña "Fotos que no matchearon" (la llenaba "Lois Fotos" desde la carpeta de
+    Drive), `VITE_N8N_FOTOS_URL` y el código que subía por n8n.
+  - **"Tiene foto" = foto en Storage:** un link de Drive solo ya no cuenta, así la cobertura, "Sin
+    foto" y "Solo con foto" coinciden con lo que se ve (migración
+    `20261016000020_tiene_foto_storage.sql`, ya aplicada).
+  - El bot de Telegram manda las fotos desde Storage, sin Drive (`n8n/lois-sql.json`). El contrato
+    con n8n (`docs/n8n.md`) y `CLAUDE.md` lo dicen; "Lois Fotos" y "Lois Subir foto" quedan
+    retirados.
 
 ### Arreglado
 
