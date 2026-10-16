@@ -11,6 +11,12 @@ semántico.
   miniatura y el detalle la foto grande; si un artículo todavía no tiene foto en Storage, usa la de
   Drive como antes. El botón del detalle pasa a llamarse "Abrir foto".
 
+### Arreglado
+
+- **Textos largos dentro de los cuadros:** un código, nombre o familia muy largos (sobre todo sin
+  espacios) estiraban las tarjetas de la respuesta y el detalle hasta salirse de la pantalla. Ahora
+  se cortan dentro del cuadro: el código y la familia con "…" y el nombre en dos líneas.
+
 ## [0.6.0] - 2026-10-16
 
 ### Arreglado

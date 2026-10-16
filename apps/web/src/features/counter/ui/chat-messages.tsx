@@ -173,9 +173,12 @@ export function ReplyBubble(props: {
   const visible = expanded ? articles : articles.slice(0, PREVIEW);
   return (
     <BotBubble className={cn(visible.length > 0 && 'w-full')}>
-      <p>{replySummary(count, state, familyName, total.data?.approximate)}</p>
+      <p className="wrap-anywhere">
+        {replySummary(count, state, familyName, total.data?.approximate)}
+      </p>
       {visible.length > 0 && (
-        <div className="mt-1 grid divide-y">
+        // grid-cols-1 (minmax(0, 1fr)): un texto largo no estira la lista fuera del cuadro.
+        <div className="mt-1 grid grid-cols-1 divide-y">
           {visible.map((a) => (
             <ArticleCard key={a.id} article={a} onOpen={props.onOpen} />
           ))}
