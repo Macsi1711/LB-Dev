@@ -76,7 +76,10 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | Pasar las fotos de Drive a Storage (442 de 443)                                                       | ✅                    | #71           |
 | 6    | Búsqueda más rápida: usa el índice y busca una sola vez (prueba de carga local)                       | ✅                    | #72, #73      |
 | 6    | **Release v0.6.0**                                                                                    | ✅                    | release/0.6.0 |
-| 6    | El bot y la web leen las fotos de Storage y se apaga Drive                                            | ⏳                    | —             |
+| 6    | La web muestra y carga las fotos solo en Storage, sin Drive; el bot también                           | ✅                    | #75, #77–#80  |
+| 6    | Textos largos que se salían de las tarjetas                                                           | ✅                    | #76           |
+| 6    | **Release v0.7.0**                                                                                    | ✅                    | release/0.7.0 |
+| 6    | Apagar Drive en n8n (Lois Fotos, Lois Subir foto, credencial) y sacar `VITE_N8N_FOTOS_URL`            | ⏳ dueño              | —             |
 | 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño              | —             |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ⏳ dueño              | —             |
 | 6    | Prueba de punta a punta con los flujos de n8n andando                                                 | 🔒 migraciones y n8n  | —             |
