@@ -12,16 +12,7 @@ describe('loadConfig', () => {
       supabaseUrl: 'http://127.0.0.1:55421',
       supabaseKey: 'sb_publishable_abc',
       n8nConsultaUrl: null,
-      n8nFotosUrl: null,
     });
-  });
-
-  it('el webhook de fotos también es opcional y https', () => {
-    const url = 'https://n8n.example.com/webhook/lois-subir-foto';
-    expect(loadConfig({ ...ok, VITE_N8N_FOTOS_URL: url }).n8nFotosUrl).toBe(url);
-    expect(() => loadConfig({ ...ok, VITE_N8N_FOTOS_URL: 'http://n8n.example.com/x' })).toThrow(
-      'VITE_N8N_FOTOS_URL tiene que ser https',
-    );
   });
 
   it('el webhook de n8n es opcional y tiene que ser https (salvo en localhost)', () => {

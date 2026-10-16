@@ -1,24 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import { isImage, parseUploadResponse, UploadError, uploadErrorMessage } from './upload';
+import { isImage, photoPath, photoToken, uploadErrorMessage, uploadErrorReason } from './upload';
 
-const reasonOf = (fn: () => unknown) => {
-  try {
-    fn();
-  } catch (e) {
-    return e instanceof UploadError ? e.reason : 'otro error';
-  }
-  return 'no tiró';
-};
-
-describe('parseUploadResponse', () => {
-  it('devuelve el id de Drive que manda n8n', () => {
-    expect(parseUploadResponse({ drive_id: '1AbCdEfGhIjKl_-9' })).toBe('1AbCdEfGhIjKl_-9');
+describe('photoPath', () => {
+  it('la foto nueva va en la carpeta del artículo, con un nombre que nunca se repite', () => {
+    expect(photoPath(15, 'AbCdEf123456')).toBe('15/AbCdEf123456.jpg');
   });
+});
 
-  it('una respuesta sin id válido es una falla', () => {
-    expect(reasonOf(() => parseUploadResponse(null))).toBe('failed');
-    expect(reasonOf(() => parseUploadResponse({ drive_id: 'https://x/y' }))).toBe('failed');
-    expect(reasonOf(() => parseUploadResponse({}))).toBe('failed');
+describe('photoToken', () => {
+  it('pasa bytes al azar a 12 letras y números (lo que acepta el bucket)', () => {
+    const token = photoToken(new Uint8Array([0, 1, 25, 26, 51, 52, 61, 62, 63, 255, 128, 7]));
+    expect(token).toMatch(/^[A-Za-z0-9]{12}$/);
+    expect(token.slice(0, 7)).toBe('ABZaz09');
+  });
+});
+
+describe('uploadErrorReason', () => {
+  it('según lo que contesta Supabase, explica por qué no se pudo subir', () => {
+    expect(uploadErrorReason(413)).toBe('too-large');
+    expect(uploadErrorReason(401)).toBe('unauthorized');
+    expect(uploadErrorReason(403)).toBe('unauthorized');
+    expect(uploadErrorReason(415)).toBe('not-image');
+    expect(uploadErrorReason(500)).toBe('failed');
+    expect(uploadErrorReason(undefined)).toBe('failed');
   });
 });
 

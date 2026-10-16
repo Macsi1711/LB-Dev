@@ -10,6 +10,10 @@ semántico.
 - **La web muestra las fotos desde Supabase Storage (ADR-008, paso 4):** las tarjetas usan la
   miniatura y el detalle la foto grande; si un artículo todavía no tiene foto en Storage, usa la de
   Drive como antes. El botón del detalle pasa a llamarse "Abrir foto".
+- **"Agregar foto" sube directo a Supabase Storage (ADR-008, paso 4):** la web achica la foto
+  (800 px y una miniatura de 320 px), la sube al bucket `fotos` y la asigna con
+  `asignar_foto_subida()`, sin n8n ni Drive. La pestaña aparece siempre y la ayuda ya no manda a
+  la carpeta de Drive. Se va `VITE_N8N_FOTOS_URL` y el código que subía por n8n.
 
 ### Arreglado
 
