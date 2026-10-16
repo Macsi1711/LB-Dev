@@ -92,4 +92,14 @@ describe('v_articulos', () => {
       { codigo: '854100', imagen_drive_id: null, tiene_foto: false },
     ]);
   });
+
+  it('tiene foto solo si está en Supabase Storage: un link de Drive solo ya no cuenta (0020)', async () => {
+    await inTransaction(db, async (tx) => {
+      await tx.query(`update articulos set foto = null where trim("Codigo") = '854000'`);
+      const { rows } = await tx.query(
+        `select imagen_drive_id, tiene_foto from v_articulos where codigo = '854000'`,
+      );
+      expect(rows[0]).toEqual({ imagen_drive_id: '1ONIXdelantera_abc-123', tiene_foto: false });
+    });
+  });
 });

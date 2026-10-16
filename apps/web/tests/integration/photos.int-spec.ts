@@ -36,13 +36,12 @@ describe('asignar_foto', () => {
       const photoId = await pendingPhoto(tx);
       await actAs(tx, await createUser(tx, 'admin'));
       const { rows } = await tx.query(
-        `select imagen_url, imagen_drive_id, tiene_foto from asignar_foto($1, 2)`,
+        `select imagen_url, imagen_drive_id from asignar_foto($1, 2)`,
         [photoId],
       );
       expect(rows[0]).toEqual({
         imagen_url: 'https://drive.google.com/file/d/DRIVE_abc-1/view?usp=drivesdk',
         imagen_drive_id: 'DRIVE_abc-1',
-        tiene_foto: true,
       });
       const photo = await tx.query('select resuelto from fotos_sin_match where id = $1', [photoId]);
       expect(photo.rows[0]).toEqual({ resuelto: true });

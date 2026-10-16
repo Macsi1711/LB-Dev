@@ -15,6 +15,10 @@ values
   ('999001', 'DESCUENTO ESPECIAL', null, null, '999', 'VARIOS', null),
   ('DV01', 'DEVOLUCIÓN', null, null, 'DV', 'DEVOLUCIONES', null);
 
+-- Como en producción después de pasar las fotos a Storage (ADR-008): los que tenían link de
+-- Drive tienen su foto en el bucket. Los archivos no existen en local: la web muestra "Sin foto".
+update public.articulos set foto = id || '/SeedLocal01.jpg' where "Imagen" ilike '%http%';
+
 -- Las migraciones corren antes que este seed: las familias se cargan acá.
 select public.sincronizar_familias();
 
