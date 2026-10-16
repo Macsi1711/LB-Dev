@@ -13,7 +13,7 @@ export function ArticleCard({
 }) {
   return (
     <article
-      className="flex cursor-pointer items-center gap-3 rounded-md py-2 hover:bg-accent"
+      className="flex min-w-0 cursor-pointer items-center gap-3 rounded-md py-2 hover:bg-accent"
       onClick={() => onOpen(article)}
     >
       <ArticleThumbnail
@@ -40,7 +40,7 @@ export function ArticleCard({
             />
           )}
         </div>
-        <p className="line-clamp-2 text-sm">{article.name}</p>
+        <p className="line-clamp-2 text-sm wrap-anywhere">{article.name}</p>
         {article.familyName && (
           <p className="truncate text-xs text-muted-foreground">{article.familyName}</p>
         )}

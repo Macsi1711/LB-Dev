@@ -27,12 +27,14 @@ export function ArticleDetail(props: { article: Article | null; onClose: () => v
         {a && (
           <>
             <SheetHeader className="pb-0">
-              <SheetTitle className="font-mono text-3xl font-semibold text-codigo">
+              <SheetTitle className="font-mono text-3xl font-semibold text-codigo wrap-anywhere">
                 {a.code}
               </SheetTitle>
-              <SheetDescription className="text-base text-foreground">{a.name}</SheetDescription>
+              <SheetDescription className="text-base text-foreground wrap-anywhere">
+                {a.name}
+              </SheetDescription>
             </SheetHeader>
-            <div className="grid gap-4 px-4 pb-6">
+            <div className="grid grid-cols-1 gap-4 px-4 pb-6">
               <ArticleThumbnail
                 driveId={a.driveId}
                 storagePhoto={a.storagePhoto}
@@ -45,16 +47,25 @@ export function ArticleDetail(props: { article: Article | null; onClose: () => v
                   role="note"
                 >
                   <TriangleAlert className="size-5 shrink-0 text-aviso" aria-hidden />
-                  <p className="text-sm">
+                  <p className="text-sm wrap-anywhere">
                     <span className="font-semibold">Observaciones: </span>
                     {a.notes}
                   </p>
                 </div>
               )}
-              <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+              <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
                 <dt className="text-muted-foreground">Familia</dt>
                 <dd>
-                  {a.familyName ? <Badge variant="secondary">{a.familyName}</Badge> : '—'}
+                  {a.familyName ? (
+                    <Badge
+                      variant="secondary"
+                      className="max-w-full rounded-md whitespace-normal wrap-anywhere"
+                    >
+                      {a.familyName}
+                    </Badge>
+                  ) : (
+                    '—'
+                  )}
                   {a.familyCode && (
                     <span className="ml-2 font-mono text-xs text-muted-foreground">
                       {a.familyCode}
@@ -62,7 +73,7 @@ export function ArticleDetail(props: { article: Article | null; onClose: () => v
                   )}
                 </dd>
                 <dt className="text-muted-foreground">Descripción</dt>
-                <dd>{a.description || '—'}</dd>
+                <dd className="wrap-anywhere">{a.description || '—'}</dd>
               </dl>
               <div className="grid gap-2 sm:grid-cols-2">
                 <CopyCodeButton code={a.code} label="Copiar código" />
