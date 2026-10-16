@@ -2,12 +2,12 @@ import {
   demoArticles,
   demoFamilies,
   demoFamilyName,
+  demoPhoto,
   type DemoArticle,
 } from '@/shared/demo/catalog';
 import { demoBotQueries } from '@/shared/demo/extras';
 import { searchTerms, termMatches } from '@/shared/demo/search';
 import { normalize, similarity } from '@/shared/demo/text';
-import { driveViewUrl } from '../domain/drive';
 import type { Article, CounterPort } from '../domain/ports';
 import type { SearchState } from '../domain/search-state';
 
@@ -19,8 +19,7 @@ const toArticle = (a: DemoArticle): Article => ({
   notes: a.notes,
   familyCode: a.family,
   familyName: demoFamilyName(a.family),
-  photoUrl: a.photo ? driveViewUrl(a.photo) : null,
-  driveId: a.photo,
+  storagePhoto: demoPhoto(a.photo),
   hasPhoto: !!a.photo,
 });
 

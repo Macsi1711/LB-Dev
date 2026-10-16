@@ -1,0 +1,580 @@
+{
+  "name": "Lois SQL",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "14f76449-7fdf-42b3-90d2-9100083d3853",
+                    "leftValue": "={{ $('Telegram Trigger1').item.json.message.photo }}",
+                    "rightValue": "",
+                    "operator": { "type": "array", "operation": "exists", "singleValue": true }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "FOTO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Trigger1').item.json.message.text }}",
+                    "rightValue": "",
+                    "operator": { "type": "string", "operation": "exists", "singleValue": true },
+                    "id": "5408e2b0-94a9-4e3b-9052-9441c1552e9d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "TEXTO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "18af2adc-f72a-4aba-805d-35ef0b6e725f",
+                    "leftValue": "={{ $('Telegram Trigger1').item.json.message.voice }}",
+                    "rightValue": "",
+                    "operator": { "type": "object", "operation": "exists", "singleValue": true }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "AUDIO"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [3936, 1344],
+      "id": "7e1fa343-a263-42cd-b0b1-e717704daf83",
+      "name": "Ver tipo mensaje"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[3].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [4384, 1056],
+      "id": "6161ae4b-af7d-417d-a3d1-0f201c08f330",
+      "name": "Get a file4",
+      "webhookId": "517f949c-62a3-4fa3-9168-88d3b43b4836",
+      "retryOnFail": false,
+      "credentials": { "telegramApi": { "id": "rDef1M1I9aVjb5sy", "name": "Lois" } }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[2].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [4384, 1248],
+      "id": "229d7f5e-197b-4a06-b2ca-3f41a46ad4ce",
+      "name": "Get a file1",
+      "webhookId": "517f949c-62a3-4fa3-9168-88d3b43b4836",
+      "retryOnFail": false,
+      "credentials": { "telegramApi": { "id": "rDef1M1I9aVjb5sy", "name": "Lois" } }
+    },
+    {
+      "parameters": { "operation": "binaryToPropery", "options": {} },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [4608, 1104],
+      "id": "336aa23f-1bdc-4929-be97-a5f98f754c4c",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": { "operation": "toBinary", "sourceProperty": "data", "options": {} },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [4832, 1104],
+      "id": "03e636c6-ed29-4fd7-8742-80a68be98cd3",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [4832, 1536],
+      "id": "c7ffee9b-e84b-485f-9c37-28adab72324e",
+      "name": "Get a file5",
+      "webhookId": "517f949c-62a3-4fa3-9168-88d3b43b4836",
+      "credentials": { "telegramApi": { "id": "rDef1M1I9aVjb5sy", "name": "Lois" } }
+    },
+    {
+      "parameters": { "resource": "audio", "operation": "transcribe", "options": {} },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [5056, 1536],
+      "id": "8bca2c20-7965-4896-8f77-181e4903ebff",
+      "name": "Transcribir audio1",
+      "credentials": { "openAiApi": { "id": "c9Ptnzu7SSjC1qx2", "name": "Lois&Boago" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener respuesta del agente\nconst response = items[0].json.output;\n\n// Extraer SQL del bloque de código\nconst sqlMatch = response.match(/```sql\\s*([\\s\\S]*?)\\s*```/);\n\nif (!sqlMatch) {\n  return [{\n    json: {\n      error: true,\n      mensaje: \"No se pudo extraer el SQL del response\",\n      response_raw: response\n    }\n  }];\n}\n\nconst sql = sqlMatch[1].trim();\n\n// Validación de seguridad básica\nconst sqlLower = sql.toLowerCase();\nconst operacionesProhibidas = ['drop', 'delete', 'truncate', 'update', 'insert', 'alter', 'create'];\nconst tieneOperacionProhibida = operacionesProhibidas.some(op => \n  sqlLower.includes(` ${op} `) || sqlLower.startsWith(op + ' ')\n);\n\nif (tieneOperacionProhibida) {\n  return [{\n    json: {\n      error: true,\n      mensaje: \"El SQL contiene operaciones prohibidas (solo SELECT permitido)\",\n      sql_generado: sql\n    }\n  }];\n}\n\n// Devolver SQL limpio\nreturn [{\n  json: {\n    sql_query: sql\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [5856, 1392],
+      "id": "1ef11deb-80ee-4faf-8c83-aa47a2d582a6",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.sql_query }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [6080, 1392],
+      "id": "d47ec009-ec9c-4889-9af9-bbbd582ce2a2",
+      "name": "Execute a SQL query1",
+      "credentials": { "postgres": { "id": "piZcPj3aQsBQCfVx", "name": "Lois" } }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dfcacd2f-8e59-44b8-b8e0-609a6f10d906",
+              "leftValue": "={{ $json.sin_resultados }}",
+              "rightValue": false,
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [6304, 1392],
+      "id": "058a22f8-c967-45a1-8fd6-7cc61c15c36b",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields').first().json.chat_id }}",
+        "text": "=Sin resultados para: {{ $('Code in JavaScript4').first().json.texto }}",
+        "additionalFields": { "appendAttribution": false }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [6528, 1232],
+      "id": "70aa016f-e2fe-42ad-9d40-1814f0c1a62a",
+      "name": "Send a text message3",
+      "webhookId": "e88a8668-4de4-41bf-99a0-ecaf335c1643",
+      "credentials": { "telegramApi": { "id": "rDef1M1I9aVjb5sy", "name": "Lois" } }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "text": "=# Rol\nEres un extractor de señales visuales para repuestos automotrices.\n\n# Objetivo\nConvertir cualquier imagen recibida en una **consulta corta y accionable** para buscar productos en la base de datos.\n\n# Instrucciones\n1) Analiza la imagen y detecta SOLO información útil para búsqueda: tipo de producto, marca, modelo/nombre comercial, especificaciones (DOT, ATF, viscosidad, código OEM/SKU), capacidad (ml/l), compatibilidades visibles.\n2) NO escribas descripciones largas. NO uses Markdown. NO uses listas largas.\n3) Produce SIEMPRE salida en **JSON válido** (una sola línea o multilínea, pero JSON estricto).\n4) Si NO hay información clave, genera una consulta genérica y amplia (ej: \"barra led rectangular auxiliar\", \"aceite transmisión automática ATF\", etc.).\n5) Prioriza términos exactos que aparezcan en la etiqueta (texto visible). Si hay duda, no inventes.\n\n\n### Formato de salida (OBLIGATORIO)\n\nDevuelve **únicamente una pregunta**, sin texto adicional, sin explicaciones y sin formato JSON.\n\n**Reglas estrictas:**\n\n* La salida debe ser **una sola oración**\n* Debe estar formulada como **pregunta tipo vendedor**\n* En español rioplatense\n* Enfocada exclusivamente en **consulta de stock**\n* No incluir listas, metadatos ni aclaraciones\n\n**Formato esperado:**\n¿Pregunta corta y clara para consultar disponibilidad en stock?\n\n---\n\n### Ejemplos válidos de salida\n\n* ¿Tenemos en stock líquido de frenos Prestone DOT 3 de 1 litro?\n* ¿Hay aceite de transmisión automática Chevron ATF disponible?\n* ¿Tenemos barra LED auxiliar rectangular en stock?\n\n",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [5056, 1104],
+      "id": "4a33a7f8-e83e-4865-86da-9ef418acb965",
+      "name": "OpenAI1",
+      "credentials": { "openAiApi": { "id": "c9Ptnzu7SSjC1qx2", "name": "Lois&Boago" } }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3821ab09-1226-4dd3-ac15-535ed729c365",
+              "leftValue": "={{ $('Loop fotos1').item.json.observaciones }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [8096, 1232],
+      "id": "3ff16cd4-a18a-4101-8db9-363849ef4de1",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Junta los resultados SIN imagen en un solo mensaje de texto.\nconst items = $input.all();\n\nconst sinFoto = items.filter(function (i) {\n  const tieneFoto = Boolean(i.json.foto_url);\n  return (i.json.sin_resultados !== true) && !tieneFoto;\n});\n\nconst resumen = sinFoto.map(function (i) {\n  const cod  = (i.json.Codigo != null) ? i.json.Codigo : '';\n  const nom  = (i.json['Nombre artículo'] != null) ? i.json['Nombre artículo'] : '';\n  const desc = (i.json['Descripción'] != null) ? String(i.json['Descripción']).trim() : '';\n  const obs  = (i.json.observaciones != null) ? String(i.json.observaciones).trim() : '';\n  let bloque = 'Codigo: ' + cod + '\\nNombre: ' + nom;\n  if (desc) { bloque += '\\nDescripción: ' + desc; }\n  if (obs)  { bloque += '\\nObservaciones: ' + obs; }\n  return bloque;\n}).join('\\n\\n');\n\nreturn [{ json: { resumen: resumen, tiene_resumen: sinFoto.length > 0 } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [6528, 1424],
+      "id": "726f84c3-adbb-4916-bb00-5a332310a0d4",
+      "name": "Consolidar sin foto1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cond-resumen-0001",
+              "leftValue": "={{ $json.tiene_resumen }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [6752, 1424],
+      "id": "14fd1ea4-86fc-4aa9-8cf0-e9d6eabbb2e0",
+      "name": "If tiene resumen1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields').first().json.chat_id }}",
+        "text": "={{ $json.resumen }}",
+        "additionalFields": { "appendAttribution": false }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [6976, 1280],
+      "id": "6fafc70b-8ecb-43c9-be47-e2616987c077",
+      "name": "Send resumen1",
+      "webhookId": "e88a8668-4de4-41bf-99a0-ecaf335c1643",
+      "credentials": { "telegramApi": { "id": "rDef1M1I9aVjb5sy", "name": "Lois" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Devuelve, uno por item, solo los resultados con foto en Supabase Storage.\nconst all = $('Sumar fotos de Storage').all();\n\nconst conFoto = all.filter(function (i) {\n  return (i.json.sin_resultados !== true) && i.json.foto_url;\n});\n\nreturn conFoto;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [7200, 1424],
+      "id": "cab82b68-29b4-4ddf-a1c9-9ebfddc4fa82",
+      "name": "Emitir con foto1"
+    },
+    {
+      "parameters": { "options": {} },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [7424, 1424],
+      "id": "3926ceda-78fd-4bea-b3e0-97041378a38a",
+      "name": "Loop fotos1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "351c93f9-e9d1-4a59-b1ad-f0ce7f69dcb2",
+              "name": "chat_id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [3712, 1360],
+      "id": "355acc68-1058-42d0-9ad4-8c93fa11a4cf",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3010e51c-0285-47f7-aff1-92ec988f44bc",
+              "leftValue": "={{ $json.message.photo[3].file_id }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "exists", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [4160, 1104],
+      "id": "e0a7f8bf-2c3e-469e-bc8d-4c96a8c62e64",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el item de entrada\nconst item = $input.first().json;\n\n// Variable para almacenar el texto resultante\nlet texto = null;\n\n// Verificar en orden de prioridad cuál variable existe y tiene contenido\nif (item.message && item.message.text) {\n  texto = item.message.text;\n} else if (item.text) {\n  texto = item.text;\n} else if (item.content) {\n  texto = item.content;\n}\n\n// Retornar el resultado\nreturn {\n  json: {\n    texto: texto,\n    // Opcional: incluir información sobre qué variable se usó\n    fuente: item.message?.text ? 'message.text' : \n            item.text ? 'text' : \n            item.content ? 'content' : 'ninguna'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [5280, 1392],
+      "id": "f7609df6-5107-463b-956d-0aefe37333de",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [5440, 1616],
+      "id": "9c8b6111-1972-4a48-92fa-1697008befce",
+      "name": "OpenAI Chat Model2",
+      "credentials": { "openAiApi": { "id": "c9Ptnzu7SSjC1qx2", "name": "Lois&Boago" } }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-5-20250929",
+          "cachedResultName": "Claude Sonnet 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [5600, 1616],
+      "id": "d4c1ae9c-fe5c-4280-8d55-a968437eaad3",
+      "name": "Anthropic Chat Model2",
+      "credentials": { "anthropicApi": { "id": "qlcKKzBAUuF5UeNV", "name": "Atom" } }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields').first().json.chat_id }}",
+        "text": "=Observaciones: {{ $('Loop fotos1').item.json.observaciones }}",
+        "additionalFields": { "appendAttribution": false }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [8320, 1376],
+      "id": "ed3b886b-baeb-49e2-a993-83cad78b367e",
+      "name": "Send a text message4",
+      "webhookId": "e88a8668-4de4-41bf-99a0-ecaf335c1643",
+      "credentials": { "telegramApi": { "id": "rDef1M1I9aVjb5sy", "name": "Lois" } }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Mensaje del usuario: {{ $('Code in JavaScript4').item.json.texto }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=# ROL\nEres un experto en repuestos automotrices y en PostgreSQL. A partir del mensaje de un usuario generas UNICAMENTE el codigo SQL para buscar productos en la tabla `articulos`. NO ejecutas nada, solo generas el SQL.\n\n# PASO 1 - Es un CODIGO de producto?\nEl mensaje ES un codigo si cumple TODAS estas condiciones:\n- Es unicamente un token, sin palabras que describan una pieza (no dice \"filtro\", \"freno\", \"bomba\", etc.)\n- Es una combinacion alfanumerica corta sin espacios (ej: SYL2095, ADB1186, GM2237, 40810)\n- No es una palabra del espanol\n\nNO es un codigo si el token aparece junto a una descripcion de pieza:\n- \"filtro de aceite c10\" -> c10 es un modelo, es busqueda GENERICA\n- \"kit distribucion gol 1.6\" -> 1.6 es cilindrada, es GENERICA\n- \"pastilla freno tipo 2\" -> tipo 2 es un modelo, es GENERICA\n\nSi ES un codigo  -> genera el SQL de tipo \"codigo\" usando ese codigo.\nSi NO es un codigo -> continua al PASO 2.\n\n# PASO 2 - Clasificar la FAMILIA (solo busquedas genericas)\nNormaliza el mensaje: mayusculas, sin tildes, sin palabras irrelevantes (QUIERO, NECESITO, PRECIO, PARA, DE, EL, LA, etc.), sin marcas ni modelos.\nCompara contra la lista cerrada de familias de abajo y elegi el codigo_familia de la coincidencia MAS especifica. No inventes familias. Si ninguna matchea con claridad, igual elegi la mas probable.\n\n## LISTA DE FAMILIAS (codigo => nombre)\n333 => SERVICIO\n444 => IMPORTenTRAMITE\n555 => MercaderiaIMPORTADA\n555.001 => ArticuloIMPORTADO\n777 => Articulos Varios LyB\n777.001 => Descuentos obtenidos\n777.002 => Descuentos\n888 => GASTOS_LYB\n999 => IMPUESTOS_VARIOS\nAA => AUTOMATICO ARRANQUE\nAC => CABLE ACELERA T AIRE\nAD => ADITIVO Y LUBRICANTE\nAF => ALFOMBRA\nAG => AGUA REFRIG PARABRIS\nAL => ACRILICO TRAS/DEL\nAM => ACEITES MOTUL\nAN => ANTENA\nAPT => AMORTIG PORTON CAPOT\nAR => ARRANQUE Y ALTERNADO\nAT => AMORTIGUADORES\nAV => AVANCE VACIO\nBA => BRAZO AUXILIAR\nBB => BUJE BRONCE P/MEDIDA\nBC => BIELETA CAMBIOS\nBD => BARRA DIRECCION\nBDA => BOMBA DE AGUA\nBE => BARRA ESTABILIZORA\nBF => BOMBA DE FRENO\nBG => BASE FILTRO COM\nBH => BATERIA TODAS MARCAS\nBI => TORNILLO TUERCA RUED\nBJ => BUJIA\nBK => PARABRISA MOTOR/BRAZ\nBL => BIELETA SUSPENCION\nBM => BOMBA BOMBIN COMBUST\nBN => BOBINA ENCENDIDO\nBÑ => BOMBA BOMBIN EMBRAGU\nBP => BRAZO PITMAN\nBR => BRAZO ROTULA\nBS => BUJE DE SUSPENCION\nBT => BULBO ELECTRO VENT\nBU => BULBO FRENO M ATRAS\nBV => BOMBA VACIO\nBX => BENDIX\nBY => BOMBA ACEITE\nBZ => BOMBA DIRECCION HIDR\nCA => CAÑO AGUA RESPIRADER\nCB => CABLE BUJIAS\nCC => CREMALLERA C/ DIRECC\nCD => CORREA DISTRIBUCION\nCE => CERRADURA CIERRE CAP\nCF => CABLE FRENO\nCH => CABLE CAPOT CAMBIOS\nCIL => CILINDRO FRENO\nCK => CABLE CUENTA KILOMET\nCL => CAÑO METAL PLASTICO\nCM => CABLE EMBRAGUE\nCN => CAÑO NAFTA RETORNO\nCO => CAÑO CALEFA Y AIRE\nCON => CONDENSADOR\nCP => CILINDRO PUERTA\nCQ => CARBONES\nCR => CARROCERIA\nCS => CAZOLETA GRAPODINA S\nCT => CALENTADOR\nCU => CRUCETA\nCV => CORREA EN V\nCX => CILINDRO DE ARRANQUE\nCY => CAJA PORTA FUSIBLE\nCZ => CILINDRO VALIJA\nDE => DISCO DE EMBRAGUE\nDF => DISCO CAMPANA FRENO\nDP => DEPOSITO AGUA\nDT => CABLE REVOLUCION\nDV => DEVOLUCIONES\nDY => DIAFRAGMA\nEF => ENCHUFE TODOS\nEL => ESCOBILLA\nEÑ => ESTAÑO SOLDAR\nEP => ESPEJO\nER => ROTOR DISTRIBUIDOR\nES => ESPIRALES SUSPENCION\nET => ELECTROVENTILADOR\nEW => CAJA CAMBIO TODO\nEX => ACEITE REPSOL\nFA => FILTRO AIRE\nFAC => FILTRO ACEITE\nFC => FUELLE LADO CAJA\nFD => FARO DEL SEMIOPTICA\nFE => FLEXIBLE DE ESCAPE\nFF => FLEXIBLE DE FRENO\nFG => FILTRO DE GASOIL\nFH => FUELLE HOMOCINETICA\nFI => FIAT ( ESTANTERIA )\nFKM => FARO CAMINERO/LATERA\nFL => FLOTADOR CARBURADOR\nFM => FUELLE CREMALLERA\nFN => FILTRO NAFTA\nFO => FARO SEÑALERO\nFP => FILTRO POLEN\nFS => FUELLE Y TOPE AMORTI\nFT => FARO TRASERO/MATRICU\nFW => FLOTADOR/TANQUE COMB\nGC => CANILLA CALEFACCION\nGM => CHEVROLET ( ESTANTE)\nGN => PARTES CARDAN\nHC => HOMOCINETICA CAJA\nHR => HOMOCINETICA RUEDA\nIN => INYECCION\nIT => BULBO ACEITE\nJC => JUNTA CARBURADOR\nJD => JUNTA ADMISION\nJE => JUNTAS VARIAS SUELTA\nJG => JGO JUNTAS SUPERIOR\nJI => JUNJTA DISTRIBUCION\nJJ => JUNTAS JGO COMPLETO\nJM => JUNTA MULTIPLE ESCAP\nJP => JUNTA ESCAPE\nJR => JUNTA CARTER\nJT => JUNTA TAPA CILINDROS\nJV => JUNTA TAPA VALVULAS\nJW => EJE TRAS DIFERENCIAL\nKE => KIT DE EMBRAGUE\nKK => KIT DISTRIBUCION\nLG => FUSIBLE\nLÑ => PORTA FUSIBLE\nLO => LLAVE CORTE\nLP => LAMPARA\nLZ => LLAVE ELECT TODAS\nMA => COPAS\nMB => MONTANA OIL\nMC => MATE DE CREMALLERA\nMD => MAZA DELANTERA\nME => MANIJA EXTERIOR\nMI => MANIJA INTERIOR\nMLC => MAQUINA L/ CRISTAL\nMN => MODULO ENCENDIDO\nMO => MOTOR PARTES\nMP => MANIJA PORTON\nMS => MOTOR PASO PASO\nMT => BULBO TEMP Y CARBURA\nMU => ACEITE MULLER OL\nMX => MANIJA L/CRISTAL\nMY => MANIJA CAPOT\nMZ => MAZA TRASERA\nNC => NUEVA CERRO/SOLO GAL\nND => PARTE ELECTRICA ARRA\nNP => ABRAZADERA\nPC => PARTES DE CARROCERIA\nPD => PUNTERO DE DIRECCION\nPE => PLACA DE EMBRAGUE\nPF => PASTILLAS DE FRENO\nPI => PLATINO\nPK => CORREA PK\nPL => ARTICULO DE LIMPIEZA\nPN => PORTA LAMPARA\nPÑ => PUNZON\nPP => PIPA AGUA TERMOSTATO\nPR => PLACA RECTIFICADORA\nPS => PARRILLA SUSPENCION\nPV => PALETA VENT VISCOSO\nPX => PORTA CARBON\nRA => RADIADOR\nRB => RETEN BANCADA\nRC => RETEN DIRECC Y CAJA\nRD => RETEN DISTIBUCION\nRE => RULEMAN EMBRAGUE\nRF => CEMENTO\nRK => RETEN ORING X MEDIDA\nRL => RELAY DESTELLADOR\nRM => RULEMAN DE RUEDA\nRP => RETE PIÑON\nRR => RETEN RUEDA\nRS => ROTULA DE SUSPENCION\nRT => RELOJ MEDIDOR\nRU => RULEMAN\nRV => REGULADOR DE VOLTAJE\nSB => SENSORES TODOS\nSI => SEMIEJE\nSM => SOPORTE MOTOR RADIAD\nSS => SOPORTE SUSPENCION\nST => SILICONA\nSV => SELLO VALVULA\nSW => SERVO FRENO\nTA => TAPON ACEITE\nTC => TAPON COMBUSTIBLE\nTD => TAPA DISTRIBUIDOR TO\nTE => TERMOSTATO\nTG => TAPA GRASA\nTL => TAPON CARTER Y CAJA\nTM => TEMPORIZADORES\nTN => TENSOR RULEM CORREA\nTO => TORNILLO TAPA CIL\nTR => TRICETA\nTT => BUJE BRONCE P/MEDIDA\nTW => TAPON DEPOSITO AUX\nTX => TERMINALES CAÑO INST\nTZ => JGO TAZAS\nVC => BROCHE SAPITO\nVG => VALVULA GASES\nVL => MERCADERI ENTRA SALE\nVW => VOLKSWAGEN (ESTANTE\nWW => ACCESORIOS HERRAMIEN\nZO => BOCINA TODAS\n\n# ESQUEMA DE LA TABLA\nCREATE TABLE articulos (\n  \"Codigo\" TEXT,\n  \"Nombre artículo\" TEXT,\n  \"Descripción\" TEXT,\n  observaciones TEXT,\n  \"codigo  familia\" TEXT,\n  \"Nombre familia\" TEXT,\n  \"Imagen\" TEXT\n);\n\n# REGLA CRITICA - COLUMNA observaciones\n- Tipo \"codigo\":   el SELECT incluye `observaciones` (valor real de la columna).\n- Tipo \"generica\": el SELECT incluye `'' AS observaciones` (string vacio).\nLa columna observaciones SIEMPRE aparece en el SELECT.\nIncluir SIEMPRE tambien la columna \"Descripción\" (valor real) en el SELECT, en ambos tipos.\nLa columna de familia tiene DOS espacios: \"codigo  familia\". Usala SIEMPRE exactamente asi.\n\n# SQL SEGUN TIPO\n\n## Tipo \"codigo\" - busqueda por codigo exacto (observaciones con valor real)\nWITH resultados AS (\n  SELECT \"Codigo\", \"Nombre artículo\", \"Descripción\", \"codigo  familia\", \"Imagen\", observaciones\n  FROM articulos\n  WHERE \"Codigo\" = 'CODIGO_AQUI'\n  LIMIT 20\n)\nSELECT *, FALSE AS sin_resultados FROM resultados\nUNION ALL\nSELECT NULL, NULL, NULL, NULL, NULL, NULL, TRUE\nWHERE NOT EXISTS (SELECT 1 FROM resultados);\n\n## Tipo \"generica\" - filtrar por familia + reglas de marca/modelo (observaciones vacio)\n1. SIEMPRE filtrar: WHERE \"codigo  familia\" = 'FAMILIA_AQUI'\n2. Marca + modelo  -> ignorar la marca, usar solo el modelo con ILIKE.\n   Solo marca/modelo unico -> usar ese termino con ILIKE.\n   Sin marca ni modelo -> no agregar condicion extra.\n3. Cuando se use modelo: ILIKE '%termino%' en \"Nombre artículo\", \"Descripción\" y observaciones.\n4. SIEMPRE terminar con ORDER BY \"Nombre artículo\" LIMIT 20.\n\n# ESTRUCTURA OBLIGATORIA (siempre CTE + UNION ALL + bandera sin_resultados)\nToda consulta usa este patron:\nWITH resultados AS (\n  -- consulta principal\n)\nSELECT *, FALSE AS sin_resultados FROM resultados\nUNION ALL\nSELECT NULL, NULL, NULL, NULL, NULL, NULL, TRUE\nWHERE NOT EXISTS (SELECT 1 FROM resultados);\n\n# EJEMPLOS\n\nGenerica con modelo (observaciones vacio):\nWITH resultados AS (\n  SELECT \"Codigo\", \"Nombre artículo\", \"Descripción\", \"codigo  familia\", \"Imagen\", '' AS observaciones\n  FROM articulos\n  WHERE \"codigo  familia\" = 'PF'\n    AND (\n      \"Nombre artículo\" ILIKE '%onix%'\n      OR \"Descripción\" ILIKE '%onix%'\n      OR observaciones ILIKE '%onix%'\n    )\n  ORDER BY \"Nombre artículo\" LIMIT 20\n)\nSELECT *, FALSE AS sin_resultados FROM resultados\nUNION ALL\nSELECT NULL, NULL, NULL, NULL, NULL, NULL, TRUE\nWHERE NOT EXISTS (SELECT 1 FROM resultados);\n\nGenerica sin modelo (observaciones vacio):\nWITH resultados AS (\n  SELECT \"Codigo\", \"Nombre artículo\", \"Descripción\", \"codigo  familia\", \"Imagen\", '' AS observaciones\n  FROM articulos\n  WHERE \"codigo  familia\" = 'PF'\n  ORDER BY \"Nombre artículo\" LIMIT 20\n)\nSELECT *, FALSE AS sin_resultados FROM resultados\nUNION ALL\nSELECT NULL, NULL, NULL, NULL, NULL, NULL, TRUE\nWHERE NOT EXISTS (SELECT 1 FROM resultados);\n\n# SALIDA\nGenera SOLO el SQL dentro de un bloque de codigo ```sql ... ```. Sin explicaciones, sin comentarios, sin texto adicional. Siempre el patron CTE + UNION ALL con la bandera sin_resultados."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [5504, 1392],
+      "id": "5702b7c1-634e-459b-85ad-e1b88bfd79fb",
+      "name": "AI Agent2",
+      "retryOnFail": true
+    },
+    {
+      "parameters": { "updates": ["message"], "additionalFields": {} },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [3504, 1360],
+      "id": "dc215f95-467b-4202-a5a4-6d2daddc16a8",
+      "name": "Telegram Trigger1",
+      "webhookId": "983b9c21-c668-4355-b16b-7d4da18b9aab",
+      "credentials": { "telegramApi": { "id": "rDef1M1I9aVjb5sy", "name": "Lois" } }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select trim(\"Codigo\") as codigo, foto\nfrom public.articulos\nwhere foto is not null\n  and trim(\"Codigo\") = any(string_to_array($1, chr(31)))",
+        "options": {
+          "queryReplacement": "={{ [ $('Execute a SQL query1').all().map(i => String(i.json.Codigo ?? '').trim()).filter(c => c).join(String.fromCharCode(31)) ] }}"
+        }
+      },
+      "name": "Buscar fotos en Storage",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [6300, 1192],
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": { "postgres": { "id": "piZcPj3aQsBQCfVx", "name": "Lois" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Le suma a cada resultado del SQL el link público de su foto en Supabase Storage.\nconst BASE = 'https://<PROJECT_REF>.supabase.co/storage/v1/object/public/fotos/';\nconst fotos = {};\nfor (const f of $('Buscar fotos en Storage').all()) {\n  if (f.json.codigo && f.json.foto) fotos[f.json.codigo] = f.json.foto;\n}\nreturn $('Execute a SQL query1').all().map(function (i) {\n  const foto = fotos[String(i.json.Codigo ?? '').trim()];\n  return { json: Object.assign({}, i.json, { foto_url: foto ? BASE + foto : null }) };\n});\n"
+      },
+      "name": "Sumar fotos de Storage",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [6520, 1192]
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Edit Fields').first().json.chat_id }}",
+        "binaryData": false,
+        "additionalFields": {
+          "caption": "=Codigo: {{ $('Loop fotos1').item.json.Codigo }}\nNombre: {{ $('Loop fotos1').item.json['Nombre artículo'] }}{{ $('Loop fotos1').item.json['Descripción'] ? '\\nDescripción: ' + $('Loop fotos1').item.json['Descripción'] : '' }}"
+        },
+        "file": "={{ $('Loop fotos1').item.json.foto_url }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [7648, 1032],
+      "name": "Enviar foto de Storage",
+      "credentials": { "telegramApi": { "id": "rDef1M1I9aVjb5sy", "name": "Lois" } }
+    }
+  ],
+  "connections": {
+    "Ver tipo mensaje": {
+      "main": [
+        [{ "node": "If6", "type": "main", "index": 0 }],
+        [{ "node": "Code in JavaScript4", "type": "main", "index": 0 }],
+        [{ "node": "Get a file5", "type": "main", "index": 0 }]
+      ]
+    },
+    "Get a file4": { "main": [[{ "node": "Extract from File", "type": "main", "index": 0 }]] },
+    "Get a file1": { "main": [[{ "node": "Extract from File", "type": "main", "index": 0 }]] },
+    "Extract from File": { "main": [[{ "node": "Convert to File", "type": "main", "index": 0 }]] },
+    "Convert to File": { "main": [[{ "node": "OpenAI1", "type": "main", "index": 0 }]] },
+    "Get a file5": { "main": [[{ "node": "Transcribir audio1", "type": "main", "index": 0 }]] },
+    "Transcribir audio1": {
+      "main": [[{ "node": "Code in JavaScript4", "type": "main", "index": 0 }]]
+    },
+    "Code in JavaScript3": {
+      "main": [[{ "node": "Execute a SQL query1", "type": "main", "index": 0 }]]
+    },
+    "Execute a SQL query1": {
+      "main": [[{ "node": "Buscar fotos en Storage", "type": "main", "index": 0 }]]
+    },
+    "If4": {
+      "main": [
+        [{ "node": "Send a text message3", "type": "main", "index": 0 }],
+        [{ "node": "Consolidar sin foto1", "type": "main", "index": 0 }]
+      ]
+    },
+    "OpenAI1": { "main": [[{ "node": "Code in JavaScript4", "type": "main", "index": 0 }]] },
+    "If5": {
+      "main": [
+        [{ "node": "Send a text message4", "type": "main", "index": 0 }],
+        [{ "node": "Loop fotos1", "type": "main", "index": 0 }]
+      ]
+    },
+    "Consolidar sin foto1": {
+      "main": [[{ "node": "If tiene resumen1", "type": "main", "index": 0 }]]
+    },
+    "If tiene resumen1": {
+      "main": [
+        [{ "node": "Send resumen1", "type": "main", "index": 0 }],
+        [{ "node": "Emitir con foto1", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send resumen1": { "main": [[{ "node": "Emitir con foto1", "type": "main", "index": 0 }]] },
+    "Emitir con foto1": { "main": [[{ "node": "Loop fotos1", "type": "main", "index": 0 }]] },
+    "Loop fotos1": {
+      "main": [[], [{ "node": "Enviar foto de Storage", "type": "main", "index": 0 }]]
+    },
+    "Edit Fields": { "main": [[{ "node": "Ver tipo mensaje", "type": "main", "index": 0 }]] },
+    "If6": {
+      "main": [
+        [{ "node": "Get a file4", "type": "main", "index": 0 }],
+        [{ "node": "Get a file1", "type": "main", "index": 0 }]
+      ]
+    },
+    "Code in JavaScript4": { "main": [[{ "node": "AI Agent2", "type": "main", "index": 0 }]] },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [[{ "node": "AI Agent2", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Anthropic Chat Model2": {
+      "ai_languageModel": [[{ "node": "AI Agent2", "type": "ai_languageModel", "index": 1 }]]
+    },
+    "Send a text message4": { "main": [[{ "node": "Loop fotos1", "type": "main", "index": 0 }]] },
+    "AI Agent2": { "main": [[{ "node": "Code in JavaScript3", "type": "main", "index": 0 }]] },
+    "Telegram Trigger1": { "main": [[{ "node": "Edit Fields", "type": "main", "index": 0 }]] },
+    "Buscar fotos en Storage": {
+      "main": [[{ "node": "Sumar fotos de Storage", "type": "main", "index": 0 }]]
+    },
+    "Sumar fotos de Storage": { "main": [[{ "node": "If4", "type": "main", "index": 0 }]] },
+    "Enviar foto de Storage": { "main": [[{ "node": "If5", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "binaryMode": "separate" }
+}

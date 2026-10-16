@@ -1,3 +1,4 @@
+import type { StoragePhoto } from '@/shared/lib/storage-photo';
 import type { QueryLog } from './conversation';
 import type { MediaKind, Understood } from './media';
 import type { SearchState } from './search-state';
@@ -10,8 +11,8 @@ export interface Article {
   notes: string | null;
   familyCode: string | null;
   familyName: string | null;
-  photoUrl: string | null;
-  driveId: string | null;
+  /** La foto en Supabase Storage (ADR-008); null si el artículo no tiene foto. */
+  storagePhoto: StoragePhoto | null;
   hasPhoto: boolean;
 }
 

@@ -1,4 +1,4 @@
-/** Fotos subidas desde la web: n8n las sube a Drive y la web las asigna (ADR-007). */
+/** Fotos subidas desde la web directo a Supabase Storage (ADR-008). */
 export type UploadErrorReason = 'unauthorized' | 'too-large' | 'failed' | 'not-image';
 
 export class UploadError extends Error {
@@ -11,15 +11,22 @@ export class UploadError extends Error {
 export const toUploadError = (e: unknown): UploadError =>
   e instanceof UploadError ? e : new UploadError('failed');
 
-// Mismo criterio que asignar_imagen_drive() en la base.
-const DRIVE_ID = /^[A-Za-z0-9_-]{10,200}$/;
+const TOKEN_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-/** La respuesta del webhook de n8n: { drive_id }. */
-export function parseUploadResponse(raw: unknown): string {
-  const id =
-    typeof raw === 'object' && raw !== null ? (raw as { drive_id?: unknown }).drive_id : null;
-  if (typeof id !== 'string' || !DRIVE_ID.test(id)) throw new UploadError('failed');
-  return id;
+/** Un nombre nuevo por foto (12 letras y números): la caché nunca muestra una foto vieja. */
+export function photoToken(randomBytes: Uint8Array): string {
+  return Array.from(randomBytes.slice(0, 12), (b) => TOKEN_CHARS[b % TOKEN_CHARS.length]).join('');
+}
+
+/** Ruta de la foto grande en el bucket; la miniatura va al lado (`.mini.jpg`). */
+export const photoPath = (articleId: number, token: string) => `${articleId}/${token}.jpg`;
+
+/** Por qué no se pudo subir, según el código HTTP que devolvió Supabase. */
+export function uploadErrorReason(status: number | undefined): UploadErrorReason {
+  if (status === 413) return 'too-large';
+  if (status === 401 || status === 403) return 'unauthorized';
+  if (status === 415) return 'not-image';
+  return 'failed';
 }
 
 export const isImage = (file: { type: string }) => file.type.startsWith('image/');

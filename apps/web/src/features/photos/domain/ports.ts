@@ -1,4 +1,4 @@
-import type { CodeSuggestion, UnmatchedPhoto } from './unmatched';
+import type { StoragePhoto } from '@/shared/lib/storage-photo';
 
 export interface CoverageStat {
   familyCode: string | null;
@@ -27,7 +27,7 @@ export interface UploadTarget {
   name: string | null;
   familyName: string | null;
   hasPhoto: boolean;
-  driveId: string | null;
+  storagePhoto: StoragePhoto | null;
 }
 
 export interface PhotosPort {
@@ -39,19 +39,11 @@ export interface PhotosPort {
   ): Promise<MissingPhotoArticle[]>;
   /** Todos, para exportar a CSV. */
   allMissingPhotos(family: string | null): Promise<MissingPhotoArticle[]>;
-  /** Fotos de Drive que n8n no pudo asignar, sin resolver. */
-  unmatchedPhotos(): Promise<UnmatchedPhoto[]>;
-  suggestCodes(texts: string[]): Promise<CodeSuggestion[]>;
-  /** Escribe la foto en el artículo y la marca como resuelta (rpc asignar_foto). */
-  assignPhoto(photoId: number, articleId: number): Promise<void>;
-  dismissPhoto(photoId: number): Promise<void>;
   /** Busca artículos para asignarles una foto (misma búsqueda que el Mostrador). */
   findArticles(q: string): Promise<UploadTarget[]>;
-  /** Escribe en el artículo la foto ya subida a Drive (rpc asignar_imagen_drive). */
-  assignDrivePhoto(articleId: number, driveId: string): Promise<void>;
-}
-
-/** Sube una foto a Drive y devuelve su id. Falla con UploadError. */
-export interface PhotoUploadPort {
-  upload(code: string, photo: Blob): Promise<string>;
+  /**
+   * Sube la foto (grande y miniatura, JPEG) a Supabase Storage y se la asigna al artículo
+   * (rpc asignar_foto_subida). Falla con UploadError.
+   */
+  savePhoto(articleId: number, photo: { full: Blob; mini: Blob }): Promise<void>;
 }

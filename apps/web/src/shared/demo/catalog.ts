@@ -1,4 +1,9 @@
 // Datos de ejemplo del modo demo. Son inventados: no corresponden al catálogo real.
+import type { StoragePhoto } from '@/shared/lib/storage-photo';
+
+/** La ilustración de un artículo del demo con la misma forma que una foto de Storage. */
+export const demoPhoto = (photo: string | null): StoragePhoto | null =>
+  photo ? { full: `${photo}.svg`, mini: `${photo}.svg` } : null;
 
 export interface DemoArticle {
   id: number;

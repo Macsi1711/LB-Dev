@@ -13,10 +13,10 @@ export function ArticleCard({
 }) {
   return (
     <article
-      className="flex cursor-pointer items-center gap-3 rounded-md py-2 hover:bg-accent"
+      className="flex min-w-0 cursor-pointer items-center gap-3 rounded-md py-2 hover:bg-accent"
       onClick={() => onOpen(article)}
     >
-      <ArticleThumbnail driveId={article.driveId} className="w-20 shrink-0 rounded-md" />
+      <ArticleThumbnail storagePhoto={article.storagePhoto} className="w-20 shrink-0 rounded-md" />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex items-center gap-1">
           <button
@@ -36,7 +36,7 @@ export function ArticleCard({
             />
           )}
         </div>
-        <p className="line-clamp-2 text-sm">{article.name}</p>
+        <p className="line-clamp-2 text-sm wrap-anywhere">{article.name}</p>
         {article.familyName && (
           <p className="truncate text-xs text-muted-foreground">{article.familyName}</p>
         )}
