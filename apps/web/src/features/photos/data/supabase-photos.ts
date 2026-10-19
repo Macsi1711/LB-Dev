@@ -80,6 +80,11 @@ export function createSupabasePhotos(client: SupabaseClient<Database>): PhotosPo
       };
       return { overall, families: stats.filter((s) => !s.isTotal) };
     },
+    async storageUsage() {
+      const { data, error } = await client.rpc('uso_fotos');
+      if (error) throw error;
+      return { bytes: Number(data[0]?.bytes ?? 0), photos: Number(data[0]?.fotos ?? 0) };
+    },
     missingPhotos,
     async allMissingPhotos(family) {
       const all: MissingPhotoArticle[] = [];

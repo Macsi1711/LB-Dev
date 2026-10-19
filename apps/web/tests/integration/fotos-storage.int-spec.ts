@@ -88,6 +88,39 @@ describe('bucket fotos', () => {
   });
 });
 
+describe('uso_fotos', () => {
+  it('suma lo que ocupan todos los archivos y cuenta los artículos con foto', async () => {
+    await inTransaction(db, async (tx) => {
+      const user = await createUser(tx);
+      await actAs(tx, user);
+      const before = await tx.query('select * from uso_fotos()');
+      await tx.query('reset role');
+      await tx.query(
+        `insert into storage.objects (bucket_id, name, metadata)
+         values ('fotos', '15/Uso00001.jpg', '{"size": 120000}'),
+                ('fotos', '15/Uso00001.mini.jpg', '{"size": 20000}')`,
+      );
+      const id = await articleId(tx, '854100');
+      await tx.query(`update articulos set foto = $1 where id = $2`, [`${id}/Uso00001.jpg`, id]);
+      await actAs(tx, user);
+      const { rows } = await tx.query('select * from uso_fotos()');
+      expect(Number(rows[0].bytes) - Number(before.rows[0].bytes)).toBe(140000);
+      expect(Number(rows[0].fotos) - Number(before.rows[0].fotos)).toBe(1);
+    });
+  });
+
+  it('no lo ve quien no tiene perfil', async () => {
+    await inTransaction(db, async (tx) => {
+      await actAs(tx, await userWithoutProfile(tx));
+      expect(await errorCode(tx, 'select * from uso_fotos()')).toBe('42501');
+    });
+    await inTransaction(db, async (tx) => {
+      await tx.query('set local role anon');
+      expect(await errorCode(tx, 'select * from uso_fotos()')).toBe('42501');
+    });
+  });
+});
+
 describe('asignar_foto_subida', () => {
   it('pone la ruta en el artículo sin tocar "Imagen" y guarda el historial', async () => {
     await inTransaction(db, async (tx) => {

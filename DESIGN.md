@@ -44,8 +44,8 @@ color. En el código se usan como clases de Tailwind (`bg-background`, `text-cod
 | `border`, `input`, `ring`                | Bordes, campos y foco visible                              |
 | `primary` / `primary-foreground`         | Acción principal (ámbar: se ve bien con poca luz)          |
 | `secondary` / `secondary-foreground`     | Acciones secundarias y badges de familia                   |
-| `destructive` / `destructive-foreground` | Descartar, errores                                         |
-| `aviso` / `aviso-foreground`             | Observaciones del artículo (ícono de alerta y caja)        |
+| `destructive` / `destructive-foreground` | Descartar, errores; espacio de fotos desde el 85 %         |
+| `aviso` / `aviso-foreground`             | Observaciones del artículo; espacio de fotos desde el 70 % |
 | `exito`                                  | Confirmaciones (código copiado, foto asignada)             |
 | `codigo`                                 | Texto del código de artículo: contraste máximo             |
 | `sin-foto`                               | Placeholder gris de "Sin foto"                             |
