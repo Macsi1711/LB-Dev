@@ -3,6 +3,14 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [Unreleased]
+
+### Agregado
+
+- **Aviso de espacio para fotos:** la pantalla Fotos muestra cuánto del 1 GB gratis de Supabase
+  Storage se usa y cuántas fotos más entran. Avisa en amarillo desde el 70 % y en rojo desde el
+  85 % (`uso_fotos()`, migración `20261019000021_uso_fotos.sql`).
+
 ## [0.7.0] - 2026-10-16
 
 ### Cambiado

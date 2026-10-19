@@ -43,6 +43,11 @@ export function createDemoPhotos(): PhotosPort {
       );
       return { overall, families };
     },
+    // Lo que ocupa una foto real con su miniatura (~140 KB).
+    async storageUsage() {
+      const photos = demoArticles.filter((a) => a.photo).length;
+      return { bytes: photos * 140_000, photos };
+    },
     missingPhotos: async (family, offset, limit) => missing(family).slice(offset, offset + limit),
     allMissingPhotos: async (family) => missing(family),
     async findArticles(q) {
