@@ -18,8 +18,7 @@ secundario: el principal es la web) y el que pasa audio y foto a texto para la w
 
 - **Contrato con n8n:** no se renombran, borran ni cambian de tipo las columnas de `articulos`.
   Las fotos están en Supabase Storage (`articulos.foto`, bucket `fotos`, ADR-008): **Drive ya no
-  se usa para nada**. `"Imagen"` queda sin uso; si se escribiera, va con el formato
-  `https://drive.google.com/file/d/<ID>/view?usp=drivesdk` (lo verifica
+  se usa para nada**. `"Imagen"` queda sin uso y n8n ya no la puede escribir (lo verifica
   `n8n-contract.int-spec.ts`).
 - **Migraciones:** van en `supabase/migrations/`, son idempotentes (`if not exists`,
   `create or replace`, `drop policy if exists`) y siempre van con `pnpm db:generate`.

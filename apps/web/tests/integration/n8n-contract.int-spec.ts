@@ -94,7 +94,7 @@ describe('n8n_bot (SQL generado por la IA)', () => {
   });
 });
 
-describe('n8n_app (lista blanca, log y fotos)', () => {
+describe('n8n_app (lista blanca y log)', () => {
   it('lee la lista blanca', async () => {
     // n8n_app usa otra conexión: el dato tiene que estar commiteado.
     await admin.query(`insert into usuarios_telegram (chat_id, nombre) values (555, 'Ana')`);
@@ -120,35 +120,11 @@ describe('n8n_app (lista blanca, log y fotos)', () => {
     });
   });
 
-  it('escribe la foto con la query del flujo "Lois Fotos"', async () => {
-    await inTransaction(app, async (tx) => {
-      const { rows } = await tx.query(
-        `UPDATE articulos SET "Imagen" = $1 WHERE upper(trim("Codigo")) = ANY($2)
-         RETURNING "Codigo", "Nombre artículo", "Imagen"`,
-        ['https://drive.google.com/file/d/NUEVO/view?usp=drivesdk', ['854001', 'BUJ-10']],
-      );
-      expect(rows.map((r) => r.Codigo).sort()).toEqual(['854001', 'BUJ-10']);
-    });
-  });
-
-  it('registra fotos sin match sin duplicar por drive_id', async () => {
-    await inTransaction(app, async (tx) => {
-      const sql = `insert into fotos_sin_match (drive_id, archivo, candidatos, link)
-                   values ($1, $2, $3, $4) on conflict (drive_id) do nothing`;
-      const values = [
-        'DRV1',
-        'onix.jpg',
-        'ONIX|ONIX.JPG',
-        'https://drive.google.com/file/d/DRV1/view',
-      ];
-      expect((await tx.query(sql, values)).rowCount).toBe(1);
-      expect((await tx.query(sql, values)).rowCount).toBe(0);
-    });
-  });
-
   it('no puede tocar otras columnas ni borrar', async () => {
     await inTransaction(app, async (tx) => {
       expect(await errorCode(tx, `update articulos set "Nombre artículo" = 'x'`)).toBe('42501');
+      // "Lois Fotos" (Drive) está retirado: ya nadie escribe la foto desde n8n.
+      expect(await errorCode(tx, `update articulos set "Imagen" = 'x'`)).toBe('42501');
       expect(await errorCode(tx, 'delete from articulos')).toBe('42501');
       expect(await errorCode(tx, 'delete from consultas_bot')).toBe('42501');
       expect(await errorCode(tx, 'select * from consultas_bot')).toBe('42501');

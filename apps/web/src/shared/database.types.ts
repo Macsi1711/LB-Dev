@@ -134,37 +134,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      fotos_sin_match: {
-        Row: {
-          archivo: string | null;
-          candidatos: string | null;
-          created_at: string;
-          drive_id: string | null;
-          id: number;
-          link: string | null;
-          resuelto: boolean;
-        };
-        ComputedFields: never;
-        Insert: {
-          archivo?: string | null;
-          candidatos?: string | null;
-          created_at?: string;
-          drive_id?: string | null;
-          id?: never;
-          link?: string | null;
-          resuelto?: boolean;
-        };
-        Update: {
-          archivo?: string | null;
-          candidatos?: string | null;
-          created_at?: string;
-          drive_id?: string | null;
-          id?: never;
-          link?: string | null;
-          resuelto?: boolean;
-        };
-        Relationships: [];
-      };
       fotos_subidas: {
         Row: {
           articulo_id: number;
@@ -347,52 +316,8 @@ export type Database = {
         Args: { codigo: string; descripcion: string; nombre: string; observaciones: string };
         Returns: string;
       };
-      asignar_foto: {
-        Args: { p_articulo_id: number; p_foto_id: number };
-        Returns: {
-          codigo: string | null;
-          descripcion: string | null;
-          familia_codigo: string | null;
-          familia_nombre: string | null;
-          foto: string | null;
-          id: number | null;
-          imagen_drive_id: string | null;
-          imagen_url: string | null;
-          nombre: string | null;
-          observaciones: string | null;
-          tiene_foto: boolean | null;
-        };
-        SetofOptions: {
-          from: '*';
-          to: 'v_articulos';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
       asignar_foto_subida: {
         Args: { p_articulo_id: number; p_ruta: string };
-        Returns: {
-          codigo: string | null;
-          descripcion: string | null;
-          familia_codigo: string | null;
-          familia_nombre: string | null;
-          foto: string | null;
-          id: number | null;
-          imagen_drive_id: string | null;
-          imagen_url: string | null;
-          nombre: string | null;
-          observaciones: string | null;
-          tiene_foto: boolean | null;
-        };
-        SetofOptions: {
-          from: '*';
-          to: 'v_articulos';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
-      asignar_imagen_drive: {
-        Args: { p_articulo_id: number; p_drive_id: string };
         Returns: {
           codigo: string | null;
           descripcion: string | null;
@@ -542,16 +467,6 @@ export type Database = {
           familia_nombre: string;
           porcentaje: number;
           total: number;
-        }[];
-      };
-      sugerir_codigos: {
-        Args: { p_limit?: number; p_textos: string[] };
-        Returns: {
-          codigo: string;
-          id: number;
-          nombre: string;
-          similitud: number;
-          tiene_foto: boolean;
         }[];
       };
       terminos_busqueda: { Args: { p_q: string }; Returns: string[] };

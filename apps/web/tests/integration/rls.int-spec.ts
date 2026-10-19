@@ -87,22 +87,19 @@ describe('vendedor', () => {
     });
   });
 
-  it('ve el bot y las fotos sin match, y resuelve fotos', async () => {
+  it('ve el bot', async () => {
     await inTransaction(db, async (tx) => {
-      for (const table of ['consultas_bot', 'usuarios_telegram', 'fotos_sin_match'])
+      for (const table of ['consultas_bot', 'usuarios_telegram'])
         await tx.query(`delete from ${table}`);
       await tx.query(
         `insert into consultas_bot (chat_id, fuente, texto, cantidad) values (1, 'texto', 'x', 0)`,
       );
       await tx.query(`insert into usuarios_telegram (chat_id, nombre) values (1, 'Juan')`);
-      await tx.query(`insert into fotos_sin_match (drive_id, archivo) values ('d1', 'a.jpg')`);
       await actAs(tx, await createUser(tx, 'vendedor'));
-      for (const table of ['consultas_bot', 'usuarios_telegram', 'fotos_sin_match']) {
+      for (const table of ['consultas_bot', 'usuarios_telegram']) {
         const { rows } = await tx.query(`select * from ${table}`);
         expect(rows, table).toHaveLength(1);
       }
-      const r = await tx.query(`update fotos_sin_match set resuelto = true where drive_id = 'd1'`);
-      expect(r.rowCount).toBe(1);
     });
   });
 
@@ -166,18 +163,6 @@ describe('admin', () => {
       expect(queries.rows).toEqual([{ texto: 'x' }]);
       const deleted = await tx.query('delete from usuarios_telegram where chat_id = 99');
       expect(deleted.rowCount).toBe(1);
-    });
-  });
-
-  it('marca fotos sin match como resueltas, pero no edita otros campos', async () => {
-    await inTransaction(db, async (tx) => {
-      await tx.query(`insert into fotos_sin_match (drive_id, archivo) values ('d1', 'a.jpg')`);
-      await actAs(tx, await createUser(tx, 'admin'));
-      const r = await tx.query(`update fotos_sin_match set resuelto = true where drive_id = 'd1'`);
-      expect(r.rowCount).toBe(1);
-      expect(
-        await errorCode(tx, `update fotos_sin_match set archivo = 'b.jpg' where drive_id = 'd1'`),
-      ).toBe(PERMISSION_DENIED);
     });
   });
 });

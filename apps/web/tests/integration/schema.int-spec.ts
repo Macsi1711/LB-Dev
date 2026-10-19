@@ -103,3 +103,24 @@ describe('v_articulos', () => {
     });
   });
 });
+
+describe('Drive retirado (ADR-008)', () => {
+  it('no quedan las funciones ni la tabla de cuando las fotos venían de Drive', async () => {
+    const { rows } = await db.query(
+      `select proname from pg_proc
+       where pronamespace = 'public'::regnamespace
+         and proname in ('asignar_foto', 'asignar_imagen_drive', 'sugerir_codigos')`,
+    );
+    expect(rows).toEqual([]);
+    const table = await db.query(`select to_regclass('public.fotos_sin_match') as t`);
+    expect(table.rows[0].t).toBeNull();
+  });
+
+  it('n8n_app ya no puede escribir "Imagen"', async () => {
+    const { rows } = await db.query(
+      `select privilege_type from information_schema.column_privileges
+       where grantee = 'n8n_app' and table_name = 'articulos' and privilege_type = 'UPDATE'`,
+    );
+    expect(rows).toEqual([]);
+  });
+});
