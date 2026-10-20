@@ -38,6 +38,44 @@ export function parseUnderstood(raw: unknown): Understood {
   return { text, heard: heard ? clean(heard) || null : null };
 }
 
+// Lo que en una etiqueta tiene números pero no es un código de artículo.
+const NOT_A_CODE = [
+  /^\d+([.,]\d+)?(mm|cm|ml|lts?|kg|cc|hp|v|w)$/i, // medidas: 119MM, 500ML
+  /^dot\d$/i, // líquido de frenos
+  /^(19|20)\d\d$/, // años
+];
+
+function isCode(token: string): boolean {
+  const alnum = token.replace(/[^a-z0-9]/gi, '');
+  if (!/^[a-z0-9./-]+$/i.test(token) || alnum.length < 4 || !/\d/.test(token)) return false;
+  if (NOT_A_CODE.some((re) => re.test(token))) return false;
+  // Solo números: con barra son medidas o referencias (024/264); con 12 o más, un código de barras.
+  if (/^\d+$/.test(alnum)) return !token.includes('/') && alnum.length <= 11;
+  return true;
+}
+
+const codesIn = (s: string | null) =>
+  (s ?? '')
+    .split(/[\s,;:()«»"'·|]+/)
+    .map((t) => t.replace(/^[./-]+|[./-]+$/g, ''))
+    .filter(isCode);
+
+/**
+ * El código de artículo que se leyó en una foto, para buscar solo eso: la IA a veces lo deja en
+ * lo que leyó o lo mezcla con palabras, y entonces salen todas las pastillas. Primero el que
+ * tiene letras y números (SYL2095, PD/363) y después el que es solo número (36060); primero lo
+ * que la IA eligió para buscar y después el resto de la etiqueta. null si no se leyó ninguno.
+ */
+export function photoCode({ text, heard }: Understood): string | null {
+  const all = [...codesIn(text), ...codesIn(heard)];
+  const code = all.find((c) => /[a-z]/i.test(c)) ?? all[0];
+  return code ? code.toUpperCase() : null;
+}
+
+/** Aviso cuando una foto no tenía código: se busca igual, pero puede traer muchas parecidas. */
+export const PHOTO_WITHOUT_CODE =
+  'No pude leer ningún código en la foto, así que busqué por lo que se ve. Para encontrar la pieza exacta, sacala de cerca al código grabado en la pieza o en la caja.';
+
 export function formatDuration(seconds: number): string {
   const total = Math.floor(seconds);
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
