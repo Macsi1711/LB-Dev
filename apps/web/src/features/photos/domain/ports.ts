@@ -1,4 +1,5 @@
 import type { StoragePhoto } from '@/shared/lib/storage-photo';
+import type { StorageUsage } from './storage-usage';
 
 export interface CoverageStat {
   familyCode: string | null;
@@ -32,6 +33,8 @@ export interface UploadTarget {
 
 export interface PhotosPort {
   stats(): Promise<PhotoStats>;
+  /** Espacio de Storage usado (rpc uso_fotos). */
+  storageUsage(): Promise<StorageUsage>;
   missingPhotos(
     family: string | null,
     offset: number,

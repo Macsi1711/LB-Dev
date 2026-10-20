@@ -7,10 +7,16 @@ import { AddPhotoTab } from './add-photo-tab';
 import { CoverageCard } from './coverage-card';
 import { MissingPhotosTab } from './missing-photos-tab';
 import { usePhotosPort } from './photos-context';
+import { StorageCard } from './storage-card';
 
 export function PhotosPage() {
   const port = usePhotosPort();
   const stats = useQuery({ queryKey: ['stats-fotos'], queryFn: () => port.stats() });
+  // Bajo 'stats-fotos': se refresca solo cuando "Agregar foto" sube una.
+  const usage = useQuery({
+    queryKey: ['stats-fotos', 'espacio'],
+    queryFn: () => port.storageUsage(),
+  });
   const [tab, setTab] = useState('agregar');
   const [target, setTarget] = useState<UploadTarget | null>(null);
   // Desde "Sin foto": abre "Agregar foto" con el artículo ya elegido.
@@ -27,6 +33,7 @@ export function PhotosPage() {
         instante en el Mostrador.
       </p>
       {stats.data ? <CoverageCard stats={stats.data} /> : <Skeleton className="h-24" />}
+      {usage.data && <StorageCard usage={usage.data} />}
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="max-w-full justify-start overflow-x-auto">
           <TabsTrigger value="agregar">Agregar foto</TabsTrigger>

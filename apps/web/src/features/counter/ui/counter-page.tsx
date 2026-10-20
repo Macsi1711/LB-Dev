@@ -9,7 +9,14 @@ import {
   type ChatQuery,
   type QueryLog,
 } from '../domain/conversation';
-import { mediaErrorMessage, toMediaError, type MediaError, type MediaKind } from '../domain/media';
+import {
+  mediaErrorMessage,
+  PHOTO_WITHOUT_CODE,
+  photoCode,
+  toMediaError,
+  type MediaError,
+  type MediaKind,
+} from '../domain/media';
 import type { Article } from '../domain/ports';
 import { parseSearchState, toSearchParams, type SearchState } from '../domain/search-state';
 import { ArticleDetail } from './article-detail';
@@ -91,8 +98,12 @@ export function CounterPage() {
     setPending(kind);
     try {
       const upload = kind === 'photo' ? await shrinkPhoto(file) : file;
-      const { text, heard } = await media.understand(kind, upload);
-      send({ ...draft, q: text }, heard ? { source: kind, heard } : { source: kind });
+      const understood = await media.understand(kind, upload);
+      const { text, heard } = understood;
+      // En una foto se busca solo el código leído: con palabras salen todas las de la familia.
+      const code = kind === 'photo' ? photoCode(understood) : null;
+      send({ ...draft, q: code ?? text }, heard ? { source: kind, heard } : { source: kind });
+      if (kind === 'photo' && !code) setNotice(PHOTO_WITHOUT_CODE);
     } catch (e) {
       const message = mediaErrorMessage(kind, toMediaError(e).reason);
       setNotice(message);

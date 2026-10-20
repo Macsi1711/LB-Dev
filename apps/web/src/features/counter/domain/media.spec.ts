@@ -4,6 +4,7 @@ import {
   MediaError,
   mediaErrorMessage,
   parseUnderstood,
+  photoCode,
   pickAudioType,
   toMediaError,
 } from './media';
@@ -85,5 +86,48 @@ describe('mediaErrorMessage', () => {
     expect(mediaErrorMessage('audio', 'failed')).toMatch(/No pude procesar el audio/);
     expect(mediaErrorMessage('audio', 'mic-denied')).toMatch(/permiso/);
     expect(mediaErrorMessage('audio', 'no-mic')).toMatch(/no puede grabar/);
+  });
+});
+
+describe('photoCode', () => {
+  it('usa el código que leyó aunque la IA buscó palabras (caso real: S1978)', () => {
+    expect(photoCode({ text: 'pastilla freno', heard: 'S1978' })).toBe('S1978');
+  });
+
+  it('saca las palabras que la IA mezcló con el código (caso real: SYL2095)', () => {
+    expect(photoCode({ text: 'sistema frenos SYL2095', heard: 'SYL2095 024/264 265/024' })).toBe(
+      'SYL2095',
+    );
+  });
+
+  it('sin código legible no hay código (caso real: "pastilla de freno")', () => {
+    expect(photoCode({ text: 'pastilla freno', heard: 'pastilla de freno' })).toBeNull();
+    expect(photoCode({ text: 'filtro aceite gol trend', heard: null })).toBeNull();
+  });
+
+  it('prefiere el código con letras y números al que es solo número', () => {
+    expect(photoCode({ text: 'pastilla', heard: 'SELVIR 36060 · ADB-486' })).toBe('ADB-486');
+    expect(photoCode({ text: 'pastilla', heard: 'SELVIR 36060' })).toBe('36060');
+    expect(photoCode({ text: 'PD/363', heard: null })).toBe('PD/363');
+  });
+
+  it('prefiere lo que eligió la IA para buscar antes que el resto de la etiqueta', () => {
+    expect(photoCode({ text: 'PH5796', heard: 'FRAM PH5796 lote AB1234' })).toBe('PH5796');
+  });
+
+  it('no confunde medidas, años, códigos de barra ni el DOT del líquido con un código', () => {
+    const none = [
+      'pastilla 119MM',
+      'corolla 2010',
+      '7791234567890',
+      'liquido frenos DOT4',
+      'medidas 024/264',
+      'motor 1.6 16v',
+    ];
+    for (const heard of none) expect(photoCode({ text: 'x', heard }), heard).toBeNull();
+  });
+
+  it('lo devuelve en mayúsculas y sin puntuación alrededor', () => {
+    expect(photoCode({ text: 'x', heard: 'código: syl2095.' })).toBe('SYL2095');
   });
 });

@@ -556,6 +556,13 @@ export type Database = {
       };
       terminos_busqueda: { Args: { p_q: string }; Returns: string[] };
       tiene_perfil: { Args: Record<PropertyKey, never>; Returns: boolean };
+      uso_fotos: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          bytes: number;
+          fotos: number;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;
