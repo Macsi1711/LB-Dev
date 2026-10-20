@@ -5,6 +5,14 @@ semántico.
 
 ## [Unreleased]
 
+### Arreglado
+
+- **La búsqueda por foto encuentra la pieza exacta:** si en la foto se lee un código (por ejemplo
+  `SYL2095` grabado en una pastilla), la web busca solo ese código, aunque la IA lo haya dejado en
+  lo que leyó o lo haya mezclado con palabras. Antes buscaba "pastilla freno" y salían las 269
+  pastillas. Si la foto no tiene ningún código, busca igual y avisa cómo sacarla para encontrar la
+  pieza exacta. La consigna de "Leer foto" en n8n pide también los códigos grabados en la pieza.
+
 ### Agregado
 
 - **Aviso de espacio para fotos:** la pantalla Fotos muestra cuánto del 1 GB gratis de Supabase
