@@ -3,6 +3,15 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [Unreleased]
+
+### Arreglado
+
+- **Foto con un código que no está en el catálogo:** si el código leído es de otra marca (por
+  ejemplo FRAM `CH10246`, cargado en Lois como `HU612`), la web ya no se queda en "no hay nada":
+  busca qué pieza se ve ("filtro aceite cartucho") y avisa que no encontró el código. La consigna
+  de "Leer foto" en n8n devuelve también la pieza (`pieza`).
+
 ## [0.8.0] - 2026-10-20
 
 ### Arreglado
