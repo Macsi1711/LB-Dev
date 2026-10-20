@@ -79,7 +79,11 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | La web muestra y carga las fotos solo en Storage, sin Drive; el bot también                           | ✅                    | #75, #77–#80  |
 | 6    | Textos largos que se salían de las tarjetas                                                           | ✅                    | #76           |
 | 6    | **Release v0.7.0**                                                                                    | ✅                    | release/0.7.0 |
-| 6    | Apagar Drive en n8n (Lois Fotos, Lois Subir foto, credencial) y sacar `VITE_N8N_FOTOS_URL`            | ⏳ dueño              | —             |
+| 6    | Aviso de espacio para fotos en la pantalla Fotos (70 % y 85 %)                                        | ✅                    | #82           |
+| 6    | La búsqueda por foto busca solo el código leído (pastillas)                                           | ✅                    | #84           |
+| 6    | **Release v0.8.0**                                                                                    | ✅                    | release/0.8.0 |
+| 6    | Apagar Drive en n8n (Lois Fotos, Lois Subir foto, credencial) y borrar lo de Drive en la base         | ⏳ dueño              | #83           |
+| 6    | Pegar en n8n la consigna nueva de "Leer foto" (códigos grabados en la pieza)                          | ⏳ dueño              | #84           |
 | 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño              | —             |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ⏳ dueño              | —             |
 | 6    | Prueba de punta a punta con los flujos de n8n andando                                                 | 🔒 migraciones y n8n  | —             |
