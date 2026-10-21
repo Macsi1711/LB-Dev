@@ -86,8 +86,9 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | Apagar Drive en n8n (Lois Fotos, Lois Subir foto) y cambiar el bot por "Lois SQL (sin Drive)"         | ✅                    | —             |
 | 6    | Borrar lo que quedaba de Drive en la base (migración 0022, aplicada)                                  | ✅                    | #83           |
 | 6    | **Release v0.8.1**                                                                                    | ✅                    | release/0.8.1 |
-| 6    | Pegar en n8n la consigna y el código nuevos de "Leer foto" y "Respuesta foto"                         | ⏳ dueño              | #84, #86      |
-| 6    | Borrar la credencial "LoisDrive" y los flujos viejos de n8n                                           | ⏳ dueño              | —             |
+| 6    | Pegar en n8n la consigna y el código nuevos de "Leer foto" y "Respuesta foto"                         | ✅                    | #84, #86      |
+| 6    | Borrar la credencial "LoisDrive" y los flujos viejos de n8n                                           | ✅                    | —             |
+| 6    | Códigos con o sin espacios, guiones o barras (PH4386 = PH 4386, ADB2533 = ADB-2533)                   | 🔄                    | #88           |
 | 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño              | —             |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ⏳ dueño              | —             |
 | 6    | Prueba de punta a punta con los flujos de n8n andando                                                 | 🔒 migraciones y n8n  | —             |
