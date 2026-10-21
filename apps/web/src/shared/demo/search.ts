@@ -49,7 +49,23 @@ function wordSimilarity(term: string, text: string): number {
   );
 }
 
+/** Como compactar_busqueda(): solo letras y números ("PH 4386" → "ph4386"). */
+export const compact = (text: string): string => normalize(text).replace(/[^a-z0-9]+/g, '');
+
+/** Como termino_compacto() (migración 0023): el término compacto si parece código, si no null. */
+export function compactTerm(term: string): string | null {
+  const c = compact(term);
+  const looksLikeCode = /[0-9]/.test(term) && (/[a-z]/.test(c) || /[./-]/.test(term));
+  return looksLikeCode && c.length >= 4 ? c : null;
+}
+
+/** El término aparece; si parece código, también sin espacios, guiones ni barras. */
+export function containsTerm(term: string, text: string): boolean {
+  const c = compactTerm(term);
+  return text.includes(term) || (c !== null && compact(text).includes(c));
+}
+
 /** Un término cuenta si aparece o si se le parece (errores de tipeo). `text` ya normalizado. */
 export function termMatches(term: string, text: string): boolean {
-  return text.includes(term) || wordSimilarity(term, text) >= 0.6;
+  return containsTerm(term, text) || wordSimilarity(term, text) >= 0.6;
 }

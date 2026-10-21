@@ -6,7 +6,7 @@ import {
   type DemoArticle,
 } from '@/shared/demo/catalog';
 import { demoBotQueries } from '@/shared/demo/extras';
-import { searchTerms, termMatches } from '@/shared/demo/search';
+import { compact, containsTerm, searchTerms, termMatches } from '@/shared/demo/search';
 import { normalize, similarity } from '@/shared/demo/text';
 import type { Article, CounterPort } from '../domain/ports';
 import type { SearchState } from '../domain/search-state';
@@ -33,12 +33,15 @@ const withFilters = (state: SearchState) =>
 /** Mismo criterio que buscar_articulos(): todos los términos, código exacto primero. */
 function strict(state: SearchState): DemoArticle[] {
   const code = state.q.trim().toUpperCase();
+  const compactCode = compact(state.q);
   const terms = searchTerms(state.q);
+  const sameCode = (a: DemoArticle) => !!compactCode && compact(a.code) === compactCode;
   return withFilters(state)
-    .filter((a) => a.code.toUpperCase() === code || terms.every((t) => textOf(a).includes(t)))
+    .filter((a) => a.code.toUpperCase() === code || terms.every((t) => containsTerm(t, textOf(a))))
     .sort(
       (a, b) =>
         Number(b.code.toUpperCase() === code) - Number(a.code.toUpperCase() === code) ||
+        Number(sameCode(b)) - Number(sameCode(a)) ||
         Number(!!code && b.code.toUpperCase().startsWith(code)) -
           Number(!!code && a.code.toUpperCase().startsWith(code)) ||
         a.name.localeCompare(b.name),
