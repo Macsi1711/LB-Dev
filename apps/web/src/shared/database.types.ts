@@ -316,6 +316,10 @@ export type Database = {
         Args: { codigo: string; descripcion: string; nombre: string; observaciones: string };
         Returns: string;
       };
+      articulo_texto_compacto: {
+        Args: { codigo: string; descripcion: string; nombre: string; observaciones: string };
+        Returns: string;
+      };
       asignar_foto_subida: {
         Args: { p_articulo_id: number; p_ruta: string };
         Returns: {
@@ -366,6 +370,7 @@ export type Database = {
           isSetofReturn: true;
         };
       };
+      compactar_busqueda: { Args: { texto: string }; Returns: string };
       contar_articulos: {
         Args: { p_con_foto?: boolean; p_familia?: string; p_q?: string };
         Returns: number;
@@ -469,6 +474,7 @@ export type Database = {
           total: number;
         }[];
       };
+      termino_compacto: { Args: { p_termino: string }; Returns: string };
       terminos_busqueda: { Args: { p_q: string }; Returns: string[] };
       tiene_perfil: { Args: Record<PropertyKey, never>; Returns: boolean };
       uso_fotos: {
