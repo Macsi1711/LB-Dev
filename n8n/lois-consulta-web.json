@@ -179,7 +179,7 @@
           "mode": "list",
           "cachedResultName": "gpt-4o-mini"
         },
-        "text": "=Sos un lector de etiquetas de repuestos automotores. Mirá la foto (una etiqueta, una caja, un código o la pieza misma: las pastillas de freno, por ejemplo, traen códigos grabados en la chapa) y devolvé SOLO un JSON válido, sin markdown ni texto extra, con dos campos:\n- \"texto\": lo que hay que buscar en el catálogo. Si se ve un código de artículo, OEM, SKU o de fabricante (por ejemplo SYL2095, ADB-486, PD/363, 36060), poné SOLO ese código, sin palabras. Si no se ve ningún código, la pieza y la marca o el modelo del auto, en hasta 6 palabras, sin verbos ni saludos. Ejemplos: \"pastilla freno onix\", \"filtro aceite gol trend\", \"liquido frenos dot 4\".\n- \"leido\": todos los códigos y textos que leíste, tal cual, en una línea corta.\nSi no se puede leer nada útil, devolvé {\"texto\": \"\", \"leido\": \"\"}. No inventes códigos: si un código se ve a medias, copiá solo lo que se lee.",
+        "text": "=Sos un lector de etiquetas de repuestos automotores. Mirá la foto (una etiqueta, una caja, un código o la pieza misma: las pastillas de freno, por ejemplo, traen códigos grabados en la chapa) y devolvé SOLO un JSON válido, sin markdown ni texto extra, con tres campos:\n- \"texto\": lo que hay que buscar en el catálogo. Si se ve un código de artículo, OEM, SKU o de fabricante (por ejemplo SYL2095, ADB-486, PD/363, 36060), poné SOLO ese código, sin palabras. Si no se ve ningún código, la pieza y la marca o el modelo del auto, en hasta 6 palabras, sin verbos ni saludos. Ejemplos: \"pastilla freno onix\", \"filtro aceite gol trend\", \"liquido frenos dot 4\".\n- \"leido\": todos los códigos y textos que leíste, tal cual, en una línea corta.\n- \"pieza\": qué pieza es, aunque hayas leído un código: el tipo de pieza, una característica que se vea (cartucho, rosca, delantera, trasera) y el auto o modelo si figura, en hasta 5 palabras, sin el código ni la marca del repuesto. Ejemplos: \"filtro aceite cartucho\", \"pastilla freno delantera onix\".\nSi no se puede leer nada útil, devolvé {\"texto\": \"\", \"leido\": \"\", \"pieza\": \"\"}. No inventes códigos: si un código se ve a medias, copiá solo lo que se lee.",
         "inputType": "base64",
         "options": {}
       },
@@ -192,7 +192,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// La IA devuelve {\"texto\", \"leido\"}; si no vino JSON, se usa lo que dijo como texto.\nconst raw = String($json.content ?? $json.text ?? '').trim();\nlet texto = raw;\nlet leido = '';\ntry {\n  const j = JSON.parse(raw.replace(/^```(?:json)?\\s*|\\s*```$/g, ''));\n  texto = String(j.texto ?? '');\n  leido = String(j.leido ?? '');\n} catch (e) {}\nreturn [{ json: { texto: texto.trim(), transcripcion: (leido || texto).trim() } }];\n"
+        "jsCode": "// La IA devuelve {\"texto\", \"leido\", \"pieza\"}; si no vino JSON, se usa lo que dijo como texto.\nconst raw = String($json.content ?? $json.text ?? '').trim();\nlet texto = raw;\nlet leido = '';\nlet pieza = '';\ntry {\n  const j = JSON.parse(raw.replace(/^```(?:json)?\\s*|\\s*```$/g, ''));\n  texto = String(j.texto ?? '');\n  leido = String(j.leido ?? '');\n  pieza = String(j.pieza ?? '');\n} catch (e) {}\nreturn [{ json: { texto: texto.trim(), transcripcion: (leido || texto).trim(), pieza: pieza.trim() } }];\n"
       },
       "name": "Respuesta foto",
       "type": "n8n-nodes-base.code",

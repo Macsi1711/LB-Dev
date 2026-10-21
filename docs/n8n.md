@@ -11,7 +11,8 @@
 
 **Retirados (ADR-008):** el flujo "Lois Fotos" (escribía `"Imagen"` y `fotos_sin_match` desde la
 carpeta de Drive) y el webhook "Lois Subir foto". Las fotos se cargan solo desde la web y van a
-Supabase Storage.
+Supabase Storage. La migración `20261019000022_limpieza_drive.sql` borra `fotos_sin_match`, las
+funciones que asignaban fotos de Drive y el permiso de `n8n_app` para escribir `"Imagen"`.
 
 `familias` ya existe en producción con `"Código"` y `"Nombre"` (con tilde y sin clave): tampoco
 se renombra. La web solo le agrega `es_producto` y la lee por la vista `v_familias`.
@@ -19,9 +20,8 @@ se renombra. La web solo le agrega `es_producto` y la lee por la vista `v_famili
 **Fotos:** están en Supabase Storage, bucket público `fotos`. `articulos.foto` tiene la ruta de la
 foto grande (`<id>/<token>.jpg`) y la miniatura está al lado (`<id>/<token>.mini.jpg`). El link
 público es `<SUPABASE_URL>/storage/v1/object/public/fotos/<foto>`. `"Imagen"` queda en la tabla con
-el link de Drive de antes (no se borran columnas): ya no se usa para las fotos ni se escribe; si
-alguien la escribiera, el formato sigue siendo `https://drive.google.com/file/d/<ID>/view?usp=drivesdk` (lo
-verifica `apps/web/tests/integration/n8n-contract.int-spec.ts`).
+el link de Drive de antes (no se borran columnas): ya no se usa para las fotos y n8n no la puede
+escribir (lo verifica `apps/web/tests/integration/n8n-contract.int-spec.ts`).
 
 ## Antes de aplicar las migraciones en producción
 
@@ -102,11 +102,14 @@ producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_UR
 2. **Audio:** el nodo de transcripción de OpenAI del bot. La transcripción va tal cual como texto a
    buscar: la búsqueda de la web ya ignora el relleno ("che, ¿tenés…?") y pasa a singular.
 3. **Foto:** la misma cadena del bot (_Extract from File_ → _Convert to File_ → análisis de
-   imagen con gpt-4o-mini). La consigna pide un JSON `{"texto", "leido"}`: el código si se ve
-   (también el grabado en la pieza, como en las pastillas) y, si no, la pieza y la marca o el
-   modelo en hasta 6 palabras. En `leido` van todos los códigos y textos que leyó. La web busca
-   **solo el código** que encuentre en `texto` o en `leido`, aunque la IA lo haya mezclado con
-   palabras (`photoCode()`); si no hay código, busca `texto` y avisa cómo sacar la foto.
+   imagen con gpt-4o-mini). La consigna pide un JSON `{"texto", "leido", "pieza"}`: el código si
+   se ve (también el grabado en la pieza, como en las pastillas) y, si no, la pieza y la marca o
+   el modelo en hasta 6 palabras. En `leido` van todos los códigos y textos que leyó, y en `pieza`
+   qué pieza es (tipo, una característica y el auto si figura), aunque haya leído un código. La
+   web busca **solo el código** que encuentre en `texto` o en `leido`, aunque la IA lo haya
+   mezclado con palabras (`photoCode()`). Si el código no está en el catálogo (el de otra marca,
+   como FRAM `CH10246`), busca `pieza` y lo avisa (`photoFallback()`); si no hay código, busca
+   `texto` y avisa cómo sacar la foto.
 4. **Responde 200** con JSON:
 
    ```json
@@ -116,7 +119,8 @@ producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_UR
    }
    ```
 
-   `texto` vacío si no entendió nada. En una foto, `transcripcion` es lo que leyó.
+   `texto` vacío si no entendió nada. En una foto, `transcripcion` es lo que leyó y `pieza` (opcional)
+   qué pieza es.
 
 **Errores:** 401 sin sesión, 400 si falta el archivo o el tipo, 413 si el archivo pasa el límite
 de n8n y 500 para el resto. La web muestra un aviso y deja escribir. El webhook no escribe en

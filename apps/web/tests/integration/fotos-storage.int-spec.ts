@@ -213,10 +213,16 @@ describe('asignar_foto_subida', () => {
     });
   });
 
-  it('la web no escribe la columna foto directo', async () => {
+  it('la web no escribe la columna foto ni el historial directo', async () => {
     await inTransaction(db, async (tx) => {
       await actAs(tx, await createUser(tx, 'admin'));
       expect(await errorCode(tx, `update articulos set foto = '1/AbCdEf12.jpg'`)).toBe('42501');
+      expect(
+        await errorCode(
+          tx,
+          `insert into fotos_subidas (articulo_id, foto) values (1, '1/AbCdEf12.jpg')`,
+        ),
+      ).toBe('42501');
     });
   });
 });

@@ -3,6 +3,22 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.8.1] - 2026-10-20
+
+### Arreglado
+
+- **Foto con un código que no está en el catálogo:** si el código leído es de otra marca (por
+  ejemplo FRAM `CH10246`, cargado en Lois como `HU612`), la web ya no se queda en "no hay nada":
+  busca qué pieza se ve ("filtro aceite cartucho") y avisa que no encontró el código. La consigna
+  de "Leer foto" en n8n devuelve también la pieza (`pieza`).
+
+### Quitado
+
+- **Lo que quedaba de Drive en la base (ADR-008):** se borran la tabla `fotos_sin_match`, las
+  funciones `asignar_foto()`, `sugerir_codigos()` y `asignar_imagen_drive()`, y el permiso de
+  `n8n_app` para escribir `"Imagen"` (migración `20261019000022_limpieza_drive.sql`). Ni la web ni
+  el bot las usaban y "Lois Fotos" ya está apagado en n8n.
+
 ## [0.8.0] - 2026-10-20
 
 ### Arreglado
