@@ -76,7 +76,7 @@ const rows: Row[] = [
   ['860030', 'DISCO FRENO MACIZO RENAULT KANGOO', 'Par, 238 mm', null, 'DF', null],
   ['120-33', 'FILTRO DE ACEITE VW GOL TREND', 'Rosca 3/4', null, 'FA', 'filtro-aceite'],
   ['120-34', 'FILTRO DE ACEITE RENAULT KANGOO', null, 'Reemplaza al 120-30', 'FA', 'filtro-aceite'],
-  ['120-40', 'FILTRO DE ACEITE TOYOTA HILUX 2.8', null, null, 'FA', null],
+  ['120-40', 'FILTRO DE ACEITE TOYOTA HILUX 2.8', 'Equivalente FRAM PH 4386', null, 'FA', null],
   ['130-10', 'FILTRO DE AIRE FIAT CRONOS 1.3', 'Panel', null, 'FI', 'filtro-aire'],
   ['130-11', 'FILTRO DE AIRE CHEVROLET ONIX 1.0 TURBO', 'Panel', null, 'FI', 'filtro-aire'],
   ['130-25', 'FILTRO DE AIRE FORD RANGER 3.2', 'Panel reforzado', null, 'FI', null],
