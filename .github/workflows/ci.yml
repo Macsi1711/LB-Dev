@@ -62,6 +62,8 @@ jobs:
           git diff --exit-code apps/web/src/shared/database.types.ts
       - name: Tests de integración (RLS, RPC y contrato con n8n)
         run: pnpm test:integration
+      - name: Ensayo del respaldo (respaldar, restaurar y los seguros, contra el Supabase local)
+        run: bash supabase/respaldo/ensayo-local.sh
 
   # Canario: avisa antes de que una versión nueva de Node rompa algo. No bloquea.
   verify-node-nuevo:
