@@ -3,6 +3,16 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.9.0] - 2026-10-21
+
+### Arreglado
+
+- **Códigos con o sin espacios, guiones o barras:** `PH4386` encuentra el artículo que en el
+  catálogo dice `PH 4386`, `ADB2533` encuentra `ADB-2533`, `PD363` encuentra `PD/363` y `36.060`
+  encuentra `36060`. El artículo cuyo código es el buscado va primero. Los números sueltos no se
+  juntan (`1234` no encuentra "1/2 34"). Usa un índice nuevo, así que la búsqueda sigue rápida
+  (migración `20261021000023_codigos_sin_separadores.sql`). El modo demo busca igual.
+
 ## [0.8.1] - 2026-10-20
 
 ### Arreglado
