@@ -88,7 +88,8 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | **Release v0.8.1**                                                                                    | ✅                    | release/0.8.1 |
 | 6    | Pegar en n8n la consigna y el código nuevos de "Leer foto" y "Respuesta foto"                         | ✅                    | #84, #86      |
 | 6    | Borrar la credencial "LoisDrive" y los flujos viejos de n8n                                           | ✅                    | —             |
-| 6    | Códigos con o sin espacios, guiones o barras (PH4386 = PH 4386, ADB2533 = ADB-2533)                   | 🔄                    | #88           |
+| 6    | Códigos con o sin espacios, guiones o barras (migración 0023, aplicada)                               | ✅                    | #88, #89      |
+| 6    | **Release v0.9.0**                                                                                    | ✅                    | release/0.9.0 |
 | 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño              | —             |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ⏳ dueño              | —             |
 | 6    | Prueba de punta a punta con los flujos de n8n andando                                                 | 🔒 migraciones y n8n  | —             |
