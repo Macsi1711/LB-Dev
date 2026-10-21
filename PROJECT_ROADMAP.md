@@ -90,6 +90,8 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | Borrar la credencial "LoisDrive" y los flujos viejos de n8n                                           | ✅                    | —             |
 | 6    | Códigos con o sin espacios, guiones o barras (migración 0023, aplicada)                               | ✅                    | #88, #89      |
 | 6    | **Release v0.9.0**                                                                                    | ✅                    | release/0.9.0 |
+| 6    | Respaldo nocturno de la base y las fotos en Cloudflare R2, con prueba mensual (ADR-009)               | 🔄                    | #91–#93       |
+| 6    | Poner en marcha el respaldo: cuenta de Cloudflare, claves, secrets y migración 0024                   | ⏳ dueño              | —             |
 | 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño              | —             |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ⏳ dueño              | —             |
 | 6    | Prueba de punta a punta con los flujos de n8n andando                                                 | 🔒 migraciones y n8n  | —             |
