@@ -102,11 +102,14 @@ producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_UR
 2. **Audio:** el nodo de transcripción de OpenAI del bot. La transcripción va tal cual como texto a
    buscar: la búsqueda de la web ya ignora el relleno ("che, ¿tenés…?") y pasa a singular.
 3. **Foto:** la misma cadena del bot (_Extract from File_ → _Convert to File_ → análisis de
-   imagen con gpt-4o-mini). La consigna pide un JSON `{"texto", "leido"}`: el código si se ve
-   (también el grabado en la pieza, como en las pastillas) y, si no, la pieza y la marca o el
-   modelo en hasta 6 palabras. En `leido` van todos los códigos y textos que leyó. La web busca
-   **solo el código** que encuentre en `texto` o en `leido`, aunque la IA lo haya mezclado con
-   palabras (`photoCode()`); si no hay código, busca `texto` y avisa cómo sacar la foto.
+   imagen con gpt-4o-mini). La consigna pide un JSON `{"texto", "leido", "pieza"}`: el código si
+   se ve (también el grabado en la pieza, como en las pastillas) y, si no, la pieza y la marca o
+   el modelo en hasta 6 palabras. En `leido` van todos los códigos y textos que leyó, y en `pieza`
+   qué pieza es (tipo, una característica y el auto si figura), aunque haya leído un código. La
+   web busca **solo el código** que encuentre en `texto` o en `leido`, aunque la IA lo haya
+   mezclado con palabras (`photoCode()`). Si el código no está en el catálogo (el de otra marca,
+   como FRAM `CH10246`), busca `pieza` y lo avisa (`photoFallback()`); si no hay código, busca
+   `texto` y avisa cómo sacar la foto.
 4. **Responde 200** con JSON:
 
    ```json
@@ -116,7 +119,8 @@ producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_UR
    }
    ```
 
-   `texto` vacío si no entendió nada. En una foto, `transcripcion` es lo que leyó.
+   `texto` vacío si no entendió nada. En una foto, `transcripcion` es lo que leyó y `pieza` (opcional)
+   qué pieza es.
 
 **Errores:** 401 sin sesión, 400 si falta el archivo o el tipo, 413 si el archivo pasa el límite
 de n8n y 500 para el resto. La web muestra un aviso y deja escribir. El webhook no escribe en

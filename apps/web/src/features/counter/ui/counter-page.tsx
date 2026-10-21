@@ -10,9 +10,11 @@ import {
   type QueryLog,
 } from '../domain/conversation';
 import {
+  codeNotFoundNotice,
   mediaErrorMessage,
   PHOTO_WITHOUT_CODE,
   photoCode,
+  photoFallback,
   toMediaError,
   type MediaError,
   type MediaKind,
@@ -102,8 +104,21 @@ export function CounterPage() {
       const { text, heard } = understood;
       // En una foto se busca solo el código leído: con palabras salen todas las de la familia.
       const code = kind === 'photo' ? photoCode(understood) : null;
-      send({ ...draft, q: code ?? text }, heard ? { source: kind, heard } : { source: kind });
-      if (kind === 'photo' && !code) setNotice(PHOTO_WITHOUT_CODE);
+      let q = code ?? text;
+      let hint = kind === 'photo' && !code ? PHOTO_WITHOUT_CODE : null;
+      if (code) {
+        // Si el código no está (el de otra marca, por ejemplo), se busca la pieza que se ve.
+        const found = await queryClient
+          .fetchQuery(summaryQuery(port, { ...draft, q: code }))
+          .catch(() => null);
+        if (found && (found.total === 0 || found.approximate)) {
+          const fallback = photoFallback(understood, code);
+          if (fallback) q = fallback;
+          hint = codeNotFoundNotice(code, fallback);
+        }
+      }
+      send({ ...draft, q }, heard ? { source: kind, heard } : { source: kind });
+      if (hint) setNotice(hint);
     } catch (e) {
       const message = mediaErrorMessage(kind, toMediaError(e).reason);
       setNotice(message);

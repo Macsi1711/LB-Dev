@@ -8,6 +8,8 @@ export interface Understood {
   text: string;
   /** Lo que se escuchó o se leyó, para mostrarlo en la burbuja. */
   heard: string | null;
+  /** En una foto, qué pieza es (sin el código): se busca si el código no está en el catálogo. */
+  part: string | null;
 }
 
 export type MediaErrorReason =
@@ -26,16 +28,19 @@ export const toMediaError = (e: unknown): MediaError =>
 const clean = (s: string) => s.trim().replace(/\s+/g, ' ');
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
 
-/** La respuesta del webhook de n8n: { texto, transcripcion? }. */
+const optionalText = (v: unknown): string | null => {
+  if (v !== undefined && v !== null && typeof v !== 'string') throw new MediaError('failed');
+  return v ? clean(v) || null : null;
+};
+
+/** La respuesta del webhook de n8n: { texto, transcripcion?, pieza? }. */
 export function parseUnderstood(raw: unknown): Understood {
   if (!isRecord(raw) || typeof raw.texto !== 'string') throw new MediaError('failed');
-  const heard = raw.transcripcion;
-  if (heard !== undefined && heard !== null && typeof heard !== 'string') {
-    throw new MediaError('failed');
-  }
+  const heard = optionalText(raw.transcripcion);
+  const part = optionalText(raw.pieza);
   const text = clean(raw.texto);
   if (!text) throw new MediaError('not-understood');
-  return { text, heard: heard ? clean(heard) || null : null };
+  return { text, heard, part };
 }
 
 // Lo que en una etiqueta tiene números pero no es un código de artículo.
@@ -66,11 +71,36 @@ const codesIn = (s: string | null) =>
  * tiene letras y números (SYL2095, PD/363) y después el que es solo número (36060); primero lo
  * que la IA eligió para buscar y después el resto de la etiqueta. null si no se leyó ninguno.
  */
-export function photoCode({ text, heard }: Understood): string | null {
+export function photoCode({ text, heard }: Pick<Understood, 'text' | 'heard'>): string | null {
   const all = [...codesIn(text), ...codesIn(heard)];
   const code = all.find((c) => /[a-z]/i.test(c)) ?? all[0];
   return code ? code.toUpperCase() : null;
 }
+
+const sameCode = (a: string, b: string) =>
+  a.replace(/[^a-z0-9]/gi, '').toUpperCase() === b.replace(/[^a-z0-9]/gi, '').toUpperCase();
+
+/**
+ * Qué buscar si el código leído no está en el catálogo (por ejemplo el de otra marca, como
+ * FRAM CH10246): la pieza que dijo la IA o, si no la dijo, las palabras que puso junto al código.
+ */
+export function photoFallback(
+  { text, part }: Pick<Understood, 'text' | 'part'>,
+  code: string,
+): string | null {
+  const words = clean(
+    text
+      .split(' ')
+      .filter((w) => !sameCode(w, code))
+      .join(' '),
+  );
+  return [part, words].find((c) => c && !sameCode(c, code)) ?? null;
+}
+
+export const codeNotFoundNotice = (code: string, fallback: string | null): string =>
+  fallback
+    ? `No encontré el código ${code} en el catálogo. Busqué «${fallback}»: fijate si es alguno de estos.`
+    : `No encontré el código ${code} en el catálogo. Probá escribir la pieza y el auto.`;
 
 /** Aviso cuando una foto no tenía código: se busca igual, pero puede traer muchas parecidas. */
 export const PHOTO_WITHOUT_CODE =

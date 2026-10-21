@@ -3,8 +3,10 @@ import {
   formatDuration,
   MediaError,
   mediaErrorMessage,
+  codeNotFoundNotice,
   parseUnderstood,
   photoCode,
+  photoFallback,
   pickAudioType,
   toMediaError,
 } from './media';
@@ -22,11 +24,15 @@ describe('parseUnderstood', () => {
   it('toma el texto a buscar limpio y lo que se escuchó o se leyó', () => {
     expect(
       parseUnderstood({ texto: '  pastilla   freno onix ', transcripcion: ' ¿Tenés pastillas? ' }),
-    ).toEqual({ text: 'pastilla freno onix', heard: '¿Tenés pastillas?' });
+    ).toEqual({ text: 'pastilla freno onix', heard: '¿Tenés pastillas?', part: null });
   });
 
   it('la transcripción es opcional', () => {
-    expect(parseUnderstood({ texto: 'BUJ-10' })).toEqual({ text: 'BUJ-10', heard: null });
+    expect(parseUnderstood({ texto: 'BUJ-10' })).toEqual({
+      text: 'BUJ-10',
+      heard: null,
+      part: null,
+    });
     expect(parseUnderstood({ texto: 'BUJ-10', transcripcion: '  ' }).heard).toBeNull();
   });
 
@@ -38,6 +44,7 @@ describe('parseUnderstood', () => {
     expect(reasonOf(() => parseUnderstood(null))).toBe('failed');
     expect(reasonOf(() => parseUnderstood({ texto: 3 }))).toBe('failed');
     expect(reasonOf(() => parseUnderstood({ texto: 'x', transcripcion: 3 }))).toBe('failed');
+    expect(reasonOf(() => parseUnderstood({ texto: 'x', pieza: 3 }))).toBe('failed');
   });
 });
 
@@ -129,5 +136,51 @@ describe('photoCode', () => {
 
   it('lo devuelve en mayúsculas y sin puntuación alrededor', () => {
     expect(photoCode({ text: 'x', heard: 'código: syl2095.' })).toBe('SYL2095');
+  });
+});
+
+describe('parseUnderstood con la pieza', () => {
+  it('lee qué pieza es, para buscarla si el código no está en el catálogo', () => {
+    expect(
+      parseUnderstood({
+        texto: 'CH10246',
+        transcripcion: 'FRAM CH10246',
+        pieza: ' filtro  aceite cartucho ',
+      }),
+    ).toEqual({ text: 'CH10246', heard: 'FRAM CH10246', part: 'filtro aceite cartucho' });
+    expect(parseUnderstood({ texto: 'CH10246', pieza: '  ' }).part).toBeNull();
+  });
+});
+
+describe('photoFallback', () => {
+  it('si el código no está, busca la pieza (caso real: filtro FRAM CH10246)', () => {
+    expect(photoFallback({ text: 'CH10246', part: 'filtro aceite cartucho' }, 'CH10246')).toBe(
+      'filtro aceite cartucho',
+    );
+  });
+
+  it('sin pieza usa las palabras que la IA puso junto al código', () => {
+    expect(photoFallback({ text: 'sistema frenos SYL2095', part: null }, 'SYL2095')).toBe(
+      'sistema frenos',
+    );
+  });
+
+  it('no repite el mismo código ni devuelve vacío', () => {
+    expect(photoFallback({ text: 'CH10246', part: null }, 'CH10246')).toBeNull();
+    expect(photoFallback({ text: 'ch10246', part: 'CH10246' }, 'CH10246')).toBeNull();
+  });
+});
+
+describe('codeNotFoundNotice', () => {
+  it('dice qué código no encontró y qué buscó en su lugar', () => {
+    expect(codeNotFoundNotice('CH10246', 'filtro aceite cartucho')).toBe(
+      'No encontré el código CH10246 en el catálogo. Busqué «filtro aceite cartucho»: fijate si es alguno de estos.',
+    );
+  });
+
+  it('sin nada para buscar en su lugar, pide escribir la pieza', () => {
+    expect(codeNotFoundNotice('CH10246', null)).toBe(
+      'No encontré el código CH10246 en el catálogo. Probá escribir la pieza y el auto.',
+    );
   });
 });

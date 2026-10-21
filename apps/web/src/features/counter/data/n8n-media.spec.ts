@@ -26,7 +26,7 @@ describe('createN8nMedia', () => {
     const fetchMock = respond(200, { texto: 'pastilla onix', transcripcion: '¿Pastillas Onix?' });
     const result = await createN8nMedia(URL_WEBHOOK, token).understand('photo', photo);
 
-    expect(result).toEqual({ text: 'pastilla onix', heard: '¿Pastillas Onix?' });
+    expect(result).toEqual({ text: 'pastilla onix', heard: '¿Pastillas Onix?', part: null });
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe(URL_WEBHOOK);
     expect(init.headers).toEqual({ Authorization: 'Bearer token-de-prueba' });
