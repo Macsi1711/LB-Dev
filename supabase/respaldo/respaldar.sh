@@ -21,6 +21,8 @@ echo "== Base ($hoy)"
 # Una sesión abierta exporta una foto fija de la base (snapshot) que usan los conteos y los
 # pg_dump: así cuadran entre sí aunque alguien escriba mientras tanto.
 coproc SESION { psql "$RESPALDO_DB_URL" -X -q -A -t -v ON_ERROR_STOP=1 2>&1; }
+# Bash borra SESION_PID cuando la sesión termina: se guarda antes para poder esperarla.
+pid_sesion="$SESION_PID"
 # Deja la respuesta en $resultado: los descriptores del coproc no existen dentro de un $(…).
 consulta() {
   printf '%s\n\\echo __fin__\n' "$1" >&"${SESION[1]}"
@@ -74,7 +76,7 @@ volcar --schema-only --schema=public -f "$trabajo/base/esquema.sql"
 volcar --data-only --table=storage.objects -f "$trabajo/base/storage-objects.sql"
 consulta 'commit;'
 printf '\\q\n' >&"${SESION[1]}"
-wait "$SESION_PID" || true
+wait "$pid_sesion" || true
 
 {
   echo "fecha=$hoy"
