@@ -3,6 +3,17 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [Unreleased]
+
+### Agregado
+
+- **Respaldo nocturno fuera de Supabase (ADR-009):** todas las noches GitHub Actions copia la
+  base (cifrada con age) y las fotos a Cloudflare R2. Quedan 30 días y un respaldo por mes
+  durante un año, y el día 1 de cada mes se prueba que se puede restaurar. La base se lee con
+  `lois_respaldo`, un usuario que no puede escribir nada (migración
+  `20261021000024_rol_respaldo.sql`). La CI ensaya el respaldo y la restauración en cada PR. Cómo
+  ponerlo en marcha y qué hacer en una emergencia: `docs/respaldo.md`.
+
 ## [0.9.0] - 2026-10-21
 
 ### Arreglado

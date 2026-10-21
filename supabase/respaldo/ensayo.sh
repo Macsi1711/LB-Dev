@@ -53,6 +53,38 @@ cabecera="$(caja s3 cp --only-show-errors "s3://$CAJA_BUCKET/$DIARIO/base-2026-1
 [[ "$cabecera" == age-encryption.org/v1 ]] || mal "El respaldo no está cifrado con age."
 bien "la base viaja cifrada"
 
+echo "## Se rompen datos: un artículo y todas las consultas"
+consultas="$(admin 'select count(*) from consultas_bot')"
+admin "delete from articulos where \"Codigo\" = 'ENSAYO-RESPALDO'" >/dev/null
+admin 'delete from consultas_bot' >/dev/null
+
+echo "## Prueba de restauración (la del día 1 de cada mes)"
+bash "$aqui/probar.sh" | sed 's/^/    /'
+[[ "$(admin "select count(*) from articulos where \"Codigo\" = 'ENSAYO-RESPALDO'")" == 1 ]] ||
+  mal "No volvió el artículo borrado."
+[[ "$(admin 'select count(*) from consultas_bot')" == "$consultas" ]] || mal "No volvieron las consultas."
+bien "volvieron el artículo y las $consultas consultas"
+[[ "$(admin "select count(*) from auth.users where email = 'vendedor@lois.local'")" == 1 ]] ||
+  mal "No volvieron los usuarios."
+bien "volvieron los usuarios"
+
+echo "## Los seguros"
+if RESTAURAR_DB_URL='postgresql://postgres@db.x.supabase.co:5432/postgres' bash "$aqui/probar.sh" >/dev/null 2>&1; then
+  mal "probar.sh aceptó una base de Supabase en la nube."
+fi
+bien "probar.sh no acepta una base en la nube"
+if bash "$aqui/restaurar.sh" >/dev/null 2>&1; then
+  mal "restaurar.sh restauró sin CONFIRMO_DESTINO."
+fi
+bien "restaurar.sh no hace nada sin CONFIRMO_DESTINO"
+
+echo "## Restauración de verdad: vuelve una foto borrada"
+fotos_s3 s3 rm --only-show-errors "s3://fotos/${rutas[0]}"
+host="$(printf '%s' "$RESTAURAR_DB_URL" | sed -E 's#^[^@]*@([^:/?]+).*#\1#')"
+CONFIRMO_DESTINO="$host" RESTAURAR_FOTOS=si bash "$aqui/restaurar.sh" | sed 's/^/    /'
+fotos_s3 s3api head-object --bucket fotos --key "${rutas[0]}" >/dev/null || mal "No volvió la foto."
+bien "volvió la foto ${rutas[0]}"
+
 echo "## Una foto nueva entra la noche siguiente, de a una"
 fotos_s3 s3 cp --only-show-errors --content-type image/jpeg "$foto" "s3://fotos/999/Ensayo001.jpg"
 RESPALDO_FECHA=2026-10-22 bash "$aqui/respaldar.sh" >"$salida"
@@ -61,6 +93,14 @@ caja s3api head-object --bucket "$CAJA_BUCKET" --key "$FOTOS/999/Ensayo001.jpg" 
   mal "La foto nueva no está en la caja."
 fotos_s3 s3 rm --only-show-errors "s3://fotos/999/Ensayo001.jpg"
 bien "copió solo la foto nueva"
+
+echo "## Si falta una foto en la caja, la prueba mensual avisa"
+caja s3 rm --only-show-errors "s3://$CAJA_BUCKET/$FOTOS/${rutas[0]}"
+if bash "$aqui/probar.sh" >"$salida" 2>&1; then
+  mal "probar.sh no detectó la foto que falta."
+fi
+grep -q 'Faltan 1 fotos' "$salida" || mal "probar.sh falló por otra cosa: $(tail -n 3 "$salida")"
+bien "probar.sh falla y dice qué foto falta"
 
 echo "## Limpieza"
 admin "delete from articulos where \"Codigo\" = 'ENSAYO-RESPALDO'" >/dev/null
