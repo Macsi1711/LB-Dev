@@ -19,62 +19,12 @@
     },
     {
       "parameters": {
-        "method": "GET",
-        "url": "https://<PROJECT_REF>.supabase.co/auth/v1/user",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey", "value": "<CLAVE_PUBLISHABLE>" },
-            {
-              "name": "Authorization",
-              "value": "={{ $('Webhook').first().json.headers.authorization }}"
-            }
-          ]
-        },
-        "options": { "response": { "response": { "neverError": true } } }
-      },
-      "name": "Validar sesión",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [220, 300],
-      "id": "8a24975b-6dfc-4150-923c-5a56789440a2"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "loose",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "1cb5b0e2-8f5d-49fe-bb6e-b993c882f68c",
-              "leftValue": "={{ $json.id }}",
-              "rightValue": "",
-              "operator": { "type": "string", "operation": "exists", "singleValue": true }
-            }
-          ],
-          "combinator": "and"
-        },
-        "looseTypeValidation": true,
-        "options": {}
-      },
-      "name": "¿Usuario de la web?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [440, 300],
-      "id": "aa3b92c5-da0e-4e83-95eb-993102249ba8"
-    },
-    {
-      "parameters": {
         "jsCode": "// El archivo llega en el Webhook (campo \"archivo\" del formulario) y el tipo en el cuerpo.\nconst wh = $('Webhook').first();\nconst binary = wh.binary ?? {};\nconst key = Object.keys(binary)[0];\nconst tipo = String(wh.json.body?.tipo ?? '').toLowerCase();\nreturn [{ json: { tipo: key ? tipo : 'sin-archivo' }, binary: key ? { data: binary[key] } : {} }];\n"
       },
       "name": "Recuperar archivo",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [660, 200],
+      "position": [220, 300],
       "id": "cf2a5ca2-532b-42bd-8643-146a31c576ec"
     },
     {
@@ -215,18 +165,6 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "{\"error\": \"no autorizado\"}",
-        "options": { "responseCode": 401 }
-      },
-      "name": "Sin sesión (401)",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [660, 420],
-      "id": "7f417aff-b7d2-482e-b5da-d92f27189f88"
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
         "responseBody": "{\"error\": \"falta el archivo o el tipo\"}",
         "options": { "responseCode": 400 }
       },
@@ -238,14 +176,7 @@
     }
   ],
   "connections": {
-    "Webhook": { "main": [[{ "node": "Validar sesión", "type": "main", "index": 0 }]] },
-    "Validar sesión": { "main": [[{ "node": "¿Usuario de la web?", "type": "main", "index": 0 }]] },
-    "¿Usuario de la web?": {
-      "main": [
-        [{ "node": "Recuperar archivo", "type": "main", "index": 0 }],
-        [{ "node": "Sin sesión (401)", "type": "main", "index": 0 }]
-      ]
-    },
+    "Webhook": { "main": [[{ "node": "Recuperar archivo", "type": "main", "index": 0 }]] },
     "Recuperar archivo": { "main": [[{ "node": "¿Audio o foto?", "type": "main", "index": 0 }]] },
     "¿Audio o foto?": {
       "main": [
