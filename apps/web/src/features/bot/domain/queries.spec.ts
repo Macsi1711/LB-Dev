@@ -20,9 +20,14 @@ describe('dateRange', () => {
 });
 
 describe('userLabel', () => {
-  it('muestra "no autorizado" si el chat no está en la lista blanca', () => {
-    expect(userLabel({ userName: 'Juan' })).toBe('Juan');
-    expect(userLabel({ userName: null })).toBe('no autorizado');
+  it('muestra "no autorizado" si el chat de Telegram no está en la lista blanca', () => {
+    expect(userLabel({ userName: 'Juan', channel: 'telegram' })).toBe('Juan');
+    expect(userLabel({ userName: null, channel: 'telegram' })).toBe('no autorizado');
+  });
+
+  it('en la web, sin usuario es una búsqueda sin sesión (ADR-010)', () => {
+    expect(userLabel({ userName: 'Ana', channel: 'web' })).toBe('Ana');
+    expect(userLabel({ userName: null, channel: 'web' })).toBe('sin sesión');
   });
 });
 

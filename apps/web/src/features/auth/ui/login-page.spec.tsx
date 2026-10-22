@@ -42,4 +42,12 @@ describe('LoginPage', () => {
     expect(signIn).toHaveBeenCalledWith('ana@lois.com', 'mala');
     expect(await screen.findByRole('alert')).toHaveTextContent('Email o contraseña incorrectos.');
   });
+
+  it('si se entró sin querer, se vuelve al Mostrador sin iniciar sesión (ADR-010)', async () => {
+    renderLogin(fakePort());
+    expect(await screen.findByRole('link', { name: 'Volver al Mostrador' })).toHaveAttribute(
+      'href',
+      '/',
+    );
+  });
 });

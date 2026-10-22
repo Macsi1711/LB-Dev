@@ -26,12 +26,14 @@ const router = createRouter([
   { path: '/recuperar', element: <ForgotPasswordPage /> },
   { path: '/nueva-clave', element: <NewPasswordPage /> },
   {
-    element: <RequireAuth />,
+    element: <AppShell />,
     children: [
+      // En el Mostrador se busca sin sesión (ADR-010).
+      { path: '/', element: <CounterScreen /> },
       {
-        element: <AppShell />,
+        // Fotos y Métricas: sin sesión, al login (y de vuelta a la sección); después, solo admin.
+        element: <RequireAuth />,
         children: [
-          { path: '/', element: <CounterScreen /> },
           {
             element: <RequireRole />,
             children: [

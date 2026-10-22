@@ -51,8 +51,9 @@ export function dateRange(from: string | null, to: string | null): { gte?: strin
   };
 }
 
-export function userLabel(query: Pick<BotQuery, 'userName'>): string {
-  return query.userName ?? 'no autorizado';
+/** Sin usuario: en Telegram, un chat no autorizado; en la web, una búsqueda sin sesión. */
+export function userLabel(query: Pick<BotQuery, 'userName' | 'channel'>): string {
+  return query.userName ?? (query.channel === 'web' ? 'sin sesión' : 'no autorizado');
 }
 
 /** "sin resultados", "1 resultado", "1.500 resultados". */

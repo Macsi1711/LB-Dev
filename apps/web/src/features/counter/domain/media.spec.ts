@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  canUseMedia,
   formatDuration,
   MediaError,
   mediaErrorMessage,
@@ -182,5 +183,14 @@ describe('codeNotFoundNotice', () => {
     expect(codeNotFoundNotice('CH10246', null)).toBe(
       'No encontré el código CH10246 en el catálogo. Probá escribir la pieza y el auto.',
     );
+  });
+});
+
+describe('canUseMedia', () => {
+  it('audio y foto son solo para el admin: usan la IA, que cuesta por consulta (ADR-010)', () => {
+    expect(canUseMedia('admin')).toBe(true);
+    expect(canUseMedia('vendedor')).toBe(false);
+    expect(canUseMedia('anonimo')).toBe(false);
+    expect(canUseMedia(undefined)).toBe(false);
   });
 });

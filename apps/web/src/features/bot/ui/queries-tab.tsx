@@ -38,7 +38,8 @@ function QueryRow({ q }: { q: BotQuery }) {
         {q.userName ? (
           <span className="font-medium">{q.userName}</span>
         ) : (
-          <Badge variant="destructive">{userLabel(q)}</Badge>
+          // Rojo solo para Telegram no autorizado; en la web es una búsqueda sin sesión.
+          <Badge variant={q.channel === 'web' ? 'secondary' : 'destructive'}>{userLabel(q)}</Badge>
         )}
         <Channel
           className="size-4 text-muted-foreground"
