@@ -1,7 +1,12 @@
+import type { Viewer } from '@/shared/roles';
+
 /** Consultas con audio o foto: n8n las pasa a texto y la web busca ese texto (ADR-005). */
 export type MediaKind = 'audio' | 'photo';
 
 export const MAX_AUDIO_SECONDS = 60;
+
+/** Audio y foto, solo para el admin: la IA de n8n cuesta por consulta (ADR-010). */
+export const canUseMedia = (viewer: Viewer | undefined): boolean => viewer === 'admin';
 
 export interface Understood {
   /** Lo que se busca, listo para la caja del chat. */

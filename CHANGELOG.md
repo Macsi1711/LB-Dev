@@ -14,6 +14,16 @@ semántico.
   `20261021000024_rol_respaldo.sql`). La CI ensaya el respaldo y la restauración en cada PR. Cómo
   ponerlo en marcha y qué hacer en una emergencia: `docs/respaldo.md`.
 
+### Cambiado
+
+- **En el Mostrador se busca sin login (ADR-010):** la web abre directo en el Mostrador y
+  cualquiera busca por texto. El ingreso es el ícono de entrar, sin texto, donde antes estaba el
+  de salir (abajo del menú en la compu, arriba a la derecha en el celular); el login tiene
+  "Volver al Mostrador". **Audio y foto, Fotos y Métricas** quedan para el admin. Las búsquedas
+  sin sesión quedan en Métricas como "sin sesión" (como mucho 30 por minuto). En la base, sin
+  sesión se busca solo por las funciones de búsqueda (migraciones
+  `20261022000025_busqueda_publica.sql` y `20261022000026_consultas_sin_sesion.sql`).
+
 ## [0.9.0] - 2026-10-21
 
 ### Arreglado
