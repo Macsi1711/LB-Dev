@@ -13,11 +13,12 @@ afterAll(async () => {
 const PERMISSION_DENIED = '42501';
 
 describe('anon (sin sesión)', () => {
-  it('no puede leer artículos ni buscar', async () => {
+  it('no lee los artículos directo: solo busca por la función (ADR-010)', async () => {
     await inTransaction(db, async (tx) => {
       await tx.query('set local role anon');
       expect(await errorCode(tx, 'select * from v_articulos')).toBe(PERMISSION_DENIED);
-      expect(await errorCode(tx, `select * from buscar_articulos('onix')`)).toBe(PERMISSION_DENIED);
+      const { rowCount } = await tx.query(`select * from buscar_articulos('onix')`);
+      expect(rowCount).toBeGreaterThan(0);
     });
   });
 });
