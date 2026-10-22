@@ -1,6 +1,6 @@
 # ADR-010: en el Mostrador se busca sin login; el login queda para el admin
 
-- **Estado:** aceptado
+- **Estado:** reemplazado por [ADR-011](011-mostrador-del-vendedor-sin-login.md)
 - **Fecha:** 2026-10-22
 
 ## Contexto
