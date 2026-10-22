@@ -43,6 +43,20 @@ export function parseUnderstood(raw: unknown): Understood {
   return { text, heard, part };
 }
 
+// Lo que la transcripción escucha mal y así no está en el catálogo: palabra escuchada → la buena.
+const MISHEARD: Record<string, string> = {
+  onyx: 'onix', // Chevrolet Onix
+};
+
+const MISHEARD_RE = new RegExp(
+  `(?<![\\p{L}\\p{N}])(${Object.keys(MISHEARD).join('|')})(?![\\p{L}\\p{N}])`,
+  'giu',
+);
+
+/** Corrige en lo transcripto de un audio las palabras que la IA escucha mal (MISHEARD). */
+export const fixMisheard = (text: string): string =>
+  text.replace(MISHEARD_RE, (word) => MISHEARD[word.toLowerCase()] ?? word);
+
 // Lo que en una etiqueta tiene números pero no es un código de artículo.
 const NOT_A_CODE = [
   /^\d+([.,]\d+)?(mm|cm|ml|lts?|kg|cc|hp|v|w)$/i, // medidas: 119MM, 500ML

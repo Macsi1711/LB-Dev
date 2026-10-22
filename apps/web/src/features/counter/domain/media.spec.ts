@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  fixMisheard,
   formatDuration,
   MediaError,
   mediaErrorMessage,
@@ -182,5 +183,18 @@ describe('codeNotFoundNotice', () => {
     expect(codeNotFoundNotice('CH10246', null)).toBe(
       'No encontré el código CH10246 en el catálogo. Probá escribir la pieza y el auto.',
     );
+  });
+});
+
+describe('fixMisheard', () => {
+  it('corrige lo que la IA escucha mal: el Onix sale como "onyx" y no encuentra nada', () => {
+    expect(fixMisheard('pastillas de freno para el onyx')).toBe('pastillas de freno para el onix');
+    expect(fixMisheard('Filtro de aceite Onyx 1.4')).toBe('Filtro de aceite onix 1.4');
+    expect(fixMisheard('¿Tenés para el ONYX?')).toBe('¿Tenés para el onix?');
+  });
+
+  it('cambia solo la palabra entera y deja el resto como está', () => {
+    expect(fixMisheard('onyxx onyx-plus pastilla')).toBe('onyxx onix-plus pastilla');
+    expect(fixMisheard('pastilla onix')).toBe('pastilla onix');
   });
 });
