@@ -3,6 +3,30 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.10.0] - 2026-10-22
+
+### Agregado
+
+- **Respaldo nocturno fuera de Supabase (ADR-009):** todas las noches GitHub Actions copia la
+  base (cifrada con age) y las fotos a Cloudflare R2. Quedan 30 días y un respaldo por mes
+  durante un año, y el día 1 de cada mes se prueba que se puede restaurar. La base se lee con
+  `lois_respaldo`, un usuario que no puede escribir nada (migración
+  `20261021000024_rol_respaldo.sql`). La CI ensaya el respaldo y la restauración en cada PR. Cómo
+  ponerlo en marcha y qué hacer en una emergencia: `docs/respaldo.md`.
+
+### Cambiado
+
+- **El Mostrador se usa sin login (ADR-011):** la web es interna y los vendedores la usan sin
+  entrar. Abre directo en el Mostrador, donde se busca **por texto, audio y foto**, y en **Fotos**
+  se ve cuántos artículos tienen foto. El ingreso es el ícono de entrar, sin texto, donde antes
+  estaba el de salir (abajo del menú en la compu, arriba a la derecha en el celular); el login
+  tiene "Volver al Mostrador". **Con login, el admin tiene todo:** cargar fotos, la lista de las
+  que faltan y Métricas. Las búsquedas sin sesión quedan en Métricas como "sin sesión" (como
+  mucho 30 por minuto). En la base, sin sesión se busca solo por las funciones de búsqueda y se
+  lee el contador (migraciones `20261022000025_busqueda_publica.sql`,
+  `20261022000026_consultas_sin_sesion.sql` y `20261022000027_medios_sin_sesion.sql`). El webhook
+  de audio y foto de n8n ya no pide sesión.
+
 ## [0.9.0] - 2026-10-21
 
 ### Arreglado

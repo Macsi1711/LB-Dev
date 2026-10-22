@@ -78,15 +78,15 @@ La web le manda un audio o una foto y n8n le devuelve **el texto a buscar**. La 
 la web. Decisión en el [ADR-005](adr/005-audio-y-foto-por-n8n.md).
 
 El flujo está en [`n8n/lois-consulta-web.json`](../n8n/lois-consulta-web.json). Para cargarlo en
-otro n8n: **Import from File**, reemplazar `<PROJECT_REF>` y `<CLAVE_PUBLISHABLE>` en el nodo
-_Validar sesión_ (salen de Supabase → Settings → API Keys; la publishable no es secreta), elegir la
-credencial de OpenAI del bot en _Transcribir audio_ y _Leer foto_, y activarlo. La URL de
+otro n8n: **Import from File**, elegir la credencial de OpenAI del bot en _Transcribir audio_ y
+_Leer foto_, y activarlo. La URL de
 producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_URL` en Vercel.
 
 **Pedido**
 
 - `POST` a la URL del webhook.
-- Header `Authorization: Bearer <token de Supabase del usuario>`.
+- Sin sesión ([ADR-011](adr/011-mostrador-del-vendedor-sin-login.md)): los vendedores usan la web
+  sin login. Si hay sesión, la web manda `Authorization: Bearer <token>`, pero el flujo no lo usa.
 - Cuerpo `multipart/form-data`:
   - `tipo`: `audio` o `foto`.
   - `archivo`: el audio (`audio/webm`, `audio/mp4` u `audio/ogg`, hasta 60 s) o la foto
@@ -96,12 +96,9 @@ producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_UR
 
 **Qué hace el flujo**
 
-1. **Valida la sesión** ([ADR-006](adr/006-validacion-sesion-webhook.md)):
-   `GET <SUPABASE_URL>/auth/v1/user` con `apikey: <clave publishable>` y el mismo
-   `Authorization`. Si la respuesta no trae el `id` del usuario, responde 401.
-2. **Audio:** el nodo de transcripción de OpenAI del bot. La transcripción va tal cual como texto a
+1. **Audio:** el nodo de transcripción de OpenAI del bot. La transcripción va tal cual como texto a
    buscar: la búsqueda de la web ya ignora el relleno ("che, ¿tenés…?") y pasa a singular.
-3. **Foto:** la misma cadena del bot (_Extract from File_ → _Convert to File_ → análisis de
+2. **Foto:** la misma cadena del bot (_Extract from File_ → _Convert to File_ → análisis de
    imagen con gpt-4o-mini). La consigna pide un JSON `{"texto", "leido", "pieza"}`: el código si
    se ve (también el grabado en la pieza, como en las pastillas) y, si no, la pieza y la marca o
    el modelo en hasta 6 palabras. En `leido` van todos los códigos y textos que leyó, y en `pieza`
@@ -110,7 +107,7 @@ producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_UR
    mezclado con palabras (`photoCode()`). Si el código no está en el catálogo (el de otra marca,
    como FRAM `CH10246`), busca `pieza` y lo avisa (`photoFallback()`); si no hay código, busca
    `texto` y avisa cómo sacar la foto.
-4. **Responde 200** con JSON:
+3. **Responde 200** con JSON:
 
    ```json
    {
@@ -122,7 +119,7 @@ producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_UR
    `texto` vacío si no entendió nada. En una foto, `transcripcion` es lo que leyó y `pieza` (opcional)
    qué pieza es.
 
-**Errores:** 401 sin sesión, 400 si falta el archivo o el tipo, 413 si el archivo pasa el límite
+**Errores:** 400 si falta el archivo o el tipo, 413 si el archivo pasa el límite
 de n8n y 500 para el resto. La web muestra un aviso y deja escribir. El webhook no escribe en
 `consultas_bot`: la consulta la registra la web con `registrar_consulta()`, con el canal `web`.
 

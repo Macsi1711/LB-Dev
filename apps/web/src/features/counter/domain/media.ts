@@ -126,7 +126,7 @@ export function mediaErrorMessage(kind: MediaKind, reason: MediaErrorReason): st
         ? 'No entendí el audio. Probá de nuevo, más cerca del micrófono, o escribilo.'
         : 'No pude leer la foto. Probá con más luz y que se vea la etiqueta o el código, o escribilo.';
     case 'unauthorized':
-      return 'Tu sesión venció. Volvé a entrar para mandar audios y fotos.';
+      return `No me dejaron procesar ${audio ? 'el audio' : 'la foto'}. Avisale al admin y, mientras, escribilo.`;
     case 'too-large':
       return audio
         ? 'El audio es muy largo. Probá con uno más corto.'

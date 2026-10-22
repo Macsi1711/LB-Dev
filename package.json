@@ -1,6 +1,6 @@
 {
   "name": "mostrador-lois",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.34.5",
@@ -23,6 +23,7 @@
     "db:reset": "supabase db reset",
     "db:migrate": "supabase migration up --local",
     "db:deploy": "supabase db push",
+    "respaldo:ensayo": "bash supabase/respaldo/ensayo-local.sh",
     "db:generate": "supabase gen types typescript --local > apps/web/src/shared/database.types.ts && prettier --write apps/web/src/shared/database.types.ts"
   },
   "devDependencies": {

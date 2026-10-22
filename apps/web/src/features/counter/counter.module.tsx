@@ -24,6 +24,7 @@ export function CounterScreen() {
   const [media] = useState(createMedia);
   return (
     <CounterPortContext value={port}>
+      {/* Sin webhook configurado (null), el chat muestra solo la caja de texto. */}
       <MediaPortContext value={media}>
         <CounterPage />
       </MediaPortContext>

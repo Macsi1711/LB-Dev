@@ -26,16 +26,18 @@ const router = createRouter([
   { path: '/recuperar', element: <ForgotPasswordPage /> },
   { path: '/nueva-clave', element: <NewPasswordPage /> },
   {
-    element: <RequireAuth />,
+    element: <AppShell />,
     children: [
+      // Sin sesión, el vendedor busca y ve cuántas fotos hay (ADR-011).
+      { path: '/', element: <CounterScreen /> },
+      { path: '/fotos', element: <PhotosScreen /> },
       {
-        element: <AppShell />,
+        // Métricas: sin sesión, al login (y de vuelta a la sección); después, solo admin.
+        element: <RequireAuth />,
         children: [
-          { path: '/', element: <CounterScreen /> },
           {
             element: <RequireRole />,
             children: [
-              { path: '/fotos', element: <PhotosScreen /> },
               { path: '/metricas', element: <BotScreen /> },
               // Los links viejos a la sección Bot siguen andando.
               { path: '/bot', element: <Navigate to="/metricas" replace /> },

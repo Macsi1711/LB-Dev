@@ -11,14 +11,13 @@ const FILE_NAME: Record<string, string> = {
 const fileName = (file: Blob) => FILE_NAME[file.type.split(';')[0] ?? ''] ?? 'consulta';
 
 /**
- * Webhook "Lois Consulta web" de n8n (contrato en docs/n8n.md). Manda el token de la sesión
- * para que n8n verifique que es un usuario de la web.
+ * Webhook "Lois Consulta web" de n8n (contrato en docs/n8n.md). Atiende sin sesión (ADR-011):
+ * el token va solo si hay una.
  */
 export function createN8nMedia(url: string, getToken: () => Promise<string | null>): MediaPort {
   return {
     async understand(kind: MediaKind, file: Blob) {
       const token = await getToken();
-      if (!token) throw new MediaError('unauthorized');
 
       const body = new FormData();
       body.append('tipo', kind === 'photo' ? 'foto' : 'audio');
@@ -28,7 +27,7 @@ export function createN8nMedia(url: string, getToken: () => Promise<string | nul
       try {
         res = await fetch(url, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
           body,
         });
       } catch {

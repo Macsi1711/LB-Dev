@@ -1,6 +1,6 @@
-import { ChartColumn, Image, LogOut, Moon, Search, Sun } from 'lucide-react';
+import { ChartColumn, Image, LogIn, LogOut, Moon, Search, Sun } from 'lucide-react';
 import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useAuth } from '@/features/auth';
 import { isDemo } from '@/shared/lib/demo';
 import { cn } from '@/shared/lib/utils';
@@ -42,7 +42,14 @@ function NavLinks({ items, compact }: { items: NavItem[]; compact?: boolean }) {
 const onBrand = 'text-marca-foreground hover:bg-marca-foreground/10 hover:text-marca-foreground';
 
 function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
-  const { port } = useAuth();
+  const { port, session } = useAuth();
+  const navigate = useNavigate();
+  // Al salir se vuelve al Mostrador, que se usa sin sesión. Primero se navega: si se cierra la
+  // sesión estando en Fotos o Métricas, su RequireAuth mandaría al login.
+  const signOut = () => {
+    navigate('/', { replace: true });
+    void port.signOut();
+  };
   return (
     <div className="flex items-center gap-1">
       <Button
@@ -54,23 +61,35 @@ function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme:
       >
         {theme === 'oscuro' ? <Sun /> : <Moon />}
       </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className={onBrand}
-        onClick={() => void port.signOut()}
-        aria-label="Salir"
-      >
-        <LogOut />
-      </Button>
+      {session ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          className={onBrand}
+          onClick={signOut}
+          aria-label="Salir"
+        >
+          <LogOut />
+        </Button>
+      ) : (
+        // Sin sesión, en el mismo lugar: el ingreso del admin, sin texto a la vista (ADR-010).
+        session === null && (
+          <Button variant="ghost" size="icon" className={onBrand} asChild>
+            <Link to="/login" aria-label="Ingresar">
+              <LogIn />
+            </Link>
+          </Button>
+        )
+      )}
     </div>
   );
 }
 
 /** Barra lateral en desktop; barra superior e inferior en el celular. */
 export function AppShell() {
-  const { profile } = useAuth();
-  const items = navigationFor(profile?.role ?? 'vendedor');
+  const { profile, viewer } = useAuth();
+  // Mientras se lee la sesión, lo mismo que sin sesión: solo el Mostrador.
+  const items = navigationFor(viewer ?? 'anonimo');
   // Un solo estado de tema para los dos lugares donde está el botón (lateral y header).
   const [theme, setTheme] = useState(currentTheme);
   const toggleTheme = () => {

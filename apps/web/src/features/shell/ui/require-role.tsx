@@ -2,10 +2,10 @@ import { Navigate, Outlet, useLocation } from 'react-router';
 import { useAuth } from '@/features/auth';
 import { canAccess } from '../domain/navigation';
 
-/** Si el rol no puede entrar a esta sección, vuelve al Mostrador. */
+/** Si quien mira no puede entrar a esta sección, vuelve al Mostrador. Va dentro de RequireAuth. */
 export function RequireRole() {
-  const { profile } = useAuth();
+  const { viewer } = useAuth();
   const { pathname } = useLocation();
-  if (!profile || !canAccess(profile.role, pathname)) return <Navigate to="/" replace />;
+  if (!viewer || !canAccess(viewer, pathname)) return <Navigate to="/" replace />;
   return <Outlet />;
 }

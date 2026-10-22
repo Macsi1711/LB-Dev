@@ -86,7 +86,7 @@ describe('mediaErrorMessage', () => {
   });
 
   it('cada motivo tiene su mensaje', () => {
-    expect(mediaErrorMessage('audio', 'unauthorized')).toMatch(/sesión/);
+    expect(mediaErrorMessage('audio', 'unauthorized')).toMatch(/Avisale al admin/);
     expect(mediaErrorMessage('photo', 'too-large')).toMatch(/muy pesada/);
     expect(mediaErrorMessage('audio', 'too-large')).toMatch(/muy largo/);
     expect(mediaErrorMessage('photo', 'failed')).toMatch(/No pude procesar la foto/);

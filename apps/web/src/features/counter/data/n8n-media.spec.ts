@@ -43,11 +43,12 @@ describe('createN8nMedia', () => {
     expect((body.get('archivo') as File).name).toBe('consulta.webm');
   });
 
-  it('sin sesión no llama al webhook', async () => {
-    const fetchMock = respond(200);
+  it('sin sesión llama igual, sin el header Authorization (ADR-011)', async () => {
+    const fetchMock = respond(200, { texto: 'bujía' });
     const media = createN8nMedia(URL_WEBHOOK, () => Promise.resolve(null));
-    expect(await reason(media.understand('audio', audio))).toBe('unauthorized');
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(await media.understand('audio', audio)).toMatchObject({ text: 'bujía' });
+    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(init.headers).toEqual({});
   });
 
   it.each([
