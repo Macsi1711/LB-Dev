@@ -53,15 +53,11 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | Inspección solo lectura: esquema real, familias y rol de n8n                                          | ✅                    | #42            |
 | 6    | Migraciones adaptadas a la tabla `familias` que ya existe                                             | ✅                    | #46            |
 | 6    | Respaldo, migraciones, verificación y deshacer para el SQL Editor                                     | ✅                    | #47            |
-| 6    | Confirmar si el bot hace `SELECT *` sobre `articulos`                                                 | ⏳ dueño              | —              |
-| 6    | Aplicar las migraciones en producción, **con OK del dueño**                                           | ⏳ dueño              | —              |
-| 6    | Borrar `lois_inspeccion` y rotar la contraseña de `postgres`                                          | 🔒 migraciones        | —              |
-| 6    | Auth: registro apagado, Site URL, Redirect URLs y SMTP propio                                         | 🔒 migraciones        | —              |
-| 6    | Primer admin                                                                                          | 🔒 migraciones        | —              |
+| 6    | Migraciones en producción con OK del dueño (todas menos la 0024, que va con el respaldo)              | ✅                    | —              |
+| 6    | Primer admin                                                                                          | ✅                    | —              |
 | 6    | Proyecto en Vercel (permiso de GitHub o deploy por CLI)                                               | ✅ `mostrador-lois`   | #41            |
-| 6    | Variables reales en Vercel, sin modo demo                                                             | 🔒 migraciones        | —              |
-| 6    | Contraseñas de `n8n_bot` / `n8n_app` y cambios de los flujos ([n8n.md](docs/n8n.md))                  | 🔒 migraciones        | —              |
-| 6    | Fotos de Drive compartidas con "cualquiera con el link"                                               | ⏳ verificar          | —              |
+| 6    | Variables reales en Vercel, sin modo demo                                                             | ✅                    | —              |
+| 6    | Fotos de Drive compartidas con "cualquiera con el link" (ya no aplica: Drive retirado, ADR-008)       | ✅                    | —              |
 | 6    | Consultas con audio y foto en el chat del Mostrador ([ADR-005](docs/adr/005-audio-y-foto-por-n8n.md)) | ✅                    | #49–#53        |
 | 6    | **Release v0.3.0**                                                                                    | ✅                    | release/0.3.0  |
 | 6    | Búsqueda en lenguaje natural y lo más parecido                                                        | ✅                    | #55, #56       |
@@ -90,14 +86,22 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | Borrar la credencial "LoisDrive" y los flujos viejos de n8n                                           | ✅                    | —              |
 | 6    | Códigos con o sin espacios, guiones o barras (migración 0023, aplicada)                               | ✅                    | #88, #89       |
 | 6    | **Release v0.9.0**                                                                                    | ✅                    | release/0.9.0  |
-| 6    | Respaldo nocturno de la base y las fotos en Cloudflare R2, con prueba mensual (ADR-009)               | ⏳ dueño (paso 3)     | #91–#93        |
-| 6    | Poner en marcha el respaldo: cuenta de Cloudflare, claves, secrets y migración 0024                   | ⏳ dueño              | —              |
 | 6    | Sin login, el vendedor busca por texto, audio y foto y ve el contador (ADR-011, 0025–0027 y n8n)      | ✅                    | #94–#99        |
 | 6    | **Release v0.10.0**                                                                                   | ✅                    | release/0.10.0 |
-| 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño              | —              |
+| 6    | "Onix" por audio: la IA escucha "onyx" y la web lo corrige antes de buscar                            | ✅                    | #102           |
+| 6    | **Release v0.10.1**                                                                                   | ✅                    | release/0.10.1 |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ✅                    | #98            |
-| 6    | Prueba de punta a punta con los flujos de n8n andando                                                 | 🔒 migraciones y n8n  | —              |
+| 6    | Probar audio y foto de verdad en el Mostrador, sin login, y el bot de Telegram                        | ⏳ dueño              | —              |
+| 6    | Pendientes del catálogo: prueba de la foto FRAM, HU612 dice "ECEITE", foto del 3PK848A                | ⏳ dueño              | —              |
+| 6    | Cuentas de vendedor viejas: borrarlas o sacarles los permisos en la base (ADR-011)                    | ⏳ dueño              | —              |
+| 6    | Confirmar si el bot hace `SELECT *` sobre `articulos`                                                 | ⏳ dueño              | —              |
+| 6    | Auth: Site URL, Redirect URLs y SMTP propio (el registro ya está apagado)                             | ⏳ verificar          | —              |
+| 6    | Respaldo nocturno de la base y las fotos en Cloudflare R2, con prueba mensual (ADR-009)               | ⏳ dueño (paso 3)     | #91–#93        |
+| 6    | Poner en marcha el respaldo: cuenta de Cloudflare, claves, secrets y migración 0024                   | ⏳ dueño              | —              |
+| 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño (datos)      | —              |
 | 6    | Plan de Vercel para uso comercial (Pro)                                                               | ⏳ decisión del dueño | —              |
+| 6    | n8n deja de entrar como `postgres`: usa `n8n_bot` / `n8n_app` ([n8n.md](docs/n8n.md))                 | ⏳ dueño              | —              |
+| 6    | Borrar `lois_inspeccion` y rotar la contraseña de `postgres`                                          | ⏳ al final           | —              |
 | 6    | **Release v1.0.0**                                                                                    | ⏳                    | —              |
 | 7    | Repo público                                                                                          | ⏳ aprobado           | —              |
 | 7    | Protección de `develop` y `main` (verify obligatorio, sin push directo)                               | ⏳                    | —              |
@@ -105,4 +109,6 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 8    | Alta de usuarios de la web desde la app (función en el servidor)                                      | 💡                    | —              |
 | 8    | Logo e ícono para instalar la app en el celular                                                       | 💡                    | —              |
 | 8    | Tests end-to-end en el navegador                                                                      | 💡                    | —              |
+| 8    | Que la web abra solo desde la red del local (cuida el gasto de la IA)                                 | 💡                    | —              |
+| 8    | "Lo más parecido" más rápido (hoy ~350 ms con 20 mil artículos)                                       | 💡                    | —              |
 | 8    | Confirmación propia al borrar en el demo publicado                                                    | ✅                    | #43            |

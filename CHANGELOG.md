@@ -3,6 +3,15 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.10.1] - 2026-10-22
+
+### Arreglado
+
+- **"Onix" por audio:** la IA lo transcribe como "onyx", que no está en el catálogo, y la búsqueda
+  traía cientos de pastillas parecidas. Ahora la web corrige esa palabra antes de buscar; la
+  burbuja sigue mostrando lo que se escuchó. La lista de correcciones (`MISHEARD`) se puede
+  ampliar con otras palabras que se escuchen mal.
+
 ## [0.10.0] - 2026-10-22
 
 ### Agregado
