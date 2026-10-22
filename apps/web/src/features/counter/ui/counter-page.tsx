@@ -11,6 +11,7 @@ import {
 } from '../domain/conversation';
 import {
   codeNotFoundNotice,
+  fixMisheard,
   mediaErrorMessage,
   PHOTO_WITHOUT_CODE,
   photoCode,
@@ -104,7 +105,7 @@ export function CounterPage() {
       const { text, heard } = understood;
       // En una foto se busca solo el código leído: con palabras salen todas las de la familia.
       const code = kind === 'photo' ? photoCode(understood) : null;
-      let q = code ?? text;
+      let q = code ?? (kind === 'audio' ? fixMisheard(text) : text);
       let hint = kind === 'photo' && !code ? PHOTO_WITHOUT_CODE : null;
       if (code) {
         // Si el código no está (el de otra marca, por ejemplo), se busca la pieza que se ve.
