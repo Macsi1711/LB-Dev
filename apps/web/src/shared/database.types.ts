@@ -426,6 +426,7 @@ export type Database = {
       };
       nombre_usuario_web: { Args: { p_user_id: string }; Returns: string };
       normalizar_busqueda: { Args: { texto: string }; Returns: string };
+      puede_buscar: { Args: Record<PropertyKey, never>; Returns: boolean };
       puntuar_parecidos: {
         Args: { p_con_foto?: boolean; p_familia?: string; p_q?: string };
         Returns: {
