@@ -16,13 +16,16 @@ semántico.
 
 ### Cambiado
 
-- **En el Mostrador se busca sin login (ADR-010):** la web abre directo en el Mostrador y
-  cualquiera busca por texto. El ingreso es el ícono de entrar, sin texto, donde antes estaba el
-  de salir (abajo del menú en la compu, arriba a la derecha en el celular); el login tiene
-  "Volver al Mostrador". **Audio y foto, Fotos y Métricas** quedan para el admin. Las búsquedas
-  sin sesión quedan en Métricas como "sin sesión" (como mucho 30 por minuto). En la base, sin
-  sesión se busca solo por las funciones de búsqueda (migraciones
-  `20261022000025_busqueda_publica.sql` y `20261022000026_consultas_sin_sesion.sql`).
+- **El Mostrador se usa sin login (ADR-011):** la web es interna y los vendedores la usan sin
+  entrar. Abre directo en el Mostrador, donde se busca **por texto, audio y foto**, y en **Fotos**
+  se ve cuántos artículos tienen foto. El ingreso es el ícono de entrar, sin texto, donde antes
+  estaba el de salir (abajo del menú en la compu, arriba a la derecha en el celular); el login
+  tiene "Volver al Mostrador". **Con login, el admin tiene todo:** cargar fotos, la lista de las
+  que faltan y Métricas. Las búsquedas sin sesión quedan en Métricas como "sin sesión" (como
+  mucho 30 por minuto). En la base, sin sesión se busca solo por las funciones de búsqueda y se
+  lee el contador (migraciones `20261022000025_busqueda_publica.sql`,
+  `20261022000026_consultas_sin_sesion.sql` y `20261022000027_medios_sin_sesion.sql`). El webhook
+  de audio y foto de n8n ya no pide sesión.
 
 ## [0.9.0] - 2026-10-21
 

@@ -92,7 +92,7 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | **Release v0.9.0**                                                                                    | ✅                    | release/0.9.0 |
 | 6    | Respaldo nocturno de la base y las fotos en Cloudflare R2, con prueba mensual (ADR-009)               | 🔄                    | #91–#93       |
 | 6    | Poner en marcha el respaldo: cuenta de Cloudflare, claves, secrets y migración 0024                   | ⏳ dueño              | —             |
-| 6    | En el Mostrador se busca sin login; el login queda para el admin (ADR-010, migraciones 0025 y 0026)   | 🔄                    | #94–#96       |
+| 6    | Sin login, el vendedor busca por texto, audio y foto y ve el contador de fotos (ADR-011, 0025–0027)   | 🔄                    | #94–#99       |
 | 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño              | —             |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ⏳ dueño              | —             |
 | 6    | Prueba de punta a punta con los flujos de n8n andando                                                 | 🔒 migraciones y n8n  | —             |
