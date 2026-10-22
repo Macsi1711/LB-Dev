@@ -88,6 +88,8 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | **Release v0.9.0**                                                                                    | ✅                    | release/0.9.0  |
 | 6    | Sin login, el vendedor busca por texto, audio y foto y ve el contador (ADR-011, 0025–0027 y n8n)      | ✅                    | #94–#99        |
 | 6    | **Release v0.10.0**                                                                                   | ✅                    | release/0.10.0 |
+| 6    | "Onix" por audio: la IA escucha "onyx" y la web lo corrige antes de buscar                            | ✅                    | #102           |
+| 6    | **Release v0.10.1**                                                                                   | ✅                    | release/0.10.1 |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ✅                    | #98            |
 | 6    | Probar audio y foto de verdad en el Mostrador, sin login, y el bot de Telegram                        | ⏳ dueño              | —              |
 | 6    | Pendientes del catálogo: prueba de la foto FRAM, HU612 dice "ECEITE", foto del 3PK848A                | ⏳ dueño              | —              |
