@@ -28,16 +28,16 @@ const router = createRouter([
   {
     element: <AppShell />,
     children: [
-      // En el Mostrador se busca sin sesión (ADR-010).
+      // Sin sesión, el vendedor busca y ve cuántas fotos hay (ADR-011).
       { path: '/', element: <CounterScreen /> },
+      { path: '/fotos', element: <PhotosScreen /> },
       {
-        // Fotos y Métricas: sin sesión, al login (y de vuelta a la sección); después, solo admin.
+        // Métricas: sin sesión, al login (y de vuelta a la sección); después, solo admin.
         element: <RequireAuth />,
         children: [
           {
             element: <RequireRole />,
             children: [
-              { path: '/fotos', element: <PhotosScreen /> },
               { path: '/metricas', element: <BotScreen /> },
               // Los links viejos a la sección Bot siguen andando.
               { path: '/bot', element: <Navigate to="/metricas" replace /> },

@@ -7,10 +7,10 @@ export interface NavItem {
   viewers: readonly Viewer[];
 }
 
-// Sin sesión se busca en el Mostrador; el resto es del admin (ADR-010).
+// Sin sesión, el vendedor busca y ve en Fotos cuántas hay; el resto es del admin (ADR-011).
 const ITEMS: readonly NavItem[] = [
   { path: '/', label: 'Mostrador', icon: 'search', viewers: ['anonimo', 'vendedor', 'admin'] },
-  { path: '/fotos', label: 'Fotos', icon: 'image', viewers: ['admin'] },
+  { path: '/fotos', label: 'Fotos', icon: 'image', viewers: ['anonimo', 'vendedor', 'admin'] },
   { path: '/metricas', label: 'Métricas', icon: 'chart', viewers: ['admin'] },
 ];
 

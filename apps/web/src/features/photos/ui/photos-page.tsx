@@ -9,13 +9,15 @@ import { MissingPhotosTab } from './missing-photos-tab';
 import { usePhotosPort } from './photos-context';
 import { StorageCard } from './storage-card';
 
-export function PhotosPage() {
+/** Sin `canManage` (sin login, ADR-011) se ve solo cuántos artículos tienen foto. */
+export function PhotosPage({ canManage }: { canManage: boolean }) {
   const port = usePhotosPort();
   const stats = useQuery({ queryKey: ['stats-fotos'], queryFn: () => port.stats() });
   // Bajo 'stats-fotos': se refresca solo cuando "Agregar foto" sube una.
   const usage = useQuery({
     queryKey: ['stats-fotos', 'espacio'],
     queryFn: () => port.storageUsage(),
+    enabled: canManage,
   });
   const [tab, setTab] = useState('agregar');
   const [target, setTarget] = useState<UploadTarget | null>(null);
@@ -28,24 +30,28 @@ export function PhotosPage() {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-4 p-3 sm:p-4">
       <h1 className="text-xl font-semibold">Fotos</h1>
-      <p className="rounded-md border bg-muted p-3 text-sm">
-        Para cargar o cambiar la foto de un artículo, usá <strong>Agregar foto</strong>: se ve al
-        instante en el Mostrador.
-      </p>
+      {canManage && (
+        <p className="rounded-md border bg-muted p-3 text-sm">
+          Para cargar o cambiar la foto de un artículo, usá <strong>Agregar foto</strong>: se ve al
+          instante en el Mostrador.
+        </p>
+      )}
       {stats.data ? <CoverageCard stats={stats.data} /> : <Skeleton className="h-24" />}
-      {usage.data && <StorageCard usage={usage.data} />}
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="max-w-full justify-start overflow-x-auto">
-          <TabsTrigger value="agregar">Agregar foto</TabsTrigger>
-          <TabsTrigger value="sin-foto">Sin foto</TabsTrigger>
-        </TabsList>
-        <TabsContent value="agregar">
-          <AddPhotoTab target={target} onTargetChange={setTarget} />
-        </TabsContent>
-        <TabsContent value="sin-foto">
-          <MissingPhotosTab families={stats.data?.families ?? []} onAddPhoto={addPhoto} />
-        </TabsContent>
-      </Tabs>
+      {canManage && usage.data && <StorageCard usage={usage.data} />}
+      {canManage && (
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList className="max-w-full justify-start overflow-x-auto">
+            <TabsTrigger value="agregar">Agregar foto</TabsTrigger>
+            <TabsTrigger value="sin-foto">Sin foto</TabsTrigger>
+          </TabsList>
+          <TabsContent value="agregar">
+            <AddPhotoTab target={target} onTargetChange={setTarget} />
+          </TabsContent>
+          <TabsContent value="sin-foto">
+            <MissingPhotosTab families={stats.data?.families ?? []} onAddPhoto={addPhoto} />
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 }
