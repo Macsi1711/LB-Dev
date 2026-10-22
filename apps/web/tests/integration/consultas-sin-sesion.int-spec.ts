@@ -26,17 +26,37 @@ async function lastWebQuery(tx: pg.Client) {
 }
 
 describe('registrar_consulta sin sesión', () => {
-  it('queda en Métricas sin usuario, como texto y con el texto acortado', async () => {
+  it('queda en Métricas sin usuario, con el texto acortado', async () => {
     await inTransaction(db, async (tx) => {
       await asAnon(tx);
-      await tx.query(
-        `select registrar_consulta($1, null, null, 'audio', 'algo escuchado', null, 3, false)`,
-        ['pastilla '.repeat(40)],
-      );
+      await tx.query(`select registrar_consulta($1, null, null, 'texto', null, null, 3, false)`, [
+        'pastilla '.repeat(40),
+      ]);
       await tx.query('reset role');
       const row = await lastWebQuery(tx);
       expect(row).toMatchObject({ fuente: 'texto', escuchado: null, cantidad: 3, user_id: null });
       expect(row.texto.length).toBe(200);
+    });
+  });
+
+  it('el audio y la foto quedan como tales, con lo escuchado acortado (ADR-011)', async () => {
+    await inTransaction(db, async (tx) => {
+      await asAnon(tx);
+      await tx.query(
+        `select registrar_consulta('pastilla onix', null, null, 'audio', $1, null, 2, false)`,
+        ['pastillas'.repeat(60)],
+      );
+      await tx.query('reset role');
+      const audio = await lastWebQuery(tx);
+      expect(audio).toMatchObject({ fuente: 'audio', texto: 'pastilla onix', user_id: null });
+      expect(audio.escuchado.length).toBe(500);
+
+      await asAnon(tx);
+      await tx.query(
+        `select registrar_consulta('SYL2095', null, null, 'foto', 'SYL2095 FRENOS', null, 1, false)`,
+      );
+      await tx.query('reset role');
+      expect(await lastWebQuery(tx)).toMatchObject({ fuente: 'foto', escuchado: 'SYL2095 FRENOS' });
     });
   });
 

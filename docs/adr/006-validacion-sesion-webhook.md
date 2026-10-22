@@ -1,6 +1,6 @@
 # ADR-006: el webhook de audio y foto valida la sesión con /auth/v1/user
 
-- **Estado:** aceptado
+- **Estado:** reemplazado por [ADR-011](011-mostrador-del-vendedor-sin-login.md)
 - **Fecha:** 2026-10-14
 
 ## Contexto

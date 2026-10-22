@@ -1,6 +1,6 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { connect, errorCode, inTransaction } from './db';
+import { actAs, connect, createUser, errorCode, inTransaction } from './db';
 
 // Búsqueda sin sesión (ADR-010): en el Mostrador cualquiera busca por texto; el login queda para
 // el admin. Sin sesión (rol anon) se busca solo por las funciones, que cortan en 200 por página:
@@ -38,6 +38,19 @@ describe('sin sesión', () => {
       await asAnon(tx);
       const { rows } = await tx.query('select codigo, nombre from v_familias');
       expect(rows.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('ve cuántos artículos tienen foto, los mismos números que el admin (ADR-011)', async () => {
+    await inTransaction(db, async (tx) => {
+      await tx.query(`update articulos set foto = '1/abcdefgh.jpg' where "Codigo" = '854000'`);
+      await actAs(tx, await createUser(tx, 'admin'));
+      const admin = await tx.query('select * from stats_fotos()');
+      await tx.query('reset role');
+      await asAnon(tx);
+      const anon = await tx.query('select * from stats_fotos()');
+      expect(anon.rows).toEqual(admin.rows);
+      expect(Number(anon.rows[0].con_foto)).toBeGreaterThan(0);
     });
   });
 
