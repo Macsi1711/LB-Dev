@@ -1,3 +1,5 @@
+import { shrinkPhoto } from './shrink-photo';
+
 /** Fotos subidas desde la web directo a Supabase Storage (ADR-008). */
 export type UploadErrorReason = 'unauthorized' | 'too-large' | 'failed' | 'not-image';
 
@@ -41,5 +43,22 @@ export function uploadErrorMessage(reason: UploadErrorReason): string {
       return 'Ese archivo no es una imagen. Elegí una foto.';
     case 'failed':
       return 'No se pudo subir la foto. Probá de nuevo.';
+  }
+}
+
+/** Lado mayor de la foto y de la miniatura que se suben a Storage (ADR-008). */
+const FULL_SIDE = 800;
+const MINI_SIDE = 320;
+
+/** Achica la foto elegida a las dos medidas que se guardan. Falla con UploadError('not-image'). */
+export async function articlePhotoFiles(file: Blob): Promise<{ full: Blob; mini: Blob }> {
+  try {
+    const [full, mini] = await Promise.all([
+      shrinkPhoto(file, FULL_SIDE),
+      shrinkPhoto(file, MINI_SIDE),
+    ]);
+    return { full, mini };
+  } catch {
+    throw new UploadError('not-image');
   }
 }
