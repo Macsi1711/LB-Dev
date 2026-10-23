@@ -1,6 +1,7 @@
 # shellcheck shell=bash disable=SC2034 # las constantes las usan los scripts que lo incluyen
 # Funciones que comparten respaldar.sh, probar.sh y restaurar.sh. Se incluye, no se corre solo.
-# Corre dentro del contenedor de en-contenedor.sh (bash, age, aws-cli y el cliente de Postgres 17).
+# Corre dentro del contenedor de en-contenedor.sh (bash, age, curl, node, aws-cli y el cliente de
+# Postgres 17).
 set -euo pipefail
 # Mismo orden en sort y comm, sea cual sea el idioma de la máquina.
 export LC_ALL=C
@@ -12,8 +13,10 @@ readonly FOTOS=fotos
 readonly DIAS_DIARIOS=30
 readonly MESES_MENSUALES=12
 
-# aws-cli: direcciones path-style (Supabase Storage y MinIO no aceptan otra) y sin los checksums
-# nuevos, que algunos S3 compatibles todavía rechazan.
+carpeta_respaldo="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# aws-cli (solo para volver a subir fotos a Supabase en restaurar.sh y en el ensayo):
+# direcciones path-style, que es lo único que acepta Supabase Storage, y sin los checksums nuevos.
 AWS_CONFIG_FILE="$(mktemp)"
 printf '[default]\ns3 =\n  addressing_style = path\n' >"$AWS_CONFIG_FILE"
 export AWS_CONFIG_FILE
@@ -31,10 +34,17 @@ requiere() {
   return "$falta"
 }
 
-# La caja: Cloudflare R2 en producción, MinIO en el ensayo local.
+# Necesita BLOB_READ_WRITE_TOKEN (Vercel Blob, producción) o CAJA_CARPETA (el ensayo local).
+requiere_caja() {
+  if [[ -z "${BLOB_READ_WRITE_TOKEN:-}" && -z "${CAJA_CARPETA:-}" ]]; then
+    echo "Falta la variable BLOB_READ_WRITE_TOKEN (ver docs/respaldo.md)." >&2
+    return 1
+  fi
+}
+
+# La caja: Vercel Blob en producción, una carpeta en el ensayo local (caja.mjs).
 caja() {
-  AWS_ACCESS_KEY_ID="$CAJA_ACCESS_KEY_ID" AWS_SECRET_ACCESS_KEY="$CAJA_SECRET_ACCESS_KEY" \
-    AWS_DEFAULT_REGION="${CAJA_REGION:-auto}" aws --endpoint-url "$CAJA_ENDPOINT" "$@"
+  node "$carpeta_respaldo/caja.mjs" "$@"
 }
 
 # El bucket de fotos de Supabase Storage, por su API compatible con S3.
@@ -43,18 +53,27 @@ fotos_s3() {
     AWS_DEFAULT_REGION="$FOTOS_REGION" aws --endpoint-url "$FOTOS_ENDPOINT" "$@"
 }
 
-# Claves de un bucket bajo un prefijo, una por línea y ordenadas. `cliente` es caja o fotos_s3.
-listar() {
-  local cliente="$1" bucket="$2" prefijo="$3" salida
-  # Si falla aws, falla listar: una lista vacía por error haría creer que no hay nada.
-  salida="$("$cliente" s3api list-objects-v2 --bucket "$bucket" --prefix "$prefijo" \
-    --query 'Contents[].[Key]' --output text)" || return 1
+# Las claves del bucket de fotos de Supabase, una por línea y ordenadas.
+listar_fotos_s3() {
+  local salida
+  # Si falla aws, falla esto: una lista vacía por error haría creer que no hay nada.
+  salida="$(fotos_s3 s3api list-objects-v2 --bucket "$1" --query 'Contents[].[Key]' --output text)" ||
+    return 1
   printf '%s\n' "$salida" | grep -v -e '^None$' -e '^$' | sort || true
+}
+
+# Lo que hay en la caja bajo `prefijo`, sin el prefijo.
+listar_caja() {
+  local prefijo="$1" salida
+  salida="$(caja listar "$prefijo")" || return 1
+  printf '%s\n' "$salida" | sed "s#^$prefijo##" | grep -v '^$' || true
 }
 
 # El respaldo más nuevo de la base, o vacío si no hay ninguno.
 ultimo_respaldo() {
-  listar caja "$CAJA_BUCKET" "$DIARIO/" | tail -n 1
+  local salida
+  salida="$(caja listar "$DIARIO/")" || return 1
+  printf '%s\n' "$salida" | tail -n 1
 }
 
 # Baja un respaldo de la caja, lo descifra y lo deja desarmado en `destino`.
@@ -62,8 +81,7 @@ bajar_respaldo() {
   local clave="$1" destino="$2" identidad
   identidad="$(mktemp)"
   printf '%s\n' "$AGE_IDENTIDAD" >"$identidad"
-  caja s3 cp --only-show-errors "s3://$CAJA_BUCKET/$clave" - |
-    age -d -i "$identidad" | tar -xz -C "$destino"
+  caja bajar "$clave" | age -d -i "$identidad" | tar -xz -C "$destino"
   rm -f "$identidad"
 }
 

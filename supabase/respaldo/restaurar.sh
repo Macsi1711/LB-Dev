@@ -5,8 +5,8 @@
 # migraciones aplicadas (por ejemplo, un proyecto de Supabase nuevo).
 # VACÍA las tablas del destino antes de cargar: por eso pide CONFIRMO_DESTINO=<host del destino>.
 source "$(dirname "$0")/comun.sh"
-requiere RESTAURAR_DB_URL AGE_IDENTIDAD CAJA_ENDPOINT CAJA_BUCKET CAJA_ACCESS_KEY_ID \
-  CAJA_SECRET_ACCESS_KEY
+requiere RESTAURAR_DB_URL AGE_IDENTIDAD
+requiere_caja
 
 host="$(printf '%s' "$RESTAURAR_DB_URL" | sed -E 's#^[^@]*@([^:/?]+).*#\1#')"
 if [[ "${CONFIRMO_DESTINO:-}" != "$host" ]]; then
@@ -34,11 +34,12 @@ if [[ "${RESTAURAR_FOTOS:-no}" == si ]]; then
   requiere FOTOS_ENDPOINT FOTOS_REGION FOTOS_ACCESS_KEY_ID FOTOS_SECRET_ACCESS_KEY
   bucket_fotos="${FOTOS_BUCKET:-fotos}"
   echo "== Fotos: subiendo al bucket $bucket_fotos las que falten"
-  listar caja "$CAJA_BUCKET" "$FOTOS/" | sed "s#^$FOTOS/##" >"$trabajo/en-caja.txt"
-  listar fotos_s3 "$bucket_fotos" '' >"$trabajo/en-supabase.txt"
+  listar_caja "$FOTOS/" >"$trabajo/en-caja.txt"
+  listar_fotos_s3 "$bucket_fotos" >"$trabajo/en-supabase.txt"
   comm -23 "$trabajo/en-caja.txt" "$trabajo/en-supabase.txt" >"$trabajo/faltan.txt"
   while IFS= read -r clave_foto; do
-    caja s3 cp --only-show-errors "s3://$CAJA_BUCKET/$FOTOS/$clave_foto" "$trabajo/fotos/$clave_foto"
+    mkdir -p "$(dirname "$trabajo/fotos/$clave_foto")"
+    caja bajar "$FOTOS/$clave_foto" >"$trabajo/fotos/$clave_foto"
   done <"$trabajo/faltan.txt"
   if [[ -s "$trabajo/faltan.txt" ]]; then
     fotos_s3 s3 cp --recursive --only-show-errors --content-type image/jpeg \

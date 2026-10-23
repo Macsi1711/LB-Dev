@@ -5,8 +5,8 @@
 # que cada foto asignada a un artículo esté en la caja. Si algo no cuadra, termina con error.
 # Nunca contra producción: vacía las tablas antes de cargar.
 source "$(dirname "$0")/comun.sh"
-requiere RESTAURAR_DB_URL AGE_IDENTIDAD CAJA_ENDPOINT CAJA_BUCKET CAJA_ACCESS_KEY_ID \
-  CAJA_SECRET_ACCESS_KEY
+requiere RESTAURAR_DB_URL AGE_IDENTIDAD
+requiere_caja
 
 if [[ "$RESTAURAR_DB_URL" == *supabase.co* || "$RESTAURAR_DB_URL" == *supabase.com* ]]; then
   echo "La prueba es solo contra una base descartable, nunca contra Supabase en la nube." >&2
@@ -43,7 +43,7 @@ done <"$trabajo/conteos.tsv"
 echo "== Fotos: cada foto asignada a un artículo está en la caja"
 psql "$RESTAURAR_DB_URL" -X -A -t -v ON_ERROR_STOP=1 \
   -c 'select foto from public.articulos where foto is not null' | sort >"$trabajo/asignadas.txt"
-listar caja "$CAJA_BUCKET" "$FOTOS/" | sed "s#^$FOTOS/##" >"$trabajo/en-caja.txt"
+listar_caja "$FOTOS/" >"$trabajo/en-caja.txt"
 comm -23 "$trabajo/asignadas.txt" "$trabajo/en-caja.txt" >"$trabajo/faltan.txt"
 if [[ -s "$trabajo/faltan.txt" ]]; then
   echo "  ✗ Faltan $(wc -l <"$trabajo/faltan.txt" | tr -d ' ') fotos en la caja, por ejemplo:"
