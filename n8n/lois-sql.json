@@ -169,7 +169,7 @@
       "position": [6080, 1392],
       "id": "d47ec009-ec9c-4889-9af9-bbbd582ce2a2",
       "name": "Execute a SQL query1",
-      "credentials": { "postgres": { "id": "piZcPj3aQsBQCfVx", "name": "Lois" } }
+      "credentials": { "postgres": { "name": "Lois bot (solo lectura)" } }
     },
     {
       "parameters": {
@@ -476,7 +476,7 @@
       "position": [6300, 1192],
       "executeOnce": true,
       "alwaysOutputData": true,
-      "credentials": { "postgres": { "id": "piZcPj3aQsBQCfVx", "name": "Lois" } }
+      "credentials": { "postgres": { "name": "Lois bot (solo lectura)" } }
     },
     {
       "parameters": {

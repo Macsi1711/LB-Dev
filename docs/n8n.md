@@ -5,9 +5,14 @@
 | Flujo | Rol       | Operación                                                                                                 | Objeto              |
 | ----- | --------- | --------------------------------------------------------------------------------------------------------- | ------------------- |
 | Bot   | `n8n_bot` | SELECT con SQL libre generado por la IA                                                                   | `articulos`         |
-| Bot   | `n8n_app` | `select activo from usuarios_telegram where chat_id = $1`                                                 | `usuarios_telegram` |
-| Bot   | `n8n_app` | INSERT                                                                                                    | `consultas_bot`     |
 | Bot   | `n8n_bot` | `select trim("Codigo") as codigo, foto from articulos where foto is not null and trim("Codigo") = any(…)` | `articulos`         |
+| Bot   | `n8n_app` | `select activo from usuarios_telegram where chat_id = $1` (**el flujo todavía no lo hace**)               | `usuarios_telegram` |
+| Bot   | `n8n_app` | INSERT (**el flujo todavía no lo hace**)                                                                  | `consultas_bot`     |
+
+**Desde el 2026-10-23 el bot entra como `n8n_bot`** (credencial `Lois bot (solo lectura)` en los
+dos nodos de Postgres): solo lee `articulos`, en solo lectura y con tope de 5 segundos, así que
+aunque la IA genere un `DELETE` o un `UPDATE`, la base lo rechaza. `n8n_app` tiene contraseña
+recién cuando el flujo sume la lista blanca y el registro de consultas.
 
 **Retirados (ADR-008):** el flujo "Lois Fotos" (escribía `"Imagen"` y `fotos_sin_match` desde la
 carpeta de Drive) y el webhook "Lois Subir foto". Las fotos se cargan solo desde la web y van a
@@ -29,11 +34,12 @@ escribir (lo verifica `apps/web/tests/integration/n8n-contract.int-spec.ts`).
    ```sql
    select upper(trim("Codigo")), count(*) from articulos group by 1 having count(*) > 1;
    ```
-2. **Cómo se conecta hoy n8n.** Si usa el usuario `postgres` (dueño de las tablas), RLS no lo
-   afecta y nada se corta al habilitarlo. Si usa otro rol, primero hay que pasarlo a
-   `n8n_bot`/`n8n_app`.
-3. **El prompt del bot** nunca tiene que generar `SELECT *`: `articulos` suma las columnas `id` y
-   `actualizado_en`, y el `UNION ALL` del bot cuenta columnas.
+2. **Cómo se conecta n8n.** El bot entra como `n8n_bot` (ver arriba). La credencial vieja
+   `Lois` (usuario `postgres`) queda en n8n hasta el cierre de seguridad: antes de rotar la
+   contraseña de `postgres`, revisar que ningún flujo publicado la use.
+3. **El prompt del bot** nunca tiene que generar `SELECT *` sobre `articulos` (verificado el
+   2026-10-23: nombra las columnas; el `SELECT *` del final es sobre su propio `WITH`):
+   `articulos` suma las columnas `id` y `actualizado_en`, y el `UNION ALL` del bot cuenta columnas.
 4. Aplicar con la guía paso a paso de [produccion.md](produccion.md): inspección de solo
    lectura, simulacro, respaldo y migraciones con el OK del dueño.
 
@@ -51,17 +57,18 @@ alter role n8n_app password '<otra-distinta>';
 Copiá el host de Supabase → Connect → **Session pooler**. Es del estilo
 `aws-0-<región>.pooler.supabase.com`.
 
-| Credencial en n8n           | Host            | Puerto | Base       | Usuario                 | SSL     |
-| --------------------------- | --------------- | ------ | ---------- | ----------------------- | ------- |
-| `Lois - bot (solo lectura)` | host del pooler | 5432   | `postgres` | `n8n_bot.<project-ref>` | require |
-| `Lois - app`                | host del pooler | 5432   | `postgres` | `n8n_app.<project-ref>` | require |
+| Credencial en n8n         | Host            | Puerto | Base       | Usuario                 | SSL     |
+| ------------------------- | --------------- | ------ | ---------- | ----------------------- | ------- |
+| `Lois bot (solo lectura)` | host del pooler | 5432   | `postgres` | `n8n_bot.<project-ref>` | require |
+| `Lois - app`              | host del pooler | 5432   | `postgres` | `n8n_app.<project-ref>` | require |
 
 Como cadena: `postgresql://n8n_bot.<project-ref>:<contraseña>@<host-del-pooler>:5432/postgres?sslmode=require`
 
 ## Cambios en los flujos
 
-- **Lois SQL:** el nodo _Execute a SQL query1_ pasa a `Lois - bot`. Después de _Edit Fields_,
-  chequear la lista blanca con `Lois - app`. Al final de cada camino, insertar en
+- **Lois SQL:** _Execute a SQL query1_ y _Buscar fotos en Storage_ usan `Lois bot (solo lectura)`
+  (hecho el 2026-10-23). Pendiente: después de _Edit Fields_, chequear la lista blanca con
+  `Lois - app`. Al final de cada camino, insertar en
   `consultas_bot` (chat_id, fuente, texto, sql_generado, cantidad, error). Si el usuario no está
   autorizado, insertar con `error = 'no autorizado'`.
 - **Lois SQL, fotos (ADR-008):** después de _Execute a SQL query1_, _Buscar fotos en Storage_ trae
