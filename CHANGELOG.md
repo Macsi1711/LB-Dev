@@ -3,6 +3,31 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [1.0.0] - 2026-10-23
+
+Primera versión oficial: el Mostrador Lois queda en producción con los datos reales de la empresa.
+No trae código nuevo respecto de la 0.12.0; cierra la puesta en producción.
+
+### Qué queda andando
+
+- **Mostrador sin login** para los vendedores: búsqueda por texto, audio y foto, con lo más
+  parecido cuando no hay coincidencia exacta y códigos con o sin espacios o guiones.
+- **Admin con login:** Fotos (cargar y ver las que faltan), **Productos** (alta de productos
+  nuevos con foto) y Métricas.
+- **Fotos en Supabase Storage**; Drive ya no se usa para nada.
+- **Bot de Telegram** con su usuario propio de solo lectura (`n8n_bot`).
+- **Respaldo nocturno** de la base y las fotos en Vercel Blob, con prueba de restauración el día
+  1 de cada mes.
+
+### Puesta en producción (fuera del código)
+
+- La web y el respaldo pasaron al equipo **Pro** de Vercel (uso comercial).
+- Prueba de carga en producción: 15 y 30 vendedores a la vez, sin errores y con búsquedas de
+  ~0,2 s.
+- Cierre de seguridad: contraseña de `postgres` rotada, sin la credencial vieja en n8n y sin el
+  usuario de inspección (`docs/produccion.md`, sección 8).
+- Probado en el local: audio, foto y alta de productos.
+
 ## [0.12.0] - 2026-10-23
 
 ### Agregado
