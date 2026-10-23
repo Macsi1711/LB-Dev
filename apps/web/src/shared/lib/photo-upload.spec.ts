@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { isImage, photoPath, photoToken, uploadErrorMessage, uploadErrorReason } from './upload';
+import {
+  isImage,
+  photoPath,
+  photoToken,
+  uploadErrorMessage,
+  uploadErrorReason,
+} from './photo-upload';
 
 describe('photoPath', () => {
   it('la foto nueva va en la carpeta del artículo, con un nombre que nunca se repite', () => {

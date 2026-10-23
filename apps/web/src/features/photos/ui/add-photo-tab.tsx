@@ -3,7 +3,6 @@ import { Camera, Check, Search } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ArticleThumbnail } from '@/features/counter';
-import { shrinkPhoto } from '@/shared/lib/shrink-photo';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import {
@@ -16,7 +15,12 @@ import {
 } from '@/shared/ui/dialog';
 import { Input } from '@/shared/ui/input';
 import type { UploadTarget } from '../domain/ports';
-import { isImage, toUploadError, UploadError, uploadErrorMessage } from '../domain/upload';
+import {
+  articlePhotoFiles,
+  isImage,
+  toUploadError,
+  uploadErrorMessage,
+} from '@/shared/lib/photo-upload';
 import { usePhotosPort } from './photos-context';
 
 function ArticlePicker({ onPick }: { onPick: (a: UploadTarget) => void }) {
@@ -72,10 +76,6 @@ function ArticlePicker({ onPick }: { onPick: (a: UploadTarget) => void }) {
   );
 }
 
-/** Lado mayor de la foto y de la miniatura que se suben a Storage (ADR-008). */
-const FULL_SIDE = 800;
-const MINI_SIDE = 320;
-
 /** Elegir un artículo, sacarle o elegir una foto y guardarla en Supabase Storage (ADR-008). */
 export function AddPhotoTab(props: {
   target: UploadTarget | null;
@@ -94,17 +94,7 @@ export function AddPhotoTab(props: {
 
   const save = useMutation({
     mutationFn: async ({ article, file }: { article: UploadTarget; file: File }) => {
-      let full: Blob;
-      let mini: Blob;
-      try {
-        [full, mini] = await Promise.all([
-          shrinkPhoto(file, FULL_SIDE),
-          shrinkPhoto(file, MINI_SIDE),
-        ]);
-      } catch {
-        throw new UploadError('not-image');
-      }
-      await port.savePhoto(article.id, { full, mini });
+      await port.savePhoto(article.id, await articlePhotoFiles(file));
       return article;
     },
     onSuccess: async (article) => {
