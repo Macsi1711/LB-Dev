@@ -17,6 +17,8 @@ Vercel Blob, fuera de Supabase, y el día 1 de cada mes prueba que la copia se p
 - Dentro de cada copia: `datos.sql` (lo que se restaura), `conteos.tsv` (filas por tabla),
   `respaldo.sql` (el schema `respaldo`), y de referencia `esquema.sql` y `storage-objects.sql`.
 - **No** se guardan las sesiones abiertas: después de restaurar, todos vuelven a entrar.
+- Al restaurar, las tablas que no crean nuestras migraciones se saltean con un aviso (⚠). Hoy es
+  solo `n8n_chat_histories`, la memoria del chat del bot, que n8n vuelve a crear sola.
 
 ## Puesta en marcha (una vez)
 
