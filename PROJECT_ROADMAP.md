@@ -103,6 +103,7 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | Plan de Vercel para uso comercial: el equipo Atom (web y respaldo) está en Hobby                      | ⏳ decisión del dueño | —              |
 | 6    | El bot deja de entrar como `postgres`: usa `n8n_bot`, solo lectura ([n8n.md](docs/n8n.md))            | ✅                    | #108           |
 | 6    | Cierre de seguridad: rotar `postgres`, borrar "Lois" de n8n y `lois_inspeccion` (produccion.md §8)    | ⏳ al final           | —              |
+| 6    | Productos: el admin carga productos nuevos (datos, familia y foto)                                    | 🟡                    | #110–#112      |
 | 6    | **Release v1.0.0**                                                                                    | ⏳                    | —              |
 | 7    | Repo público                                                                                          | ⏳ aprobado           | —              |
 | 7    | Protección de `develop` y `main` (verify obligatorio, sin push directo)                               | ⏳                    | —              |

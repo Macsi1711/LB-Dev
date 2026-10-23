@@ -1,4 +1,4 @@
-import { ChartColumn, Image, LogIn, LogOut, Moon, Search, Sun } from 'lucide-react';
+import { ChartColumn, Image, LogIn, LogOut, Moon, Package, Search, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useAuth } from '@/features/auth';
@@ -9,7 +9,7 @@ import { Button } from '@/shared/ui/button';
 import { Wordmark } from '@/shared/ui/wordmark';
 import { navigationFor, type NavItem } from '../domain/navigation';
 
-const ICONS = { search: Search, image: Image, chart: ChartColumn } as const;
+const ICONS = { search: Search, image: Image, package: Package, chart: ChartColumn } as const;
 
 function NavLinks({ items, compact }: { items: NavItem[]; compact?: boolean }) {
   return items.map((item) => {
