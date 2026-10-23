@@ -3,14 +3,16 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
-## [Sin publicar]
+## [0.11.0] - 2026-10-23
 
 ### Cambiado
 
-- **El respaldo nocturno va a Vercel Blob en vez de Cloudflare R2 (ADR-012):** Lois ya paga
-  Vercel Pro, así que no hace falta abrir otra cuenta. Las fotos se bajan por su link público,
-  sin claves S3 de Supabase. Para ponerlo en marcha alcanzan tres secrets y dos variables en
-  GitHub (`docs/respaldo.md`); el resto sigue igual.
+- **El respaldo nocturno va a Vercel Blob en vez de Cloudflare R2 (ADR-012), y ya está en
+  marcha:** la web ya está en Vercel, así que no hizo falta abrir otra cuenta. Las fotos se bajan
+  por su link público, sin claves S3 de Supabase, y alcanzan tres secrets y dos variables en
+  GitHub (`docs/respaldo.md`). Se aplicó la migración 0024 (`lois_respaldo`) y el 2026-10-23
+  anduvieron el primer respaldo (la base y las 910 fotos y miniaturas) y la prueba de
+  restauración.
 
 ### Arreglado
 
