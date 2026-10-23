@@ -3,6 +3,24 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.11.0] - 2026-10-23
+
+### Cambiado
+
+- **El respaldo nocturno va a Vercel Blob en vez de Cloudflare R2 (ADR-012), y ya está en
+  marcha:** la web ya está en Vercel, así que no hizo falta abrir otra cuenta. Las fotos se bajan
+  por su link público, sin claves S3 de Supabase, y alcanzan tres secrets y dos variables en
+  GitHub (`docs/respaldo.md`). Se aplicó la migración 0024 (`lois_respaldo`) y el 2026-10-23
+  anduvieron el primer respaldo (la base y las 910 fotos y miniaturas) y la prueba de
+  restauración.
+
+### Arreglado
+
+- **La prueba de restauración se cortaba con la tabla de n8n:** en producción está
+  `n8n_chat_histories` (la memoria del chat del bot, la crea n8n), que no existe en una base
+  armada con nuestras migraciones. Ahora esas tablas se saltean con un aviso y el resto se
+  restaura y se compara igual.
+
 ## [0.10.1] - 2026-10-22
 
 ### Arreglado

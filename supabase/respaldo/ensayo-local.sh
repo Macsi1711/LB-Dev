@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Ensayo de punta a punta del respaldo contra el Supabase LOCAL (pnpm db:start): las pruebas
 # están en ensayo.sh.
-# La caja es un bucket aparte del mismo Supabase local, que habla S3 como Cloudflare R2: no
-# toca producción ni Cloudflare. Lo corre también la CI.
+# La caja es una carpeta dentro del contenedor (Vercel Blob no se levanta en local): no toca
+# producción ni Vercel. Lo corre también la CI.
 # Uso: bash supabase/respaldo/ensayo-local.sh
 set -euo pipefail
 
@@ -17,8 +17,9 @@ eval "$(cd "$carpeta/../.." && pnpm exec supabase status -o env 2>/dev/null | gr
 s3="http://host.docker.internal:55421/storage/v1/s3"
 export FOTOS_ENDPOINT="$s3" FOTOS_REGION="$S3_PROTOCOL_REGION" \
   FOTOS_ACCESS_KEY_ID="$S3_PROTOCOL_ACCESS_KEY_ID" FOTOS_SECRET_ACCESS_KEY="$S3_PROTOCOL_ACCESS_KEY_SECRET"
-export CAJA_ENDPOINT="$s3" CAJA_REGION="$S3_PROTOCOL_REGION" CAJA_BUCKET=respaldo-ensayo \
-  CAJA_ACCESS_KEY_ID="$S3_PROTOCOL_ACCESS_KEY_ID" CAJA_SECRET_ACCESS_KEY="$S3_PROTOCOL_ACCESS_KEY_SECRET"
+# Las fotos se bajan por su link público, como en producción.
+export FOTOS_URL="http://host.docker.internal:55421/storage/v1/object/public/fotos"
+export CAJA_CARPETA=/tmp/caja-ensayo
 
 # Contraseña SOLO local del usuario del respaldo (la misma que usa respaldo.int-spec.ts).
 docker exec "supabase_db_$proyecto" psql -U postgres -X -q \

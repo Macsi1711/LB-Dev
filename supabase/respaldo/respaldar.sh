@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
-# Respaldo nocturno: copia la base y las fotos a la caja (Cloudflare R2), fuera de Supabase.
+# Respaldo nocturno: copia la base y las fotos a la caja (Vercel Blob), fuera de Supabase.
 # Lo corre .github/workflows/respaldo.yml todas las noches (docs/respaldo.md).
 #   - La base va cifrada con age: solo la abre quien tiene la clave privada.
-#   - Las fotos ya son públicas en la web: van tal cual y nunca se borran de la caja (solo se
-#     suman las nuevas), así una foto borrada por error se puede recuperar.
+#   - Las fotos ya son públicas en la web: se bajan por su link, van tal cual y nunca se borran
+#     de la caja (solo se suman las nuevas), así una foto borrada por error se puede recuperar.
 #   - Quedan las copias de los últimos 30 días y la primera de cada mes durante 12 meses.
 source "$(dirname "$0")/comun.sh"
-requiere RESPALDO_DB_URL AGE_DESTINATARIO CAJA_ENDPOINT CAJA_BUCKET CAJA_ACCESS_KEY_ID \
-  CAJA_SECRET_ACCESS_KEY FOTOS_ENDPOINT FOTOS_REGION FOTOS_ACCESS_KEY_ID FOTOS_SECRET_ACCESS_KEY
+requiere RESPALDO_DB_URL AGE_DESTINATARIO FOTOS_URL
+requiere_caja
 
 # RESPALDO_FECHA solo la usa el ensayo local, para probar las retenciones.
 hoy="${RESPALDO_FECHA:-$(date -u +%F)}"
 mes="${hoy:0:7}"
-bucket_fotos="${FOTOS_BUCKET:-fotos}"
 trabajo="$(mktemp -d)"
 trap 'rm -rf "$trabajo"' EXIT
 mkdir "$trabajo/base" "$trabajo/fotos"
@@ -74,6 +73,9 @@ else
 fi
 volcar --schema-only --schema=public -f "$trabajo/base/esquema.sql"
 volcar --data-only --table=storage.objects -f "$trabajo/base/storage-objects.sql"
+# Las fotos que hay en Supabase, de la misma foto fija.
+consulta "select name from storage.objects where bucket_id = 'fotos';"
+printf '%s\n' "$resultado" | grep -v '^$' | sort >"$trabajo/en-supabase.txt" || true
 consulta 'commit;'
 printf '\\q\n' >&"${SESION[1]}"
 wait "$pid_sesion" || true
@@ -86,50 +88,50 @@ wait "$pid_sesion" || true
 
 archivo="$trabajo/base-$hoy.tar.gz.age"
 tar -C "$trabajo/base" -cz . | age -r "$AGE_DESTINATARIO" -o "$archivo"
-caja s3 cp --only-show-errors "$archivo" "s3://$CAJA_BUCKET/$DIARIO/base-$hoy.tar.gz.age"
+caja subir "$archivo" "$DIARIO/base-$hoy.tar.gz.age"
 echo "Subido $DIARIO/base-$hoy.tar.gz.age ($(du -h "$archivo" | cut -f1)):"
 sed 's/^/  /' "$trabajo/base/conteos.tsv"
 
-if [[ -z "$(listar caja "$CAJA_BUCKET" "$MENSUAL/base-$mes")" ]]; then
-  caja s3 cp --only-show-errors "$archivo" "s3://$CAJA_BUCKET/$MENSUAL/base-$mes.tar.gz.age"
+mensual_del_mes="$(caja listar "$MENSUAL/base-$mes")"
+if [[ -z "$mensual_del_mes" ]]; then
+  caja subir "$archivo" "$MENSUAL/base-$mes.tar.gz.age"
   echo "Es la primera del mes: queda también como $MENSUAL/base-$mes.tar.gz.age"
 fi
 
 echo "== Retención"
+# Las listas van a un archivo antes de recorrerlas: si falla la caja, falla el respaldo.
+caja listar "$DIARIO/" >"$trabajo/diarios.txt"
 limite_dia="$(date -u -d "$hoy -$DIAS_DIARIOS days" +%F)"
 while IFS= read -r clave; do
   fecha="${clave##*/base-}"
   fecha="${fecha%.tar.gz.age}"
   if ! [[ "$fecha" > "$limite_dia" ]]; then
-    caja s3 rm --only-show-errors "s3://$CAJA_BUCKET/$clave"
+    caja borrar "$clave"
     echo "Borrado $clave (tiene más de $DIAS_DIARIOS días)"
   fi
-done < <(listar caja "$CAJA_BUCKET" "$DIARIO/")
+done <"$trabajo/diarios.txt"
+caja listar "$MENSUAL/" >"$trabajo/mensuales.txt"
 limite_mes="$(date -u -d "$mes-01 -$MESES_MENSUALES months" +%Y-%m)"
 while IFS= read -r clave; do
   mes_clave="${clave##*/base-}"
   mes_clave="${mes_clave%.tar.gz.age}"
   if ! [[ "$mes_clave" > "$limite_mes" ]]; then
-    caja s3 rm --only-show-errors "s3://$CAJA_BUCKET/$clave"
+    caja borrar "$clave"
     echo "Borrado $clave (tiene más de $MESES_MENSUALES meses)"
   fi
-done < <(listar caja "$CAJA_BUCKET" "$MENSUAL/")
+done <"$trabajo/mensuales.txt"
 
 echo "== Fotos"
-listar fotos_s3 "$bucket_fotos" '' >"$trabajo/en-supabase.txt"
-listar caja "$CAJA_BUCKET" "$FOTOS/" | sed "s#^$FOTOS/##" >"$trabajo/en-caja.txt"
+listar_caja "$FOTOS/" >"$trabajo/en-caja.txt"
 comm -23 "$trabajo/en-supabase.txt" "$trabajo/en-caja.txt" >"$trabajo/nuevas.txt"
 nuevas="$(wc -l <"$trabajo/nuevas.txt" | tr -d ' ')"
-if ((nuevas > ${RESPALDO_UMBRAL_FOTOS:-50})); then
-  # Muchas (la primera vez): se bajan todas de una, que es más rápido que una por una.
-  fotos_s3 s3 sync --only-show-errors "s3://$bucket_fotos" "$trabajo/fotos"
-else
-  while IFS= read -r clave; do
-    fotos_s3 s3 cp --only-show-errors "s3://$bucket_fotos/$clave" "$trabajo/fotos/$clave"
-  done <"$trabajo/nuevas.txt"
-fi
 if ((nuevas > 0)); then
-  caja s3 sync --only-show-errors "$trabajo/fotos" "s3://$CAJA_BUCKET/$FOTOS/"
+  # Una sola corrida de curl para todas: si falla una, falla el respaldo.
+  while IFS= read -r clave; do
+    printf 'url = "%s/%s"\noutput = "%s/%s"\n' "${FOTOS_URL%/}" "$clave" "$trabajo/fotos" "$clave"
+  done <"$trabajo/nuevas.txt" >"$trabajo/curl.txt"
+  curl -fsS --retry 3 --create-dirs --fail-early -K "$trabajo/curl.txt"
+  caja subir-carpeta "$trabajo/fotos" "$FOTOS/"
 fi
 echo "Fotos en Supabase: $(wc -l <"$trabajo/en-supabase.txt" | tr -d ' '); nuevas copiadas: $nuevas"
 

@@ -1,6 +1,6 @@
 {
   "name": "mostrador-lois",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.34.5",
@@ -30,6 +30,7 @@
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@eslint/js": "^9.39.5",
+    "@vercel/blob": "2.8.1",
     "eslint": "^9.39.5",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-boundaries": "^7.2.0",

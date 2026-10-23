@@ -1,7 +1,7 @@
 name: Respaldo
 
-# Respaldo de la base y las fotos en Cloudflare R2, fuera de Supabase, y prueba mensual de que
-# se puede restaurar (docs/respaldo.md, ADR-009). Si falla, GitHub le manda un mail a quien
+# Respaldo de la base y las fotos en Vercel Blob, fuera de Supabase, y prueba mensual de que
+# se puede restaurar (docs/respaldo.md, ADR-012). Si falla, GitHub le manda un mail a quien
 # editó por última vez este archivo.
 on:
   schedule:
@@ -33,18 +33,19 @@ jobs:
       actions: write # solo para el último paso
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      # caja.mjs usa @vercel/blob de node_modules.
+      - run: pnpm install --frozen-lockfile
       - name: Respaldar la base y las fotos
         env:
           RESPALDO_DB_URL: ${{ secrets.RESPALDO_DB_URL }}
           AGE_DESTINATARIO: ${{ vars.AGE_DESTINATARIO }}
-          CAJA_ENDPOINT: ${{ vars.CAJA_ENDPOINT }}
-          CAJA_BUCKET: ${{ vars.CAJA_BUCKET }}
-          CAJA_ACCESS_KEY_ID: ${{ secrets.CAJA_ACCESS_KEY_ID }}
-          CAJA_SECRET_ACCESS_KEY: ${{ secrets.CAJA_SECRET_ACCESS_KEY }}
-          FOTOS_ENDPOINT: ${{ vars.FOTOS_ENDPOINT }}
-          FOTOS_REGION: ${{ vars.FOTOS_REGION }}
-          FOTOS_ACCESS_KEY_ID: ${{ secrets.FOTOS_ACCESS_KEY_ID }}
-          FOTOS_SECRET_ACCESS_KEY: ${{ secrets.FOTOS_SECRET_ACCESS_KEY }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          FOTOS_URL: ${{ vars.FOTOS_URL }}
         run: bash supabase/respaldo/en-contenedor.sh respaldar.sh
       # GitHub apaga los workflows programados de un repo público que pasa 60 días sin actividad.
       # Volver a habilitarlo después de cada respaldo reinicia esa cuenta.
@@ -73,8 +74,5 @@ jobs:
           RED_DOCKER: supabase_network_mostrador-lois
           RESTAURAR_DB_URL: postgresql://postgres:postgres@db:5432/postgres
           AGE_IDENTIDAD: ${{ secrets.AGE_IDENTIDAD }}
-          CAJA_ENDPOINT: ${{ vars.CAJA_ENDPOINT }}
-          CAJA_BUCKET: ${{ vars.CAJA_BUCKET }}
-          CAJA_ACCESS_KEY_ID: ${{ secrets.CAJA_ACCESS_KEY_ID }}
-          CAJA_SECRET_ACCESS_KEY: ${{ secrets.CAJA_SECRET_ACCESS_KEY }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
         run: bash supabase/respaldo/en-contenedor.sh probar.sh

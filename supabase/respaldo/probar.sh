@@ -5,8 +5,8 @@
 # que cada foto asignada a un artículo esté en la caja. Si algo no cuadra, termina con error.
 # Nunca contra producción: vacía las tablas antes de cargar.
 source "$(dirname "$0")/comun.sh"
-requiere RESTAURAR_DB_URL AGE_IDENTIDAD CAJA_ENDPOINT CAJA_BUCKET CAJA_ACCESS_KEY_ID \
-  CAJA_SECRET_ACCESS_KEY
+requiere RESTAURAR_DB_URL AGE_IDENTIDAD
+requiere_caja
 
 if [[ "$RESTAURAR_DB_URL" == *supabase.co* || "$RESTAURAR_DB_URL" == *supabase.com* ]]; then
   echo "La prueba es solo contra una base descartable, nunca contra Supabase en la nube." >&2
@@ -28,9 +28,12 @@ restaurar_base "$trabajo" "$RESTAURAR_DB_URL"
 
 echo "== Filas: restauradas contra las del respaldo"
 fallas=0
+existentes="$(relaciones "$RESTAURAR_DB_URL")"
 while IFS=$'\t' read -r tabla esperadas; do
   # storage.objects no se restaura con la base: lo rearma Storage al volver a subir las fotos.
   [[ "$tabla" == storage.objects ]] && continue
+  # Las que no crean las migraciones se saltearon al cargar (restaurar_base avisa cuáles).
+  grep -qxF "$tabla" <<<"$existentes" || continue
   hay="$(psql "$RESTAURAR_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "select count(*) from $tabla")"
   if [[ "$hay" == "$esperadas" ]]; then
     echo "  ✓ $tabla: $hay"
@@ -43,7 +46,7 @@ done <"$trabajo/conteos.tsv"
 echo "== Fotos: cada foto asignada a un artículo está en la caja"
 psql "$RESTAURAR_DB_URL" -X -A -t -v ON_ERROR_STOP=1 \
   -c 'select foto from public.articulos where foto is not null' | sort >"$trabajo/asignadas.txt"
-listar caja "$CAJA_BUCKET" "$FOTOS/" | sed "s#^$FOTOS/##" >"$trabajo/en-caja.txt"
+listar_caja "$FOTOS/" >"$trabajo/en-caja.txt"
 comm -23 "$trabajo/asignadas.txt" "$trabajo/en-caja.txt" >"$trabajo/faltan.txt"
 if [[ -s "$trabajo/faltan.txt" ]]; then
   echo "  ✗ Faltan $(wc -l <"$trabajo/faltan.txt" | tr -d ' ') fotos en la caja, por ejemplo:"

@@ -90,14 +90,15 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | **Release v0.10.0**                                                                                   | ✅                    | release/0.10.0 |
 | 6    | "Onix" por audio: la IA escucha "onyx" y la web lo corrige antes de buscar                            | ✅                    | #102           |
 | 6    | **Release v0.10.1**                                                                                   | ✅                    | release/0.10.1 |
+| 6    | Respaldo en Vercel Blob (ADR-012), en marcha: 0024, secrets y prueba de restauración en verde         | ✅                    | #104–#106      |
+| 6    | **Release v0.11.0**                                                                                   | ✅                    | release/0.11.0 |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ✅                    | #98            |
 | 6    | Probar audio y foto de verdad en el Mostrador, sin login, y el bot de Telegram                        | ⏳ dueño              | —              |
 | 6    | Pendientes del catálogo: prueba de la foto FRAM, HU612 dice "ECEITE", foto del 3PK848A                | ⏳ dueño              | —              |
-| 6    | Cuentas de vendedor viejas: borrarlas o sacarles los permisos en la base (ADR-011)                    | ⏳ dueño              | —              |
+| 6    | Cuentas de vendedor viejas: borrarlas o sacarles los permisos en la base (ADR-011)                    | ✅                    | —              |
 | 6    | Confirmar si el bot hace `SELECT *` sobre `articulos`                                                 | ⏳ dueño              | —              |
 | 6    | Auth: Site URL, Redirect URLs y SMTP propio (el registro ya está apagado)                             | ⏳ verificar          | —              |
-| 6    | Respaldo nocturno de la base y las fotos en Cloudflare R2, con prueba mensual (ADR-009)               | ⏳ dueño (paso 3)     | #91–#93        |
-| 6    | Poner en marcha el respaldo: cuenta de Cloudflare, claves, secrets y migración 0024                   | ⏳ dueño              | —              |
+| 6    | Respaldo nocturno de la base y las fotos, con prueba mensual (ADR-009)                                | ✅                    | #91–#93        |
 | 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño (datos)      | —              |
 | 6    | Plan de Vercel para uso comercial (Pro)                                                               | ⏳ decisión del dueño | —              |
 | 6    | n8n deja de entrar como `postgres`: usa `n8n_bot` / `n8n_app` ([n8n.md](docs/n8n.md))                 | ⏳ dueño              | —              |
