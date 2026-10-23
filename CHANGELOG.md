@@ -5,6 +5,15 @@ semántico.
 
 ## [Sin publicar]
 
+### Agregado
+
+- **Base para cargar productos nuevos desde la web** (migración
+  `20261023000028_alta_de_articulos.sql`): `crear_articulo()` crea un artículo con código,
+  nombre, familia, descripción y observaciones. Solo la puede usar el admin. No deja repetir un
+  código, aunque cambien mayúsculas, espacios o guiones, y completa el nombre de la familia.
+  `articulos` suma `creado_en_web` y `creado_por`, para saber qué se cargó desde la web (no
+  cambia nada de lo que usa n8n).
+
 ### Seguridad
 
 - **El bot de Telegram ya no entra a la base como `postgres`:** usa `n8n_bot`, que solo puede
