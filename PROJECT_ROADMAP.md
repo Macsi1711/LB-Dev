@@ -92,6 +92,8 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | **Release v0.10.1**                                                                                   | ✅                    | release/0.10.1 |
 | 6    | Respaldo en Vercel Blob (ADR-012), en marcha: 0024, secrets y prueba de restauración en verde         | ✅                    | #104–#106      |
 | 6    | **Release v0.11.0**                                                                                   | ✅                    | release/0.11.0 |
+| 6    | Productos: el admin carga productos nuevos (datos, familia y foto; migración 0028)                    | ✅                    | #110–#113      |
+| 6    | **Release v0.12.0**                                                                                   | ✅                    | release/0.12.0 |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ✅                    | #98            |
 | 6    | Probar audio y foto de verdad en el Mostrador, sin login (el bot ya se probó)                         | ⏳ dueño              | —              |
 | 6    | Pendientes del catálogo: prueba de la foto FRAM, HU612 dice "ECEITE", foto del 3PK848A                | ⏳ dueño              | —              |
@@ -103,7 +105,6 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | Plan de Vercel para uso comercial: el equipo Atom (web y respaldo) está en Hobby                      | ⏳ decisión del dueño | —              |
 | 6    | El bot deja de entrar como `postgres`: usa `n8n_bot`, solo lectura ([n8n.md](docs/n8n.md))            | ✅                    | #108           |
 | 6    | Cierre de seguridad: rotar `postgres`, borrar "Lois" de n8n y `lois_inspeccion` (produccion.md §8)    | ⏳ al final           | —              |
-| 6    | Productos: el admin carga productos nuevos (datos, familia y foto)                                    | 🟡                    | #110–#112      |
 | 6    | **Release v1.0.0**                                                                                    | ⏳                    | —              |
 | 7    | Repo público                                                                                          | ⏳ aprobado           | —              |
 | 7    | Protección de `develop` y `main` (verify obligatorio, sin push directo)                               | ⏳                    | —              |

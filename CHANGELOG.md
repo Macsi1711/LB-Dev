@@ -3,7 +3,7 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
-## [Sin publicar]
+## [0.12.0] - 2026-10-23
 
 ### Agregado
 
@@ -18,7 +18,7 @@ semántico.
   nombre, familia, descripción y observaciones. Solo la puede usar el admin. No deja repetir un
   código, aunque cambien mayúsculas, espacios o guiones, y completa el nombre de la familia.
   `articulos` suma `creado_en_web` y `creado_por`, para saber qué se cargó desde la web (no
-  cambia nada de lo que usa n8n).
+  cambia nada de lo que usa n8n). Aplicada en producción el 2026-10-23.
 
 ### Seguridad
 
