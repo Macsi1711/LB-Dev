@@ -168,3 +168,42 @@ solo intenta con los artículos que todavía no tienen foto en Storage. Una foto
 compartida como "cualquiera con el link" no se puede bajar y queda listada.
 
 Se corrió el 2026-10-15: 442 de 443 fotos pasaron; la de `3PK848A` no está compartida en Drive.
+
+## 8. Cierre de seguridad (una sola vez, antes de la v1.0)
+
+Saca de circulación las llaves que hicieron falta para poner la base en producción. Va todo el
+mismo día y en este orden. Después de esto nadie entra como `postgres` desde afuera y Claude ya
+no puede revisar la base: dejarlo para cuando no quede nada por verificar.
+
+Quién usa qué después del cierre:
+
+| Quién                        | Entra como                 | Puede                         |
+| ---------------------------- | -------------------------- | ----------------------------- |
+| La web                       | `anon` / su sesión (RLS)   | Lo que permiten las políticas |
+| El bot ("Lois SQL")          | `n8n_bot`                  | Solo leer `articulos`         |
+| El respaldo (GitHub Actions) | `lois_respaldo`            | Solo leer, todo               |
+| El dueño (SQL Editor)        | `postgres`, desde el panel | Todo                          |
+
+1. **Chequeo previo.** En n8n solo tienen que estar publicados "Lois SQL (sin Drive)" (con la
+   credencial `Lois bot (solo lectura)` en sus dos nodos de Postgres) y "Lois Consulta web".
+2. **Cambiar la contraseña de `postgres`.** Supabase → Project Settings → Database → **Reset
+   database password** → Generate. Guardala en el gestor de contraseñas. El SQL Editor no la
+   pide, así que no se usa en el día a día. La web, el bot y el respaldo no la usan.
+3. **Probar** que siga todo andando: una búsqueda en la web, un mensaje al bot por Telegram y
+   Métricas con el admin.
+4. **Borrar la credencial vieja de n8n.** Credentials → `Lois` (la de Postgres, usuario
+   `postgres`) → Delete. Ojo: no confundirla con `Lois` de Telegram.
+5. **Borrar el usuario de solo lectura de la puesta en marcha.** En el SQL Editor:
+
+   ```sql
+   drop role if exists lois_inspeccion;
+   ```
+
+   Tiene que decir _Success_. Después,
+   `select count(*) from pg_roles where rolname = 'lois_inspeccion';` tiene que dar `0`.
+
+6. **Borrar el archivo local** `.env.produccion` de la raíz del repo, que tiene la contraseña de
+   `lois_inspeccion` (git lo ignora; está solo en la compu del dueño).
+7. **Opcional: las copias de antes de la web.** El schema `respaldo` (`articulos` y `familias`
+   como estaban antes de la primera migración) ya no hace falta para deshacer nada y queda en
+   los respaldos nocturnos (`respaldo.sql`). Si se quiere borrar: `drop schema respaldo cascade;`.
