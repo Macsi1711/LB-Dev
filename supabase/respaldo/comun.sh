@@ -85,13 +85,41 @@ bajar_respaldo() {
   rm -f "$identidad"
 }
 
+# Las tablas y secuencias que existen en la base `url`, como las escribe pg_dump (schema.nombre).
+relaciones() {
+  psql "$1" -X -A -t -v ON_ERROR_STOP=1 -c "select format('%I.%I', n.nspname, c.relname)
+    from pg_class c join pg_namespace n on n.oid = c.relnamespace
+    where c.relkind in ('r', 'p', 'S')"
+}
+
 # Carga un respaldo desarmado en la base `url`, que tiene que tener las migraciones aplicadas.
 # VACÍA antes las tablas que vienen en el respaldo. Todo en una transacción: o entra entero o
 # no cambia nada. Los triggers no corren (session_replication_role), así los datos quedan tal
 # cual estaban. storage.objects no se carga: lo rearma Storage al volver a subir las fotos.
+# Las tablas que las migraciones no crean (por ejemplo n8n_chat_histories, que la arma n8n
+# cuando la necesita) se saltean con un aviso: si no, la carga entera falla.
 restaurar_base() {
-  local dir="$1" url="$2" tablas
-  tablas="$(sed -n 's/^COPY \([^ ]*\) (.*/\1/p' "$dir/datos.sql" | paste -sd, -)"
+  local dir="$1" url="$2" tablas existentes
+  existentes="$(relaciones "$url")"
+  : >"$dir/datos-a-cargar.sql"
+  awk -v existentes="$existentes" -v q="'" '
+    BEGIN { n = split(existentes, lista, "\n"); for (i = 1; i <= n; i++) hay[lista[i]] = 1 }
+    salteando { if ($0 == "\\.") salteando = 0; next }
+    /^COPY / && !($2 in hay) {
+      print "  ⚠ " $2 ": no está en esta base (no la crean las migraciones), se saltea"
+      salteando = 1
+      next
+    }
+    /^SELECT pg_catalog\.setval\(/ {
+      secuencia = $0
+      sub(/^SELECT pg_catalog\.setval\(/, "", secuencia)
+      split(secuencia, partes, q)
+      secuencia = partes[2]
+      if (!(secuencia in hay)) next
+    }
+    { print > salida }
+  ' salida="$dir/datos-a-cargar.sql" "$dir/datos.sql"
+  tablas="$(sed -n 's/^COPY \([^ ]*\) (.*/\1/p' "$dir/datos-a-cargar.sql" | paste -sd, -)"
   if [[ -z "$tablas" ]]; then
     echo "El respaldo no trae datos (datos.sql vacío)." >&2
     return 1
@@ -100,7 +128,7 @@ restaurar_base() {
     -c 'set client_min_messages = warning' \
     -c 'set session_replication_role = replica' \
     -c "truncate table $tablas cascade" \
-    -f "$dir/datos.sql" \
+    -f "$dir/datos-a-cargar.sql" \
     -c 'drop schema if exists respaldo cascade' \
     -f "$dir/respaldo.sql"
 }

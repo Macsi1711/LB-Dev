@@ -35,6 +35,9 @@ RESPALDO_FECHA=2025-09-01 bash "$aqui/respaldar.sh" >"$salida"
 grep -q 'nuevas copiadas: 2' "$salida" || mal "La primera noche no copió las 2 fotos."
 RESPALDO_FECHA=2026-10-01 bash "$aqui/respaldar.sh" >/dev/null
 admin "insert into articulos (\"Codigo\", \"Nombre artículo\") values ('ENSAYO-RESPALDO', 'ARTICULO DEL ENSAYO')" >/dev/null
+# Una tabla que no crean las migraciones, como la memoria del chat que arma n8n en producción.
+admin "create table public.n8n_chat_histories (id serial primary key, session_id text, message jsonb);
+  insert into public.n8n_chat_histories (session_id, message) values ('ensayo', '{}')" >/dev/null
 RESPALDO_FECHA=2026-10-21 bash "$aqui/respaldar.sh" | tee "$salida" | sed 's/^/    /'
 
 diario="$(caja listar "$DIARIO/" | paste -sd' ' -)"
@@ -57,9 +60,13 @@ echo "## Se rompen datos: un artículo y todas las consultas"
 consultas="$(admin 'select count(*) from consultas_bot')"
 admin "delete from articulos where \"Codigo\" = 'ENSAYO-RESPALDO'" >/dev/null
 admin 'delete from consultas_bot' >/dev/null
+# La base donde se restaura no la tiene (como la de prueba, que solo tiene las migraciones).
+admin 'drop table public.n8n_chat_histories' >/dev/null
 
 echo "## Prueba de restauración (la del día 1 de cada mes)"
-bash "$aqui/probar.sh" | sed 's/^/    /'
+bash "$aqui/probar.sh" | tee "$salida" | sed 's/^/    /'
+grep -q '⚠ public.n8n_chat_histories' "$salida" || mal "No avisó que salteó la tabla de n8n."
+bien "una tabla que no crean las migraciones se saltea con un aviso, sin cortar la restauración"
 [[ "$(admin "select count(*) from articulos where \"Codigo\" = 'ENSAYO-RESPALDO'")" == 1 ]] ||
   mal "No volvió el artículo borrado."
 [[ "$(admin 'select count(*) from consultas_bot')" == "$consultas" ]] || mal "No volvieron las consultas."

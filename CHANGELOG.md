@@ -12,6 +12,13 @@ semántico.
   sin claves S3 de Supabase. Para ponerlo en marcha alcanzan tres secrets y dos variables en
   GitHub (`docs/respaldo.md`); el resto sigue igual.
 
+### Arreglado
+
+- **La prueba de restauración se cortaba con la tabla de n8n:** en producción está
+  `n8n_chat_histories` (la memoria del chat del bot, la crea n8n), que no existe en una base
+  armada con nuestras migraciones. Ahora esas tablas se saltean con un aviso y el resto se
+  restaura y se compara igual.
+
 ## [0.10.1] - 2026-10-22
 
 ### Arreglado

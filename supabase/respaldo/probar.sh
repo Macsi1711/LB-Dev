@@ -28,9 +28,12 @@ restaurar_base "$trabajo" "$RESTAURAR_DB_URL"
 
 echo "== Filas: restauradas contra las del respaldo"
 fallas=0
+existentes="$(relaciones "$RESTAURAR_DB_URL")"
 while IFS=$'\t' read -r tabla esperadas; do
   # storage.objects no se restaura con la base: lo rearma Storage al volver a subir las fotos.
   [[ "$tabla" == storage.objects ]] && continue
+  # Las que no crean las migraciones se saltearon al cargar (restaurar_base avisa cuáles).
+  grep -qxF "$tabla" <<<"$existentes" || continue
   hay="$(psql "$RESTAURAR_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "select count(*) from $tabla")"
   if [[ "$hay" == "$esperadas" ]]; then
     echo "  ✓ $tabla: $hay"
