@@ -10,6 +10,7 @@ import {
 import { BotScreen } from '@/features/bot';
 import { CounterScreen } from '@/features/counter';
 import { PhotosScreen } from '@/features/photos';
+import { ProductsScreen } from '@/features/products';
 import { AppShell, RequireRole } from '@/features/shell';
 import { isDemo } from '@/shared/lib/demo';
 import { Toaster } from '@/shared/ui/sonner';
@@ -32,13 +33,14 @@ const router = createRouter([
       { path: '/', element: <CounterScreen /> },
       { path: '/fotos', element: <PhotosScreen /> },
       {
-        // Métricas: sin sesión, al login (y de vuelta a la sección); después, solo admin.
+        // Métricas y Productos: sin sesión, al login (y de vuelta a la sección); después, solo admin.
         element: <RequireAuth />,
         children: [
           {
             element: <RequireRole />,
             children: [
               { path: '/metricas', element: <BotScreen /> },
+              { path: '/productos', element: <ProductsScreen /> },
               // Los links viejos a la sección Bot siguen andando.
               { path: '/bot', element: <Navigate to="/metricas" replace /> },
             ],

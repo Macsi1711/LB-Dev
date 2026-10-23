@@ -92,17 +92,19 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | **Release v0.10.1**                                                                                   | ✅                    | release/0.10.1 |
 | 6    | Respaldo en Vercel Blob (ADR-012), en marcha: 0024, secrets y prueba de restauración en verde         | ✅                    | #104–#106      |
 | 6    | **Release v0.11.0**                                                                                   | ✅                    | release/0.11.0 |
+| 6    | Productos: el admin carga productos nuevos (datos, familia y foto; migración 0028)                    | ✅                    | #110–#113      |
+| 6    | **Release v0.12.0**                                                                                   | ✅                    | release/0.12.0 |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ✅                    | #98            |
-| 6    | Probar audio y foto de verdad en el Mostrador, sin login, y el bot de Telegram                        | ⏳ dueño              | —              |
+| 6    | Probar audio y foto de verdad en el Mostrador, sin login (el bot ya se probó)                         | ⏳ dueño              | —              |
 | 6    | Pendientes del catálogo: prueba de la foto FRAM, HU612 dice "ECEITE", foto del 3PK848A                | ⏳ dueño              | —              |
 | 6    | Cuentas de vendedor viejas: borrarlas o sacarles los permisos en la base (ADR-011)                    | ✅                    | —              |
-| 6    | Confirmar si el bot hace `SELECT *` sobre `articulos`                                                 | ⏳ dueño              | —              |
-| 6    | Auth: Site URL, Redirect URLs y SMTP propio (el registro ya está apagado)                             | ⏳ verificar          | —              |
+| 6    | Confirmar si el bot hace `SELECT *` sobre `articulos` (no: nombra las columnas)                       | ✅                    | —              |
+| 6    | Auth: Site URL y Redirect URLs a la web; "olvidé mi contraseña" probado de punta a punta              | ✅                    | —              |
 | 6    | Respaldo nocturno de la base y las fotos, con prueba mensual (ADR-009)                                | ✅                    | #91–#93        |
-| 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño (datos)      | —              |
-| 6    | Plan de Vercel para uso comercial (Pro)                                                               | ⏳ decisión del dueño | —              |
-| 6    | n8n deja de entrar como `postgres`: usa `n8n_bot` / `n8n_app` ([n8n.md](docs/n8n.md))                 | ⏳ dueño              | —              |
-| 6    | Borrar `lois_inspeccion` y rotar la contraseña de `postgres`                                          | ⏳ al final           | —              |
+| 6    | Prueba de carga en producción: 15 y 30 vendedores, 0 errores, mediana 0,2 s                           | ✅                    | —              |
+| 6    | Plan de Vercel para uso comercial: el equipo Atom (web y respaldo) está en Hobby                      | ⏳ decisión del dueño | —              |
+| 6    | El bot deja de entrar como `postgres`: usa `n8n_bot`, solo lectura ([n8n.md](docs/n8n.md))            | ✅                    | #108           |
+| 6    | Cierre de seguridad: rotar `postgres`, borrar "Lois" de n8n y `lois_inspeccion` (produccion.md §8)    | ⏳ al final           | —              |
 | 6    | **Release v1.0.0**                                                                                    | ⏳                    | —              |
 | 7    | Repo público                                                                                          | ⏳ aprobado           | —              |
 | 7    | Protección de `develop` y `main` (verify obligatorio, sin push directo)                               | ⏳                    | —              |
@@ -112,4 +114,5 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 8    | Tests end-to-end en el navegador                                                                      | 💡                    | —              |
 | 8    | Que la web abra solo desde la red del local (cuida el gasto de la IA)                                 | 💡                    | —              |
 | 8    | "Lo más parecido" más rápido (hoy ~350 ms con 20 mil artículos)                                       | 💡                    | —              |
+| 8    | Bot: responder solo a los vendedores habilitados (`usuarios_telegram`) y anotar sus consultas         | 💡                    | —              |
 | 8    | Confirmación propia al borrar en el demo publicado                                                    | ✅                    | #43            |

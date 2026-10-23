@@ -28,6 +28,8 @@ export type Database = {
           actualizado_en: string | null;
           Codigo: string | null;
           'codigo  familia': string | null;
+          creado_en_web: string | null;
+          creado_por: string | null;
           Descripción: string | null;
           foto: string | null;
           id: number;
@@ -41,6 +43,8 @@ export type Database = {
           actualizado_en?: string | null;
           Codigo?: string | null;
           'codigo  familia'?: string | null;
+          creado_en_web?: string | null;
+          creado_por?: string | null;
           Descripción?: string | null;
           foto?: string | null;
           id?: never;
@@ -53,6 +57,8 @@ export type Database = {
           actualizado_en?: string | null;
           Codigo?: string | null;
           'codigo  familia'?: string | null;
+          creado_en_web?: string | null;
+          creado_por?: string | null;
           Descripción?: string | null;
           foto?: string | null;
           id?: never;
@@ -374,6 +380,34 @@ export type Database = {
       contar_articulos: {
         Args: { p_con_foto?: boolean; p_familia?: string; p_q?: string };
         Returns: number;
+      };
+      crear_articulo: {
+        Args: {
+          p_codigo: string;
+          p_descripcion?: string;
+          p_familia: string;
+          p_nombre: string;
+          p_observaciones?: string;
+        };
+        Returns: {
+          codigo: string | null;
+          descripcion: string | null;
+          familia_codigo: string | null;
+          familia_nombre: string | null;
+          foto: string | null;
+          id: number | null;
+          imagen_drive_id: string | null;
+          imagen_url: string | null;
+          nombre: string | null;
+          observaciones: string | null;
+          tiene_foto: boolean | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'v_articulos';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       es_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       escapar_like: { Args: { texto: string }; Returns: string };

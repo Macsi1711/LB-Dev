@@ -3,6 +3,31 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [0.12.0] - 2026-10-23
+
+### Agregado
+
+- **Productos: el admin carga productos nuevos desde la web.** En la sección nueva _Productos_
+  (solo admin) se cargan el código, el nombre, la familia (de las que ya existen), la descripción,
+  las observaciones y, si hay, la foto (con la cámara o de la galería, igual que en "Agregar
+  foto"). Si el código ya existe, avisa cuál es y no guarda. El producto aparece al instante en el
+  Mostrador y en el bot. Si la foto no se puede subir, el producto queda creado y la foto se carga
+  después desde Fotos.
+- **Base para cargar productos nuevos desde la web** (migración
+  `20261023000028_alta_de_articulos.sql`): `crear_articulo()` crea un artículo con código,
+  nombre, familia, descripción y observaciones. Solo la puede usar el admin. No deja repetir un
+  código, aunque cambien mayúsculas, espacios o guiones, y completa el nombre de la familia.
+  `articulos` suma `creado_en_web` y `creado_por`, para saber qué se cargó desde la web (no
+  cambia nada de lo que usa n8n). Aplicada en producción el 2026-10-23.
+
+### Seguridad
+
+- **El bot de Telegram ya no entra a la base como `postgres`:** usa `n8n_bot`, que solo puede
+  leer `articulos`, en solo lectura y con tope de 5 segundos. El SQL lo escribe la IA, así que
+  ahora un `DELETE` o un `UPDATE` que se le escape lo rechaza la base. `n8n/lois-sql.json` usa la
+  credencial nueva `Lois bot (solo lectura)` y `docs/n8n.md` cuenta lo que el flujo todavía no
+  hace (lista blanca y registro de consultas).
+
 ## [0.11.0] - 2026-10-23
 
 ### Cambiado

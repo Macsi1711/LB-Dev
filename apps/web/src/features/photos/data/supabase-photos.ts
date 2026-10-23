@@ -1,17 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/shared/database.types';
-import { PHOTOS_BUCKET, storagePaths, storagePhoto } from '@/shared/lib/storage-photo';
+import { storagePhoto, uploadArticlePhoto } from '@/shared/lib/storage-photo';
 import type { MissingPhotoArticle, PhotosPort } from '../domain/ports';
-import { photoPath, photoToken, UploadError, uploadErrorReason } from '../domain/upload';
 
 const PAGE = 1000; // máximo de filas por pedido de PostgREST
-
-/** El código HTTP de un error de Storage (supabase-js lo trae como `status` o `statusCode`). */
-function statusOf(error: object): number | undefined {
-  const { status, statusCode } = error as { status?: unknown; statusCode?: unknown };
-  const value = Number(status ?? statusCode);
-  return Number.isFinite(value) ? value : undefined;
-}
 
 export function createSupabasePhotos(client: SupabaseClient<Database>): PhotosPort {
   async function missingPhotos(family: string | null, offset: number, limit: number) {
@@ -45,22 +37,7 @@ export function createSupabasePhotos(client: SupabaseClient<Database>): PhotosPo
       }));
     },
     async savePhoto(articleId, photo) {
-      const path = photoPath(articleId, photoToken(crypto.getRandomValues(new Uint8Array(12))));
-      const { full, mini } = storagePaths(path);
-      const bucket = client.storage.from(PHOTOS_BUCKET);
-      const options = { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false };
-      for (const [file, blob] of [
-        [full, photo.full],
-        [mini, photo.mini],
-      ] as const) {
-        const { error } = await bucket.upload(file, blob, options);
-        if (error) throw new UploadError(uploadErrorReason(statusOf(error)));
-      }
-      const { error } = await client.rpc('asignar_foto_subida', {
-        p_articulo_id: articleId,
-        p_ruta: full,
-      });
-      if (error) throw new UploadError(error.code === '42501' ? 'unauthorized' : 'failed');
+      await uploadArticlePhoto(client, articleId, photo);
     },
     async stats() {
       const { data, error } = await client.rpc('stats_fotos');
