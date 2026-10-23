@@ -3,6 +3,16 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [Sin publicar]
+
+### Seguridad
+
+- **El bot de Telegram ya no entra a la base como `postgres`:** usa `n8n_bot`, que solo puede
+  leer `articulos`, en solo lectura y con tope de 5 segundos. El SQL lo escribe la IA, así que
+  ahora un `DELETE` o un `UPDATE` que se le escape lo rechaza la base. `n8n/lois-sql.json` usa la
+  credencial nueva `Lois bot (solo lectura)` y `docs/n8n.md` cuenta lo que el flujo todavía no
+  hace (lista blanca y registro de consultas).
+
 ## [0.11.0] - 2026-10-23
 
 ### Cambiado

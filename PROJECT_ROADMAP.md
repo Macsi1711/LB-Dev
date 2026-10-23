@@ -96,12 +96,12 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | Probar audio y foto de verdad en el Mostrador, sin login, y el bot de Telegram                        | ⏳ dueño              | —              |
 | 6    | Pendientes del catálogo: prueba de la foto FRAM, HU612 dice "ECEITE", foto del 3PK848A                | ⏳ dueño              | —              |
 | 6    | Cuentas de vendedor viejas: borrarlas o sacarles los permisos en la base (ADR-011)                    | ✅                    | —              |
-| 6    | Confirmar si el bot hace `SELECT *` sobre `articulos`                                                 | ⏳ dueño              | —              |
+| 6    | Confirmar si el bot hace `SELECT *` sobre `articulos` (no: nombra las columnas)                       | ✅                    | —              |
 | 6    | Auth: Site URL, Redirect URLs y SMTP propio (el registro ya está apagado)                             | ⏳ verificar          | —              |
 | 6    | Respaldo nocturno de la base y las fotos, con prueba mensual (ADR-009)                                | ✅                    | #91–#93        |
 | 6    | Prueba de carga en producción (solo lecturas, fuera de horario)                                       | ⏳ dueño (datos)      | —              |
 | 6    | Plan de Vercel para uso comercial (Pro)                                                               | ⏳ decisión del dueño | —              |
-| 6    | n8n deja de entrar como `postgres`: usa `n8n_bot` / `n8n_app` ([n8n.md](docs/n8n.md))                 | ⏳ dueño              | —              |
+| 6    | El bot deja de entrar como `postgres`: usa `n8n_bot`, solo lectura ([n8n.md](docs/n8n.md))            | ✅                    | #108           |
 | 6    | Borrar `lois_inspeccion` y rotar la contraseña de `postgres`                                          | ⏳ al final           | —              |
 | 6    | **Release v1.0.0**                                                                                    | ⏳                    | —              |
 | 7    | Repo público                                                                                          | ⏳ aprobado           | —              |
