@@ -1,6 +1,6 @@
 # ADR-009: respaldo nocturno de la base y las fotos en Cloudflare R2, fuera de Supabase
 
-- **Estado:** aceptado
+- **Estado:** reemplazado por [ADR-012](012-respaldo-en-vercel-blob.md)
 - **Fecha:** 2026-10-21
 
 ## Contexto
