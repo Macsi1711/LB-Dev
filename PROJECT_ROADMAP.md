@@ -95,17 +95,17 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | Productos: el admin carga productos nuevos (datos, familia y foto; migración 0028)                    | ✅                    | #110–#113      |
 | 6    | **Release v0.12.0**                                                                                   | ✅                    | release/0.12.0 |
 | 6    | Webhook "Lois Consulta web" en n8n ([n8n.md](docs/n8n.md))                                            | ✅                    | #98            |
-| 6    | Probar audio y foto de verdad en el Mostrador, sin login (el bot ya se probó)                         | ⏳ dueño              | —              |
-| 6    | Pendientes del catálogo: prueba de la foto FRAM, HU612 dice "ECEITE", foto del 3PK848A                | ⏳ dueño              | —              |
+| 6    | Probar en el local audio, foto y alta de productos (el bot ya se probó)                               | ✅                    | —              |
+| 6    | Pendientes del catálogo (FRAM, HU612, 3PK848A): fuera de la v1.0, en el sistema del dueño             | ✅ decisión del dueño | —              |
 | 6    | Cuentas de vendedor viejas: borrarlas o sacarles los permisos en la base (ADR-011)                    | ✅                    | —              |
 | 6    | Confirmar si el bot hace `SELECT *` sobre `articulos` (no: nombra las columnas)                       | ✅                    | —              |
 | 6    | Auth: Site URL y Redirect URLs a la web; "olvidé mi contraseña" probado de punta a punta              | ✅                    | —              |
 | 6    | Respaldo nocturno de la base y las fotos, con prueba mensual (ADR-009)                                | ✅                    | #91–#93        |
 | 6    | Prueba de carga en producción: 15 y 30 vendedores, 0 errores, mediana 0,2 s                           | ✅                    | —              |
-| 6    | Plan de Vercel para uso comercial: el equipo Atom (web y respaldo) está en Hobby                      | ⏳ decisión del dueño | —              |
+| 6    | Plan de Vercel: la web y el respaldo pasaron al equipo Pro (AtomLabs-completo)                        | ✅                    | —              |
 | 6    | El bot deja de entrar como `postgres`: usa `n8n_bot`, solo lectura ([n8n.md](docs/n8n.md))            | ✅                    | #108           |
-| 6    | Cierre de seguridad: rotar `postgres`, borrar "Lois" de n8n y `lois_inspeccion` (produccion.md §8)    | ⏳ al final           | —              |
-| 6    | **Release v1.0.0**                                                                                    | ⏳                    | —              |
+| 6    | Cierre de seguridad: rotar `postgres`, borrar "Lois" de n8n y `lois_inspeccion` (produccion.md §8)    | ✅                    | —              |
+| 6    | **Release v1.0.0**                                                                                    | ✅                    | release/1.0.0  |
 | 7    | Repo público                                                                                          | ⏳ aprobado           | —              |
 | 7    | Protección de `develop` y `main` (verify obligatorio, sin push directo)                               | ⏳                    | —              |
 | 7    | Prueba: una PR en rojo no se puede mergear                                                            | ⏳                    | —              |
