@@ -3,7 +3,7 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
-## [Sin publicar]
+## [1.1.0] - 2026-10-26
 
 ### Agregado
 
@@ -23,6 +23,7 @@ semántico.
   - `eliminar_articulo()` saca el artículo del catálogo. Antes guarda una copia entera en
     `articulos_eliminados`, con quién lo borró y cuándo, por si hay que recuperarlo.
   - `articulos` suma `editado_en_web` y `editado_por`. No cambia nada de lo que usa n8n.
+  - Aplicada en producción el 2026-10-26.
 
 ## [1.0.0] - 2026-10-23
 
