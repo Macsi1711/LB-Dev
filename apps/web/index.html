@@ -16,6 +16,28 @@
   </head>
   <body>
     <div id="root"></div>
+    <div id="sin-arranque" hidden style="font-family: sans-serif; padding: 24px; max-width: 40em">
+      <h1>No se pudo abrir el Mostrador en este navegador</h1>
+      <p>Probá recargar la página. Si sigue igual, mandale una foto de esta pantalla a soporte.</p>
+      <p><small id="sin-arranque-navegador"></small></p>
+    </div>
+    <script>
+      // ES5 a propósito: si la app no arranca (navegador viejo, error al cargar), en vez de una
+      // pantalla en blanco queda un aviso con el navegador para poder diagnosticarlo.
+      (function () {
+        function avisar() {
+          var root = document.getElementById('root');
+          var aviso = document.getElementById('sin-arranque');
+          if (!root || !aviso || root.childNodes.length) return;
+          document.getElementById('sin-arranque-navegador').textContent = navigator.userAgent;
+          aviso.hidden = false;
+        }
+        window.addEventListener('error', function () {
+          setTimeout(avisar, 0);
+        });
+        setTimeout(avisar, 15000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

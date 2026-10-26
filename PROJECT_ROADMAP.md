@@ -112,6 +112,8 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 8    | Cambiar contraseña desde la web (para las 3 cuentas admin nuevas)                                     | ✅                    | #118           |
 | 8    | Productos: editar y eliminar (migración 0029, copia de lo eliminado)                                  | ✅                    | #119–#122      |
 | 8    | **Release v1.1.0**                                                                                    | ✅                    | release/1.1.0  |
+| 8    | Arreglo: la web abre en las PCs viejas del mostrador (Chrome 109 / Firefox viejo de Windows 7)        | ✅                    | #125           |
+| 8    | **Release v1.1.1**                                                                                    | ✅                    | release/1.1.1  |
 | 8    | Alta de usuarios de la web desde la app (función en el servidor)                                      | 💡                    | —              |
 | 8    | Logo e ícono para instalar la app en el celular                                                       | 💡                    | —              |
 | 8    | Tests end-to-end en el navegador                                                                      | 💡                    | —              |
