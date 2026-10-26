@@ -106,9 +106,12 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 6    | El bot deja de entrar como `postgres`: usa `n8n_bot`, solo lectura ([n8n.md](docs/n8n.md))            | ✅                    | #108           |
 | 6    | Cierre de seguridad: rotar `postgres`, borrar "Lois" de n8n y `lois_inspeccion` (produccion.md §8)    | ✅                    | —              |
 | 6    | **Release v1.0.0**                                                                                    | ✅                    | release/1.0.0  |
-| 7    | Repo público                                                                                          | ⏳ aprobado           | —              |
-| 7    | Protección de `develop` y `main` (verify obligatorio, sin push directo)                               | ⏳                    | —              |
-| 7    | Prueba: una PR en rojo no se puede mergear                                                            | ⏳                    | —              |
+| 7    | Repo público (historial revisado con gitleaks: sin secretos)                                          | ✅                    | —              |
+| 7    | Protección de `develop` y `main` (verify e integration obligatorios, sin push directo)                | ✅                    | —              |
+| 7    | Prueba: una PR en rojo no se puede mergear (ni como admin)                                            | ✅                    | #116           |
+| 8    | Cambiar contraseña desde la web (para las 3 cuentas admin nuevas)                                     | ✅                    | #118           |
+| 8    | Productos: editar y eliminar (migración 0029, copia de lo eliminado)                                  | ✅                    | #119–#122      |
+| 8    | **Release v1.1.0**                                                                                    | ✅                    | release/1.1.0  |
 | 8    | Alta de usuarios de la web desde la app (función en el servidor)                                      | 💡                    | —              |
 | 8    | Logo e ícono para instalar la app en el celular                                                       | 💡                    | —              |
 | 8    | Tests end-to-end en el navegador                                                                      | 💡                    | —              |

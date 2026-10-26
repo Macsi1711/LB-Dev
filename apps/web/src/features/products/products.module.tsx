@@ -3,7 +3,7 @@ import { getSupabase } from '@/infra/supabase';
 import { isDemo } from '@/shared/lib/demo';
 import { createDemoProducts } from './data/demo-products';
 import { createSupabaseProducts } from './data/supabase-products';
-import { NewProductPage } from './ui/new-product-page';
+import { ProductsPage } from './ui/products-page';
 import { ProductsPortContext } from './ui/products-context';
 
 /** Composition root de la sección Productos (solo admin). */
@@ -13,7 +13,7 @@ export function ProductsScreen() {
   );
   return (
     <ProductsPortContext value={port}>
-      <NewProductPage />
+      <ProductsPage />
     </ProductsPortContext>
   );
 }

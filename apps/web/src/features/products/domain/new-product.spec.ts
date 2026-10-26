@@ -7,6 +7,7 @@ import {
   EMPTY_PRODUCT,
   MAX_CODE,
   productErrors,
+  productFromArticle,
   savedAs,
   type NewProduct,
 } from './new-product';
@@ -55,11 +56,43 @@ describe('savedAs', () => {
   });
 });
 
+describe('productFromArticle', () => {
+  it('carga en el formulario los datos del artículo que se va a editar', () => {
+    expect(
+      productFromArticle({
+        code: 'AMO-500',
+        name: 'AMORTIGUADOR DEL. CHEVROLET CORSA',
+        description: null,
+        notes: 'Gas',
+        familyCode: 'AM',
+      }),
+    ).toEqual({
+      code: 'AMO-500',
+      name: 'AMORTIGUADOR DEL. CHEVROLET CORSA',
+      family: 'AM',
+      description: '',
+      notes: 'Gas',
+    });
+  });
+
+  it('sin nombre ni familia, el formulario los pide al guardar', () => {
+    const p = productFromArticle({
+      code: 'X1',
+      name: null,
+      description: null,
+      notes: null,
+      familyCode: null,
+    });
+    expect(productErrors(p)).toEqual({ name: 'Poné el nombre.', family: 'Elegí la familia.' });
+  });
+});
+
 describe('createProductErrorReason', () => {
   it('según el código de error de la base, explica por qué no se guardó', () => {
     expect(createProductErrorReason('23505')).toBe('duplicate');
     expect(createProductErrorReason('22023')).toBe('invalid');
     expect(createProductErrorReason('42501')).toBe('unauthorized');
+    expect(createProductErrorReason('P0002')).toBe('missing');
     expect(createProductErrorReason(undefined)).toBe('failed');
     expect(createProductErrorReason('08006')).toBe('failed');
   });
@@ -93,5 +126,8 @@ describe('createProductErrorMessage', () => {
       'Tu sesión venció o no sos admin. Volvé a entrar.',
     );
     expect(createProductErrorMessage('failed')).toBe('No se pudo guardar. Probá de nuevo.');
+    expect(createProductErrorMessage('missing')).toBe(
+      'Ese artículo ya no existe: puede que lo haya eliminado otro admin.',
+    );
   });
 });

@@ -3,6 +3,28 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [1.1.0] - 2026-10-26
+
+### Agregado
+
+- **Cambiar contraseña desde la web:** con la sesión iniciada aparece el ícono de la llave junto
+  al de salir y lleva a la pantalla de contraseña nueva, que ahora tiene "Cancelar". Así cada
+  admin cambia la contraseña inicial sin depender del mail de recuperación (el correo de prueba
+  de Supabase solo les llega a los miembros del equipo de Supabase).
+- **Productos: editar y eliminar.** La sección _Productos_ ahora tiene dos pestañas, _Agregar_ y
+  _Editar o eliminar_. En la segunda se busca el artículo y se corrigen el nombre, la familia, la
+  descripción, las observaciones o la foto. El código queda fijo. _Eliminar producto_ pide
+  confirmación y guarda una copia en la base.
+- **Base para editar y eliminar productos desde la web** (migración
+  `20261026000029_editar_eliminar_articulos.sql`). Las funciones nuevas solo las puede usar el
+  admin.
+  - `editar_articulo()` corrige el nombre, la familia, la descripción y las observaciones. El
+    código no se cambia, porque lo usan las fotos, la búsqueda y el historial.
+  - `eliminar_articulo()` saca el artículo del catálogo. Antes guarda una copia entera en
+    `articulos_eliminados`, con quién lo borró y cuándo, por si hay que recuperarlo.
+  - `articulos` suma `editado_en_web` y `editado_por`. No cambia nada de lo que usa n8n.
+  - Aplicada en producción el 2026-10-26.
+
 ## [1.0.0] - 2026-10-23
 
 Primera versión oficial: el Mostrador Lois queda en producción con los datos reales de la empresa.

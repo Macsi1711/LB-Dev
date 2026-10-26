@@ -1,4 +1,14 @@
-import { ChartColumn, Image, LogIn, LogOut, Moon, Package, Search, Sun } from 'lucide-react';
+import {
+  ChartColumn,
+  Image,
+  KeyRound,
+  LogIn,
+  LogOut,
+  Moon,
+  Package,
+  Search,
+  Sun,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useAuth } from '@/features/auth';
@@ -62,15 +72,23 @@ function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme:
         {theme === 'oscuro' ? <Sun /> : <Moon />}
       </Button>
       {session ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          className={onBrand}
-          onClick={signOut}
-          aria-label="Salir"
-        >
-          <LogOut />
-        </Button>
+        <>
+          {/* Con sesión, cada uno cambia su contraseña sin depender del mail de recuperación. */}
+          <Button variant="ghost" size="icon" className={onBrand} asChild>
+            <Link to="/nueva-clave" aria-label="Cambiar contraseña" title="Cambiar contraseña">
+              <KeyRound />
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={onBrand}
+            onClick={signOut}
+            aria-label="Salir"
+          >
+            <LogOut />
+          </Button>
+        </>
       ) : (
         // Sin sesión, en el mismo lugar: el ingreso del admin, sin texto a la vista (ADR-010).
         session === null && (

@@ -40,7 +40,26 @@ export const savedAs = (p: NewProduct) => ({
   name: p.name.trim().toUpperCase(),
 });
 
-export type CreateProductErrorReason = 'duplicate' | 'invalid' | 'unauthorized' | 'failed';
+/** Los datos de un artículo existente que el formulario de edición necesita. */
+export interface ArticleFields {
+  code: string;
+  name: string | null;
+  description: string | null;
+  notes: string | null;
+  familyCode: string | null;
+}
+
+/** Carga en el formulario el artículo que se va a editar (el código no se edita). */
+export const productFromArticle = (a: ArticleFields): NewProduct => ({
+  code: a.code,
+  name: a.name ?? '',
+  family: a.familyCode ?? '',
+  description: a.description ?? '',
+  notes: a.notes ?? '',
+});
+
+export type CreateProductErrorReason =
+  'duplicate' | 'invalid' | 'unauthorized' | 'missing' | 'failed';
 
 export class CreateProductError extends Error {
   constructor(
@@ -53,11 +72,12 @@ export class CreateProductError extends Error {
   }
 }
 
-/** Por qué no se guardó, según el código de error de Postgres que devolvió crear_articulo. */
+/** Por qué no se guardó, según el código de error de Postgres de crear, editar o eliminar. */
 export function createProductErrorReason(code: string | undefined): CreateProductErrorReason {
   if (code === '23505') return 'duplicate';
   if (code === '22023') return 'invalid';
   if (code === '42501') return 'unauthorized';
+  if (code === 'P0002') return 'missing';
   return 'failed';
 }
 
@@ -74,6 +94,8 @@ export function createProductErrorMessage(
       return detail ? sentence(detail) : 'Revisá los datos del producto.';
     case 'unauthorized':
       return 'Tu sesión venció o no sos admin. Volvé a entrar.';
+    case 'missing':
+      return 'Ese artículo ya no existe: puede que lo haya eliminado otro admin.';
     case 'failed':
       return 'No se pudo guardar. Probá de nuevo.';
   }
