@@ -11,6 +11,10 @@ semántico.
   al de salir y lleva a la pantalla de contraseña nueva, que ahora tiene "Cancelar". Así cada
   admin cambia la contraseña inicial sin depender del mail de recuperación (el correo de prueba
   de Supabase solo les llega a los miembros del equipo de Supabase).
+- **Productos: editar y eliminar.** La sección _Productos_ ahora tiene dos pestañas, _Agregar_ y
+  _Editar o eliminar_. En la segunda se busca el artículo y se corrigen el nombre, la familia, la
+  descripción, las observaciones o la foto. El código queda fijo. _Eliminar producto_ pide
+  confirmación y guarda una copia en la base.
 - **Base para editar y eliminar productos desde la web** (migración
   `20261026000029_editar_eliminar_articulos.sql`). Las funciones nuevas solo las puede usar el
   admin.
