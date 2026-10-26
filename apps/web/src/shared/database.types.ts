@@ -31,6 +31,8 @@ export type Database = {
           creado_en_web: string | null;
           creado_por: string | null;
           Descripción: string | null;
+          editado_en_web: string | null;
+          editado_por: string | null;
           foto: string | null;
           id: number;
           Imagen: string | null;
@@ -46,6 +48,8 @@ export type Database = {
           creado_en_web?: string | null;
           creado_por?: string | null;
           Descripción?: string | null;
+          editado_en_web?: string | null;
+          editado_por?: string | null;
           foto?: string | null;
           id?: never;
           Imagen?: string | null;
@@ -60,12 +64,42 @@ export type Database = {
           creado_en_web?: string | null;
           creado_por?: string | null;
           Descripción?: string | null;
+          editado_en_web?: string | null;
+          editado_por?: string | null;
           foto?: string | null;
           id?: never;
           Imagen?: string | null;
           'Nombre artículo'?: string | null;
           'Nombre familia'?: string | null;
           observaciones?: string | null;
+        };
+        Relationships: [];
+      };
+      articulos_eliminados: {
+        Row: {
+          articulo_id: number;
+          codigo: string | null;
+          datos: NonNullable<Json>;
+          eliminado_en: string;
+          eliminado_por: string | null;
+          id: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          articulo_id: number;
+          codigo?: string | null;
+          datos: NonNullable<Json>;
+          eliminado_en?: string;
+          eliminado_por?: string | null;
+          id?: never;
+        };
+        Update: {
+          articulo_id?: number;
+          codigo?: string | null;
+          datos?: NonNullable<Json>;
+          eliminado_en?: string;
+          eliminado_por?: string | null;
+          id?: never;
         };
         Relationships: [];
       };
@@ -409,6 +443,35 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      editar_articulo: {
+        Args: {
+          p_descripcion?: string;
+          p_familia: string;
+          p_id: number;
+          p_nombre: string;
+          p_observaciones?: string;
+        };
+        Returns: {
+          codigo: string | null;
+          descripcion: string | null;
+          familia_codigo: string | null;
+          familia_nombre: string | null;
+          foto: string | null;
+          id: number | null;
+          imagen_drive_id: string | null;
+          imagen_url: string | null;
+          nombre: string | null;
+          observaciones: string | null;
+          tiene_foto: boolean | null;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'v_articulos';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      eliminar_articulo: { Args: { p_id: number }; Returns: undefined };
       es_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       escapar_like: { Args: { texto: string }; Returns: string };
       f_unaccent: { Args: { texto: string }; Returns: string };

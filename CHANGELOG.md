@@ -11,6 +11,14 @@ semántico.
   al de salir y lleva a la pantalla de contraseña nueva, que ahora tiene "Cancelar". Así cada
   admin cambia la contraseña inicial sin depender del mail de recuperación (el correo de prueba
   de Supabase solo les llega a los miembros del equipo de Supabase).
+- **Base para editar y eliminar productos desde la web** (migración
+  `20261026000029_editar_eliminar_articulos.sql`). Las funciones nuevas solo las puede usar el
+  admin.
+  - `editar_articulo()` corrige el nombre, la familia, la descripción y las observaciones. El
+    código no se cambia, porque lo usan las fotos, la búsqueda y el historial.
+  - `eliminar_articulo()` saca el artículo del catálogo. Antes guarda una copia entera en
+    `articulos_eliminados`, con quién lo borró y cuándo, por si hay que recuperarlo.
+  - `articulos` suma `editado_en_web` y `editado_por`. No cambia nada de lo que usa n8n.
 
 ## [1.0.0] - 2026-10-23
 
