@@ -40,6 +40,20 @@ describe('loadConfig', () => {
     );
   });
 
+  it('arranca en navegadores sin URL.canParse (Chrome < 120, el de Windows 7)', () => {
+    // jsdom hereda canParse del URL de Node: se tapa con una propiedad propia.
+    Object.defineProperty(URL, 'canParse', { value: undefined, configurable: true });
+    try {
+      expect(loadConfig(ok).supabaseUrl).toBe('http://127.0.0.1:55421');
+      expect(() => loadConfig({ ...ok, VITE_SUPABASE_URL: 'supabase' })).toThrow(
+        'VITE_SUPABASE_URL no es una URL válida',
+      );
+    } finally {
+      // @ts-expect-error se borra la propiedad propia y vuelve la heredada
+      delete URL.canParse;
+    }
+  });
+
   it('rechaza una URL inválida', () => {
     expect(() => loadConfig({ ...ok, VITE_SUPABASE_URL: 'supabase' })).toThrow(
       'VITE_SUPABASE_URL no es una URL válida',

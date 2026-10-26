@@ -3,6 +3,17 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [Sin publicar]
+
+### Corregido
+
+- **La web no abría en las PCs viejas del mostrador** (Windows 7: Chrome 109, Firefox viejo).
+  Ponían la dirección y quedaba la pantalla en blanco: al arrancar se usaba `URL.canParse`, que
+  recién existe desde Chrome 120. Ahora la URL se valida de otra forma y la web se compila para
+  Chrome 109 y Firefox 102 en adelante (los colores también bajan a hex para esos navegadores).
+- **Si la web no logra arrancar, avisa:** en vez de una pantalla en blanco aparece "No se pudo
+  abrir el Mostrador en este navegador" con los datos del navegador, para poder diagnosticarlo.
+
 ## [1.1.0] - 2026-10-26
 
 ### Agregado
