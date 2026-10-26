@@ -3,6 +3,15 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [Sin publicar]
+
+### Agregado
+
+- **Cambiar contraseña desde la web:** con la sesión iniciada aparece el ícono de la llave junto
+  al de salir y lleva a la pantalla de contraseña nueva, que ahora tiene "Cancelar". Así cada
+  admin cambia la contraseña inicial sin depender del mail de recuperación (el correo de prueba
+  de Supabase solo les llega a los miembros del equipo de Supabase).
+
 ## [1.0.0] - 2026-10-23
 
 Primera versión oficial: el Mostrador Lois queda en producción con los datos reales de la empresa.
