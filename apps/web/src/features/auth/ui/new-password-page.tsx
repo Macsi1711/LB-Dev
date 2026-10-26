@@ -5,7 +5,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { authErrorMessage } from '../domain/errors';
-import { validateNewPassword } from '../domain/password';
+import { MIN_PASSWORD_LENGTH, validateNewPassword } from '../domain/password';
 import { AuthLayout, FormError } from './auth-layout';
 import { useAuth } from './auth-context';
 
@@ -38,7 +38,10 @@ export function NewPasswordPage() {
   }
 
   return (
-    <AuthLayout title="Contraseña nueva">
+    <AuthLayout
+      title="Contraseña nueva"
+      description={`Elegí una de al menos ${MIN_PASSWORD_LENGTH} caracteres. Desde ahora entrás con esa.`}
+    >
       <form onSubmit={onSubmit} className="grid gap-4">
         <div className="grid gap-2">
           <Label htmlFor="password">Contraseña nueva</Label>
@@ -65,6 +68,10 @@ export function NewPasswordPage() {
         <Button type="submit" size="lg">
           Guardar
         </Button>
+        {/* Se llega también desde "Cambiar contraseña", con la sesión abierta: se puede volver. */}
+        <Link to="/" className="justify-self-center text-sm underline">
+          Cancelar
+        </Link>
       </form>
     </AuthLayout>
   );
