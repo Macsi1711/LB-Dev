@@ -410,6 +410,7 @@ export type Database = {
           isSetofReturn: true;
         };
       };
+      cambiar_clave_vendedor: { Args: { p_clave: string; p_user_id: string }; Returns: undefined };
       compactar_busqueda: { Args: { texto: string }; Returns: string };
       contar_articulos: {
         Args: { p_con_foto?: boolean; p_familia?: string; p_q?: string };
@@ -580,6 +581,15 @@ export type Database = {
         Returns: {
           bytes: number;
           fotos: number;
+        }[];
+      };
+      vendedores_web: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          email: string;
+          nombre: string;
+          ultimo_ingreso: string;
+          user_id: string;
         }[];
       };
     };
