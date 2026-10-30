@@ -43,11 +43,9 @@ describe('LoginPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Email o contraseña incorrectos.');
   });
 
-  it('si se entró sin querer, se vuelve al Mostrador sin iniciar sesión (ADR-010)', async () => {
+  it('no ofrece volver al Mostrador sin iniciar sesión: el login es obligatorio (ADR-013)', async () => {
     renderLogin(fakePort());
-    expect(await screen.findByRole('link', { name: 'Volver al Mostrador' })).toHaveAttribute(
-      'href',
-      '/',
-    );
+    expect(await screen.findByRole('button', { name: 'Ingresar' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Volver al Mostrador' })).not.toBeInTheDocument();
   });
 });
