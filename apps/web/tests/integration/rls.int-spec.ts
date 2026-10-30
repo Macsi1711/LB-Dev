@@ -13,12 +13,11 @@ afterAll(async () => {
 const PERMISSION_DENIED = '42501';
 
 describe('anon (sin sesión)', () => {
-  it('no lee los artículos directo: solo busca por la función (ADR-010)', async () => {
+  it('no lee los artículos ni busca: el login es obligatorio (ADR-013)', async () => {
     await inTransaction(db, async (tx) => {
       await tx.query('set local role anon');
       expect(await errorCode(tx, 'select * from v_articulos')).toBe(PERMISSION_DENIED);
-      const { rowCount } = await tx.query(`select * from buscar_articulos('onix')`);
-      expect(rowCount).toBeGreaterThan(0);
+      expect(await errorCode(tx, `select * from buscar_articulos('onix')`)).toBe(PERMISSION_DENIED);
     });
   });
 });
@@ -70,14 +69,31 @@ describe('vendedor', () => {
     });
   });
 
-  it('asigna una foto a mano, pero no toca otras columnas', async () => {
+  it('ve el contador de fotos y registra sus consultas', async () => {
+    await inTransaction(db, async (tx) => {
+      const me = await createUser(tx, 'vendedor');
+      await actAs(tx, me);
+      const stats = await tx.query('select * from stats_fotos()');
+      expect(stats.rows.length).toBeGreaterThan(0);
+      await tx.query(
+        `select registrar_consulta('pastilla onix', null, null, 'texto', null, null, 2, false)`,
+      );
+      await tx.query('reset role');
+      const { rows } = await tx.query(
+        `select user_id from consultas_bot where canal = 'web' order by id desc limit 1`,
+      );
+      expect(rows[0]).toEqual({ user_id: me });
+    });
+  });
+
+  it('no toca "Imagen" ni otras columnas de los artículos (ADR-013)', async () => {
     await inTransaction(db, async (tx) => {
       await actAs(tx, await createUser(tx, 'vendedor'));
       const r = await tx.query(
         `update articulos set "Imagen" = 'https://drive.google.com/file/d/Z/view?usp=drivesdk'
          where "Codigo" = '854001'`,
       );
-      expect(r.rowCount).toBe(1);
+      expect(r.rowCount).toBe(0);
       expect(
         await errorCode(
           tx,
@@ -88,7 +104,7 @@ describe('vendedor', () => {
     });
   });
 
-  it('ve el bot', async () => {
+  it('no ve Métricas, la lista de Telegram ni el historial de fotos (ADR-013)', async () => {
     await inTransaction(db, async (tx) => {
       for (const table of ['consultas_bot', 'usuarios_telegram'])
         await tx.query(`delete from ${table}`);
@@ -96,11 +112,19 @@ describe('vendedor', () => {
         `insert into consultas_bot (chat_id, fuente, texto, cantidad) values (1, 'texto', 'x', 0)`,
       );
       await tx.query(`insert into usuarios_telegram (chat_id, nombre) values (1, 'Juan')`);
+      const admin = await createUser(tx, 'admin');
       await actAs(tx, await createUser(tx, 'vendedor'));
-      for (const table of ['consultas_bot', 'usuarios_telegram']) {
+      for (const table of [
+        'consultas_bot',
+        'v_consultas_bot',
+        'usuarios_telegram',
+        'fotos_subidas',
+      ]) {
         const { rows } = await tx.query(`select * from ${table}`);
-        expect(rows, table).toHaveLength(1);
+        expect(rows, table).toHaveLength(0);
       }
+      const name = await tx.query('select nombre_usuario_web($1) as n', [admin]);
+      expect(name.rows[0].n).toBeNull();
     });
   });
 

@@ -42,12 +42,12 @@ describe('v_consultas_bot', () => {
     });
   });
 
-  it('un vendedor también ve las consultas', async () => {
+  it('un vendedor no ve las consultas: Métricas es del admin (ADR-013)', async () => {
     await inTransaction(db, async (tx) => {
       await seedQueries(tx);
       await actAs(tx, await createUser(tx, 'vendedor'));
       const { rows } = await tx.query('select * from v_consultas_bot');
-      expect(rows.length).toBeGreaterThan(0);
+      expect(rows).toHaveLength(0);
     });
   });
 });

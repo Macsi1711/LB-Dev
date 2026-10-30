@@ -109,7 +109,7 @@ describe('eliminar_articulo', () => {
       await actAs(tx, await createUser(tx, 'admin'));
       await tx.query(REMOVE, [id]);
       await tx.query('reset role');
-      await tx.query('set local role anon');
+      await actAs(tx, await createUser(tx, 'vendedor'));
       const { rows } = await tx.query(
         `select codigo from buscar_articulos(p_q => 'BUJ-10', p_limit => 10, p_offset => 0)`,
       );
