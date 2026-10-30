@@ -3,7 +3,7 @@ import type { Viewer } from '@/shared/roles';
 export interface NavItem {
   path: string;
   label: string;
-  icon: 'search' | 'image' | 'package' | 'chart';
+  icon: 'search' | 'image' | 'package' | 'chart' | 'users';
   viewers: readonly Viewer[];
 }
 
@@ -14,6 +14,7 @@ const ITEMS: readonly NavItem[] = [
   { path: '/fotos', label: 'Fotos', icon: 'image', viewers: ['vendedor', 'admin'] },
   { path: '/productos', label: 'Productos', icon: 'package', viewers: ['admin'] },
   { path: '/metricas', label: 'Métricas', icon: 'chart', viewers: ['admin'] },
+  { path: '/vendedores', label: 'Vendedores', icon: 'users', viewers: ['admin'] },
 ];
 
 export function navigationFor(viewer: Viewer): NavItem[] {

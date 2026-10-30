@@ -1,4 +1,14 @@
-import { ChartColumn, Image, KeyRound, LogOut, Moon, Package, Search, Sun } from 'lucide-react';
+import {
+  ChartColumn,
+  Image,
+  KeyRound,
+  LogOut,
+  Moon,
+  Package,
+  Search,
+  Sun,
+  Users,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useAuth } from '@/features/auth';
@@ -9,7 +19,13 @@ import { Button } from '@/shared/ui/button';
 import { Wordmark } from '@/shared/ui/wordmark';
 import { navigationFor, type NavItem } from '../domain/navigation';
 
-const ICONS = { search: Search, image: Image, package: Package, chart: ChartColumn } as const;
+const ICONS = {
+  search: Search,
+  image: Image,
+  package: Package,
+  chart: ChartColumn,
+  users: Users,
+} as const;
 
 function NavLinks({ items, compact }: { items: NavItem[]; compact?: boolean }) {
   return items.map((item) => {
@@ -44,8 +60,7 @@ const onBrand = 'text-marca-foreground hover:bg-marca-foreground/10 hover:text-m
 function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
   const { port, session } = useAuth();
   const navigate = useNavigate();
-  // Al salir se vuelve al Mostrador, que se usa sin sesión. Primero se navega: si se cierra la
-  // sesión estando en Fotos o Métricas, su RequireAuth mandaría al login.
+  // Al salir se vuelve a la raíz, que sin sesión manda al login (ADR-013).
   const signOut = () => {
     navigate('/', { replace: true });
     void port.signOut();
