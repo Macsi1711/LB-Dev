@@ -3,6 +3,17 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 semántico.
 
+## [Sin publicar]
+
+### Cambiado
+
+- **La base ya no responde sin sesión** (migración `20261030000030_login_obligatorio.sql`,
+  ADR-013). Sin login no se busca, no se ven las familias ni el contador de fotos y no se
+  registran consultas. El bot de Telegram no cambia: usa su propio usuario.
+  - **El vendedor puede en la base lo mismo que en la web:** buscar, ver las familias, ver el
+    contador de fotos y registrar sus consultas. Métricas, la lista de Telegram, subir y asignar
+    fotos, el uso del espacio y `"Imagen"` quedan solo para el admin.
+
 ## [1.1.1] - 2026-10-26
 
 ### Corregido

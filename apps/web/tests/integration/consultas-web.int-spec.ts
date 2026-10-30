@@ -10,12 +10,19 @@ afterAll(async () => {
   await db.end();
 });
 
+/** Métricas es del admin (ADR-013): lee como un admin y vuelve al usuario que estaba. */
 async function lastWebQuery(tx: pg.Client) {
+  const current = await tx.query(`select current_setting('request.jwt.claims', true) as claims`);
+  await tx.query('reset role');
+  await actAs(tx, await createUser(tx, 'admin'));
   const { rows } = await tx.query(
     `select canal, fuente, texto, escuchado, familia, solo_con_foto, cantidad, aproximada, error,
             usuario_nombre, user_id
      from v_consultas_bot where canal = 'web' order by id desc limit 1`,
   );
+  await tx.query('reset role');
+  await tx.query(`select set_config('request.jwt.claims', $1, true)`, [current.rows[0].claims]);
+  await tx.query('set local role authenticated');
   return rows[0];
 }
 
@@ -103,6 +110,8 @@ describe('kpis_bot con la web', () => {
         await actAs(tx, user);
         await tx.query(`select registrar_consulta('onix')`);
       }
+      await tx.query('reset role');
+      await actAs(tx, await createUser(tx, 'admin'));
       const { rows } = await tx.query('select consultas_hoy, usuarios_activos from kpis_bot()');
       expect(rows[0]).toEqual({ consultas_hoy: '4', usuarios_activos: '3' });
     });
