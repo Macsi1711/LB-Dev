@@ -5,12 +5,21 @@ semántico.
 
 ## [Sin publicar]
 
+### Agregado
+
+- **Sección Vendedores, solo para el admin** (ADR-014). Lista los vendedores con su último
+  ingreso y les pone una contraseña nueva si se la olvidaron. El vendedor entra con esa y la
+  cambia por una propia con el ícono de la llave. La contraseña de otro admin no se toca desde
+  acá (migración `20261030000031_claves_por_admin.sql`).
+
 ### Cambiado
 
 - **Login obligatorio para todos** (ADR-013). Sin sesión, cualquier dirección lleva a la
   pantalla de ingreso y, después de entrar, se vuelve a donde se iba. Cada vendedor entra con su
   cuenta y ve lo mismo que antes: el Mostrador (texto, audio y foto) y el contador de Fotos. El
   admin sigue con todo. Se van el ícono de ingresar y el "Volver al Mostrador" del login.
+- **Se va "Olvidé mi contraseña"** (ADR-014): el mail de recuperación no les llegaba a los
+  vendedores. En su lugar, el login dice que le pidan una contraseña nueva a un encargado.
 - **La base ya no responde sin sesión** (migración `20261030000030_login_obligatorio.sql`,
   ADR-013). Sin login no se busca, no se ven las familias ni el contador de fotos y no se
   registran consultas. El bot de Telegram no cambia: usa su propio usuario.
