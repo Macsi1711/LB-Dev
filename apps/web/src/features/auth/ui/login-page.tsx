@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import { isDemo } from '@/shared/lib/demo';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -55,9 +55,10 @@ export function LoginPage() {
         <Button type="submit" size="lg" disabled={sending}>
           {sending ? 'Ingresando…' : 'Ingresar'}
         </Button>
-        <Link to="/recuperar" className="text-center text-sm text-muted-foreground underline">
-          Olvidé mi contraseña
-        </Link>
+        {/* Sin mail de recuperación: la contraseña olvidada la cambia un admin (ADR-014). */}
+        <p className="text-center text-sm text-muted-foreground">
+          ¿Te olvidaste la contraseña? Pedile a un encargado que te ponga una nueva.
+        </p>
       </form>
     </AuthLayout>
   );
