@@ -92,8 +92,9 @@ producción (`/webhook/…`, no `/webhook-test/…`) va en `VITE_N8N_CONSULTA_UR
 **Pedido**
 
 - `POST` a la URL del webhook.
-- Sin sesión ([ADR-011](adr/011-mostrador-del-vendedor-sin-login.md)): los vendedores usan la web
-  sin login. Si hay sesión, la web manda `Authorization: Bearer <token>`, pero el flujo no lo usa.
+- Con sesión ([ADR-013](adr/013-login-obligatorio.md)): la web pide login a todos y siempre manda
+  `Authorization: Bearer <token>`. Por ahora el flujo no lo valida. Volver a validarlo como en
+  el [ADR-006](adr/006-validacion-sesion-webhook.md) es un cambio en n8n que queda aparte.
 - Cuerpo `multipart/form-data`:
   - `tipo`: `audio` o `foto`.
   - `archivo`: el audio (`audio/webm`, `audio/mp4` u `audio/ogg`, hasta 60 s) o la foto

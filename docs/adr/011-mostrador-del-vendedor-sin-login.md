@@ -1,6 +1,6 @@
 # ADR-011: sin login, el Mostrador es el del vendedor; con login, el admin tiene todo
 
-- **Estado:** aceptado
+- **Estado:** reemplazado por [ADR-013](013-login-obligatorio.md)
 - **Fecha:** 2026-10-22
 - **Reemplaza a:** [ADR-010](010-busqueda-sin-login.md) y [ADR-006](006-validacion-sesion-webhook.md)
 
