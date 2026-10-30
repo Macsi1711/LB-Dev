@@ -10,7 +10,7 @@ interface AuthState {
   session: Session | null | undefined;
   profile: Profile | undefined;
   profileError: Error | null;
-  /** Quién usa la web: 'anonimo' sin sesión (ADR-010); undefined mientras no se sabe. */
+  /** Quién usa la web: 'anonimo' sin sesión (va al login, ADR-013); undefined mientras no se sabe. */
   viewer: Viewer | undefined;
 }
 

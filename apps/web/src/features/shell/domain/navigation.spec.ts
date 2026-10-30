@@ -11,9 +11,12 @@ describe('navigationFor', () => {
     ]);
   });
 
-  it('sin sesión y al vendedor, el Mostrador y Fotos (ADR-011)', () => {
-    for (const viewer of ['anonimo', 'vendedor'] as const)
-      expect(navigationFor(viewer).map((i) => i.path)).toEqual(['/', '/fotos']);
+  it('al vendedor, el Mostrador y Fotos', () => {
+    expect(navigationFor('vendedor').map((i) => i.path)).toEqual(['/', '/fotos']);
+  });
+
+  it('sin sesión, nada: el login es obligatorio (ADR-013)', () => {
+    expect(navigationFor('anonimo')).toEqual([]);
   });
 });
 
@@ -25,12 +28,15 @@ describe('canAccess', () => {
     expect(canAccess('admin', '/metricas/consultas')).toBe(true);
   });
 
-  it('sin sesión y el vendedor entran al Mostrador y a Fotos, no a Productos ni a Métricas', () => {
-    for (const viewer of ['anonimo', 'vendedor'] as const) {
-      expect(canAccess(viewer, '/')).toBe(true);
-      expect(canAccess(viewer, '/fotos')).toBe(true);
-      expect(canAccess(viewer, '/productos')).toBe(false);
-      expect(canAccess(viewer, '/metricas/consultas')).toBe(false);
-    }
+  it('el vendedor entra al Mostrador y a Fotos, no a Productos ni a Métricas', () => {
+    expect(canAccess('vendedor', '/')).toBe(true);
+    expect(canAccess('vendedor', '/fotos')).toBe(true);
+    expect(canAccess('vendedor', '/productos')).toBe(false);
+    expect(canAccess('vendedor', '/metricas/consultas')).toBe(false);
+  });
+
+  it('sin sesión no entra a ninguna sección, ni al Mostrador (ADR-013)', () => {
+    for (const path of ['/', '/fotos', '/productos', '/metricas', '/cualquier-cosa'])
+      expect(canAccess('anonimo', path), path).toBe(false);
   });
 });

@@ -27,16 +27,16 @@ const router = createRouter([
   { path: '/recuperar', element: <ForgotPasswordPage /> },
   { path: '/nueva-clave', element: <NewPasswordPage /> },
   {
-    element: <AppShell />,
+    // Login obligatorio (ADR-013): sin sesión, al login y de vuelta a donde iba.
+    element: <RequireAuth />,
     children: [
-      // Sin sesión, el vendedor busca y ve cuántas fotos hay (ADR-011).
-      { path: '/', element: <CounterScreen /> },
-      { path: '/fotos', element: <PhotosScreen /> },
       {
-        // Métricas y Productos: sin sesión, al login (y de vuelta a la sección); después, solo admin.
-        element: <RequireAuth />,
+        element: <AppShell />,
         children: [
+          { path: '/', element: <CounterScreen /> },
+          { path: '/fotos', element: <PhotosScreen /> },
           {
+            // Métricas y Productos: solo el admin.
             element: <RequireRole />,
             children: [
               { path: '/metricas', element: <BotScreen /> },
