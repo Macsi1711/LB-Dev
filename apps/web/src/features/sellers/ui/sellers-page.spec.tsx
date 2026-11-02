@@ -6,13 +6,17 @@ import { SellersDataError, type SellersPort } from '../domain/ports';
 import { SellersPortContext } from './sellers-context';
 import { SellersPage } from './sellers-page';
 
-function renderPage(resetPassword: SellersPort['resetPassword']) {
-  const port: SellersPort = {
-    list: async () => [{ userId: 'u1', name: 'Juan', email: 'juan@lois.com', lastSignIn: null }],
-    resetPassword,
-  };
+function renderPage(
+  resetPassword: SellersPort['resetPassword'],
+  list: SellersPort['list'] = async () => [
+    { userId: 'u1', name: 'Juan', email: 'juan@lois.com', lastSignIn: null },
+  ],
+) {
+  const port: SellersPort = { list, resetPassword };
   render(
-    <QueryClientProvider client={new QueryClient()}>
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+    >
       <SellersPortContext value={port}>
         <SellersPage />
       </SellersPortContext>
@@ -27,6 +31,14 @@ async function setPassword(password: string) {
 }
 
 describe('SellersPage', () => {
+  it('si la lista no carga, lo avisa sin mostrar la tabla vacía', async () => {
+    renderPage(vi.fn(), async () => {
+      throw new SellersDataError('no existe la función', 'PGRST202');
+    });
+    expect(await screen.findByText('No se pudo cargar la lista.')).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+  });
+
   it('lista los vendedores y le cambia la contraseña al elegido', async () => {
     const resetPassword = vi.fn(async () => undefined);
     renderPage(resetPassword);

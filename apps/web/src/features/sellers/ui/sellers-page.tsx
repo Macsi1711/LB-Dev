@@ -22,8 +22,9 @@ export function SellersPage() {
         Si un vendedor se olvidó la contraseña, ponele una nueva acá y pasásela. Las cuentas nuevas
         se crean en Supabase.
       </p>
-      {sellers.isError && <p className="text-destructive">No se pudo cargar la lista.</p>}
-      {sellers.isSuccess && sellers.data.length === 0 ? (
+      {sellers.isError ? (
+        <p className="text-destructive">No se pudo cargar la lista.</p>
+      ) : sellers.isSuccess && sellers.data.length === 0 ? (
         <p className="py-6 text-center text-muted-foreground">Todavía no hay vendedores.</p>
       ) : (
         <Table>
