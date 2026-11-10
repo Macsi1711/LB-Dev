@@ -2,12 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { canAccess, navigationFor } from './navigation';
 
 describe('navigationFor', () => {
-  it('al admin le muestra Mostrador, Fotos, Productos y Métricas', () => {
+  it('al admin le muestra Mostrador, Fotos, Productos, Métricas y Vendedores', () => {
     expect(navigationFor('admin').map((i) => [i.label, i.path])).toEqual([
       ['Mostrador', '/'],
       ['Fotos', '/fotos'],
       ['Productos', '/productos'],
       ['Métricas', '/metricas'],
+      ['Vendedores', '/vendedores'],
     ]);
   });
 
@@ -26,13 +27,15 @@ describe('canAccess', () => {
     expect(canAccess('admin', '/fotos')).toBe(true);
     expect(canAccess('admin', '/productos')).toBe(true);
     expect(canAccess('admin', '/metricas/consultas')).toBe(true);
+    expect(canAccess('admin', '/vendedores')).toBe(true);
   });
 
-  it('el vendedor entra al Mostrador y a Fotos, no a Productos ni a Métricas', () => {
+  it('el vendedor entra al Mostrador y a Fotos, no a Productos, Métricas ni Vendedores', () => {
     expect(canAccess('vendedor', '/')).toBe(true);
     expect(canAccess('vendedor', '/fotos')).toBe(true);
     expect(canAccess('vendedor', '/productos')).toBe(false);
     expect(canAccess('vendedor', '/metricas/consultas')).toBe(false);
+    expect(canAccess('vendedor', '/vendedores')).toBe(false);
   });
 
   it('sin sesión no entra a ninguna sección, ni al Mostrador (ADR-013)', () => {
