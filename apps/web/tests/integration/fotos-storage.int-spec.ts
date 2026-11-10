@@ -49,17 +49,21 @@ describe('bucket fotos', () => {
     });
   });
 
-  it('un usuario con perfil sube la foto y la miniatura con la ruta del ADR', async () => {
+  it('el admin sube la foto y la miniatura con la ruta del ADR', async () => {
     await inTransaction(db, async (tx) => {
-      await actAs(tx, await createUser(tx));
+      await actAs(tx, await createUser(tx, 'admin'));
       expect(await errorCode(tx, INSERT_OBJECT, ['fotos', '15/AbCdEf12.jpg'])).toBeUndefined();
       expect(await errorCode(tx, INSERT_OBJECT, ['fotos', '15/AbCdEf12.mini.jpg'])).toBeUndefined();
     });
   });
 
-  it('rechaza otras rutas, otros buckets y a quien no tiene perfil', async () => {
+  it('rechaza otras rutas, otros buckets, al vendedor y a quien no tiene perfil', async () => {
     await inTransaction(db, async (tx) => {
-      await actAs(tx, await createUser(tx));
+      await actAs(tx, await createUser(tx, 'vendedor'));
+      expect(await errorCode(tx, INSERT_OBJECT, ['fotos', '15/AbCdEf12.jpg'])).toBe('42501');
+    });
+    await inTransaction(db, async (tx) => {
+      await actAs(tx, await createUser(tx, 'admin'));
       for (const path of ['854000.jpg', '15/../x.jpg', '15/AbCdEf12.png', 'x/AbCdEf12.jpg']) {
         expect(await errorCode(tx, INSERT_OBJECT, ['fotos', path]), path).toBe('42501');
       }
@@ -91,7 +95,7 @@ describe('bucket fotos', () => {
 describe('uso_fotos', () => {
   it('suma lo que ocupan todos los archivos y cuenta los artículos con foto', async () => {
     await inTransaction(db, async (tx) => {
-      const user = await createUser(tx);
+      const user = await createUser(tx, 'admin');
       await actAs(tx, user);
       const before = await tx.query('select * from uso_fotos()');
       await tx.query('reset role');
@@ -109,7 +113,11 @@ describe('uso_fotos', () => {
     });
   });
 
-  it('no lo ve quien no tiene perfil', async () => {
+  it('no lo ven el vendedor ni quien no tiene perfil', async () => {
+    await inTransaction(db, async (tx) => {
+      await actAs(tx, await createUser(tx, 'vendedor'));
+      expect(await errorCode(tx, 'select * from uso_fotos()')).toBe('42501');
+    });
     await inTransaction(db, async (tx) => {
       await actAs(tx, await userWithoutProfile(tx));
       expect(await errorCode(tx, 'select * from uso_fotos()')).toBe('42501');
@@ -128,7 +136,7 @@ describe('asignar_foto_subida', () => {
       const path = `${id}/AbCdEf12.jpg`;
       await stored(tx, path);
       const before = await tx.query('select "Imagen", foto from articulos where id = $1', [id]);
-      const user = await createUser(tx);
+      const user = await createUser(tx, 'admin');
       await actAs(tx, user);
       const { rows } = await tx.query('select * from asignar_foto_subida($1, $2)', [id, path]);
       expect(rows[0]).toMatchObject({
@@ -152,7 +160,7 @@ describe('asignar_foto_subida', () => {
     await inTransaction(db, async (tx) => {
       const id = await articleId(tx, '854100');
       await stored(tx, `${id}/AbCdEf12.jpg`);
-      await actAs(tx, await createUser(tx));
+      await actAs(tx, await createUser(tx, 'admin'));
       const before = await tx.query('select 1 from v_articulos_sin_foto where id = $1', [id]);
       expect(before.rowCount).toBe(1);
       await tx.query('select asignar_foto_subida($1, $2)', [id, `${id}/AbCdEf12.jpg`]);
@@ -166,7 +174,7 @@ describe('asignar_foto_subida', () => {
       const id = await articleId(tx, '854000');
       await stored(tx, `${id}/Primera01.jpg`);
       await stored(tx, `${id}/Segunda02.jpg`);
-      await actAs(tx, await createUser(tx));
+      await actAs(tx, await createUser(tx, 'admin'));
       await tx.query('select asignar_foto_subida($1, $2)', [id, `${id}/Primera01.jpg`]);
       await tx.query('select asignar_foto_subida($1, $2)', [id, `${id}/Segunda02.jpg`]);
       const log = await tx.query('select foto, foto_anterior from fotos_subidas order by id desc');
@@ -183,7 +191,7 @@ describe('asignar_foto_subida', () => {
       const other = await articleId(tx, '854001');
       await stored(tx, `${other}/AbCdEf12.jpg`);
       await stored(tx, `${id}/AbCdEf12.mini.jpg`);
-      await actAs(tx, await createUser(tx));
+      await actAs(tx, await createUser(tx, 'admin'));
       const assign = 'select asignar_foto_subida($1, $2)';
       expect(await errorCode(tx, assign, [id, `${other}/AbCdEf12.jpg`])).toBe('22023');
       expect(await errorCode(tx, assign, [id, `${id}/AbCdEf12.mini.jpg`])).toBe('22023');
@@ -192,9 +200,20 @@ describe('asignar_foto_subida', () => {
     });
   });
 
+  it('el vendedor no asigna fotos (ADR-013)', async () => {
+    await inTransaction(db, async (tx) => {
+      const id = await articleId(tx, '854000');
+      await stored(tx, `${id}/AbCdEf12.jpg`);
+      await actAs(tx, await createUser(tx, 'vendedor'));
+      expect(
+        await errorCode(tx, 'select asignar_foto_subida($1, $2)', [id, `${id}/AbCdEf12.jpg`]),
+      ).toBe('42501');
+    });
+  });
+
   it('avisa si el artículo no existe y no deja a quien no tiene perfil', async () => {
     await inTransaction(db, async (tx) => {
-      await actAs(tx, await createUser(tx));
+      await actAs(tx, await createUser(tx, 'admin'));
       const missing = 999999999;
       expect(
         await errorCode(tx, 'select asignar_foto_subida($1, $2)', [

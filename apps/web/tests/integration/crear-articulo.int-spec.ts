@@ -49,7 +49,7 @@ describe('crear_articulo', () => {
       await actAs(tx, await createUser(tx, 'admin'));
       await tx.query(CREATE, ['PH5949', 'FILTRO DE ACEITE FIAT CRONOS', 'FA', null, null]);
       await tx.query('reset role');
-      await tx.query('set local role anon');
+      await actAs(tx, await createUser(tx, 'vendedor'));
       const { rows } = await tx.query(
         `select codigo from buscar_articulos(p_q => 'ph5949', p_limit => 10, p_offset => 0)`,
       );

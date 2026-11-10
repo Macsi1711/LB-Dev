@@ -13,7 +13,6 @@ function fakePort(overrides: Partial<AuthPort> = {}): AuthPort {
     onChange: () => () => undefined,
     signIn: async () => ({ ok: true }),
     signOut: async () => undefined,
-    requestPasswordReset: async () => ({ ok: true }),
     updatePassword: async () => ({ ok: true }),
     myProfile: async () => ({ userId: 'u1', name: 'Ana', role: 'vendedor' }),
     ...overrides,
@@ -43,11 +42,15 @@ describe('LoginPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Email o contraseña incorrectos.');
   });
 
-  it('si se entró sin querer, se vuelve al Mostrador sin iniciar sesión (ADR-010)', async () => {
+  it('no ofrece volver al Mostrador sin iniciar sesión: el login es obligatorio (ADR-013)', async () => {
     renderLogin(fakePort());
-    expect(await screen.findByRole('link', { name: 'Volver al Mostrador' })).toHaveAttribute(
-      'href',
-      '/',
-    );
+    expect(await screen.findByRole('button', { name: 'Ingresar' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Volver al Mostrador' })).not.toBeInTheDocument();
+  });
+
+  it('no ofrece el mail de recuperación: la contraseña olvidada la cambia un admin (ADR-014)', async () => {
+    renderLogin(fakePort());
+    expect(await screen.findByText(/Pedile a un encargado/)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Olvidé mi contraseña' })).not.toBeInTheDocument();
   });
 });

@@ -2,12 +2,12 @@ import {
   ChartColumn,
   Image,
   KeyRound,
-  LogIn,
   LogOut,
   Moon,
   Package,
   Search,
   Sun,
+  Users,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
@@ -19,7 +19,13 @@ import { Button } from '@/shared/ui/button';
 import { Wordmark } from '@/shared/ui/wordmark';
 import { navigationFor, type NavItem } from '../domain/navigation';
 
-const ICONS = { search: Search, image: Image, package: Package, chart: ChartColumn } as const;
+const ICONS = {
+  search: Search,
+  image: Image,
+  package: Package,
+  chart: ChartColumn,
+  users: Users,
+} as const;
 
 function NavLinks({ items, compact }: { items: NavItem[]; compact?: boolean }) {
   return items.map((item) => {
@@ -54,8 +60,7 @@ const onBrand = 'text-marca-foreground hover:bg-marca-foreground/10 hover:text-m
 function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
   const { port, session } = useAuth();
   const navigate = useNavigate();
-  // Al salir se vuelve al Mostrador, que se usa sin sesión. Primero se navega: si se cierra la
-  // sesión estando en Fotos o Métricas, su RequireAuth mandaría al login.
+  // Al salir se vuelve a la raíz, que sin sesión manda al login (ADR-013).
   const signOut = () => {
     navigate('/', { replace: true });
     void port.signOut();
@@ -71,7 +76,8 @@ function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme:
       >
         {theme === 'oscuro' ? <Sun /> : <Moon />}
       </Button>
-      {session ? (
+      {/* El shell va detrás del login (ADR-013): acá siempre hay sesión. */}
+      {session && (
         <>
           {/* Con sesión, cada uno cambia su contraseña sin depender del mail de recuperación. */}
           <Button variant="ghost" size="icon" className={onBrand} asChild>
@@ -89,15 +95,6 @@ function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme:
             <LogOut />
           </Button>
         </>
-      ) : (
-        // Sin sesión, en el mismo lugar: el ingreso del admin, sin texto a la vista (ADR-010).
-        session === null && (
-          <Button variant="ghost" size="icon" className={onBrand} asChild>
-            <Link to="/login" aria-label="Ingresar">
-              <LogIn />
-            </Link>
-          </Button>
-        )
       )}
     </div>
   );
@@ -106,7 +103,6 @@ function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme:
 /** Barra lateral en desktop; barra superior e inferior en el celular. */
 export function AppShell() {
   const { profile, viewer } = useAuth();
-  // Mientras se lee la sesión, lo mismo que sin sesión: solo el Mostrador.
   const items = navigationFor(viewer ?? 'anonimo');
   // Un solo estado de tema para los dos lugares donde está el botón (lateral y header).
   const [theme, setTheme] = useState(currentTheme);

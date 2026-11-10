@@ -2,9 +2,8 @@ import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { actAs, connect, createUser, errorCode, inTransaction } from './db';
 
-// Búsqueda sin sesión (ADR-010): en el Mostrador cualquiera busca por texto; el login queda para
-// el admin. Sin sesión (rol anon) se busca solo por las funciones, que cortan en 200 por página:
-// las tablas no se leen directo.
+// Login obligatorio (ADR-013): sin sesión (rol anon) la base no responde nada, ni la búsqueda,
+// ni las familias, ni el contador de fotos, ni el registro de consultas.
 
 let db: pg.Client;
 beforeAll(async () => {
@@ -21,36 +20,19 @@ async function asAnon(tx: pg.Client): Promise<void> {
 }
 
 describe('sin sesión', () => {
-  it('busca y ve cuántos hay, también cuando la respuesta es lo más parecido', async () => {
+  it('no busca, no ve las familias ni el contador y no registra consultas', async () => {
     await inTransaction(db, async (tx) => {
       await asAnon(tx);
-      const exact = await tx.query(`select codigo from buscar_articulos('pastilla onix')`);
-      expect(exact.rows.map((r) => r.codigo).sort()).toEqual(['854000', '854001']);
-      const close = await tx.query(`select codigo from buscar_articulos('pastiya onix')`);
-      expect(close.rows.length).toBeGreaterThan(0);
-      const summary = await tx.query(`select * from resumen_busqueda('pastiya onix')`);
-      expect(summary.rows[0]).toMatchObject({ aproximada: true });
-    });
-  });
-
-  it('ve las familias para el filtro', async () => {
-    await inTransaction(db, async (tx) => {
-      await asAnon(tx);
-      const { rows } = await tx.query('select codigo, nombre from v_familias');
-      expect(rows.length).toBeGreaterThan(0);
-    });
-  });
-
-  it('ve cuántos artículos tienen foto, los mismos números que el admin (ADR-011)', async () => {
-    await inTransaction(db, async (tx) => {
-      await tx.query(`update articulos set foto = '1/abcdefgh.jpg' where "Codigo" = '854000'`);
-      await actAs(tx, await createUser(tx, 'admin'));
-      const admin = await tx.query('select * from stats_fotos()');
-      await tx.query('reset role');
-      await asAnon(tx);
-      const anon = await tx.query('select * from stats_fotos()');
-      expect(anon.rows).toEqual(admin.rows);
-      expect(Number(anon.rows[0].con_foto)).toBeGreaterThan(0);
+      for (const sql of [
+        `select * from buscar_articulos('pastilla onix')`,
+        `select * from resumen_busqueda('pastilla onix')`,
+        'select * from stats_fotos()',
+        `select registrar_consulta('pastilla onix', null, null, 'texto', null, null, 2, false)`,
+        'select * from v_familias',
+        'select * from familias',
+      ]) {
+        expect(await errorCode(tx, sql), sql).toBe(PERMISSION_DENIED);
+      }
     });
   });
 
@@ -87,14 +69,16 @@ describe('sin sesión', () => {
       ).toBe(PERMISSION_DENIED);
     });
   });
+});
 
+describe('con sesión', () => {
   it('no trae más de 200 por página', async () => {
     await inTransaction(db, async (tx) => {
       await tx.query(
         `insert into articulos ("Codigo", "Nombre artículo")
          select 'MUCHOS-' || i, 'ARTICULO DE PRUEBA' from generate_series(1, 250) i`,
       );
-      await asAnon(tx);
+      await actAs(tx, await createUser(tx, 'vendedor'));
       const { rowCount } = await tx.query(
         `select * from buscar_articulos('articulo prueba', null, null, 1000)`,
       );

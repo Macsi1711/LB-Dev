@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, Navigate, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -15,15 +15,8 @@ export function NewPasswordPage() {
   const [error, setError] = useState<string | null>(null);
 
   if (session === undefined) return null;
-  if (!session) {
-    return (
-      <AuthLayout title="El link venció" description="El link ya se usó o pasó demasiado tiempo.">
-        <Link to="/recuperar" className="text-sm underline">
-          Pedí uno nuevo
-        </Link>
-      </AuthLayout>
-    );
-  }
+  // Se llega solo desde "Cambiar contraseña", con la sesión abierta.
+  if (!session) return <Navigate to="/login" replace />;
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -68,7 +61,6 @@ export function NewPasswordPage() {
         <Button type="submit" size="lg">
           Guardar
         </Button>
-        {/* Se llega también desde "Cambiar contraseña", con la sesión abierta: se puede volver. */}
         <Link to="/" className="justify-self-center text-sm underline">
           Cancelar
         </Link>
