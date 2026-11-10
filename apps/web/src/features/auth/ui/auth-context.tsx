@@ -10,7 +10,7 @@ interface AuthState {
   session: Session | null | undefined;
   profile: Profile | undefined;
   profileError: Error | null;
-  /** Quién usa la web: 'anonimo' sin sesión (ADR-010); undefined mientras no se sabe. */
+  /** Quién usa la web: 'anonimo' sin sesión (va al login, ADR-013); undefined mientras no se sabe. */
   viewer: Viewer | undefined;
 }
 
@@ -24,7 +24,16 @@ export function AuthProvider({ port, children }: { port: AuthPort; children: Rea
     void port.currentSession().then(setSession);
     return port.onChange((event, next) => {
       setSession(next);
-      if (event === 'signed-out') queryClient.clear();
+      if (event === 'signed-out') {
+        queryClient.clear();
+        // Cada vendedor tiene su cuenta (ADR-013): el que entra después en la misma pestaña no ve
+        // lo del anterior, como el chat del Mostrador.
+        try {
+          sessionStorage.clear();
+        } catch {
+          // Sin almacenamiento (modo privado): no hay nada guardado.
+        }
+      }
     });
   }, [port, queryClient]);
 

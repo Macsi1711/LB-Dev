@@ -1,14 +1,4 @@
-import {
-  ChartColumn,
-  Image,
-  KeyRound,
-  LogIn,
-  LogOut,
-  Moon,
-  Package,
-  Search,
-  Sun,
-} from 'lucide-react';
+import { ChartColumn, Image, KeyRound, LogOut, Moon, Package, Search, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useAuth } from '@/features/auth';
@@ -71,7 +61,8 @@ function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme:
       >
         {theme === 'oscuro' ? <Sun /> : <Moon />}
       </Button>
-      {session ? (
+      {/* El shell va detrás del login (ADR-013): acá siempre hay sesión. */}
+      {session && (
         <>
           {/* Con sesión, cada uno cambia su contraseña sin depender del mail de recuperación. */}
           <Button variant="ghost" size="icon" className={onBrand} asChild>
@@ -89,15 +80,6 @@ function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme:
             <LogOut />
           </Button>
         </>
-      ) : (
-        // Sin sesión, en el mismo lugar: el ingreso del admin, sin texto a la vista (ADR-010).
-        session === null && (
-          <Button variant="ghost" size="icon" className={onBrand} asChild>
-            <Link to="/login" aria-label="Ingresar">
-              <LogIn />
-            </Link>
-          </Button>
-        )
       )}
     </div>
   );
@@ -106,7 +88,6 @@ function SessionActions({ theme, onToggleTheme }: { theme: Theme; onToggleTheme:
 /** Barra lateral en desktop; barra superior e inferior en el celular. */
 export function AppShell() {
   const { profile, viewer } = useAuth();
-  // Mientras se lee la sesión, lo mismo que sin sesión: solo el Mostrador.
   const items = navigationFor(viewer ?? 'anonimo');
   // Un solo estado de tema para los dos lugares donde está el botón (lateral y header).
   const [theme, setTheme] = useState(currentTheme);

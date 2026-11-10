@@ -58,10 +58,6 @@ export function LoginPage() {
         <Link to="/recuperar" className="text-center text-sm text-muted-foreground underline">
           Olvidé mi contraseña
         </Link>
-        {/* Sin sesión se busca igual (ADR-010): si se llegó acá sin querer, se vuelve. */}
-        <Link to="/" className="text-center text-sm text-muted-foreground underline">
-          Volver al Mostrador
-        </Link>
       </form>
     </AuthLayout>
   );
