@@ -160,6 +160,7 @@ describe('stats_fotos', () => {
          select '999', 'VARIOS', false
          where not exists (select 1 from familias where "Código" = '999')`,
       );
+      await actAs(tx, SELLER);
       const { rows } = await tx.query('select * from stats_fotos()');
       expect(rows[0]).toMatchObject({ es_total: true, familia_codigo: null });
       expect(rows.some((r) => r.familia_codigo === '999')).toBe(false);
