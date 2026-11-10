@@ -23,7 +23,6 @@ export function createDemoAuth(): AuthPort {
       session = null;
       emit('signed-out');
     },
-    requestPasswordReset: async () => ({ ok: true }),
     updatePassword: async () => ({ ok: true }),
     myProfile: async () => ({
       userId: session?.userId ?? '',

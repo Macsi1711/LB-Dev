@@ -16,8 +16,7 @@ export function createSupabaseAuth(client: SupabaseClient<Database>): AuthPort {
     },
     onChange(listener) {
       const { data } = client.auth.onAuthStateChange((event, session) => {
-        if (event === 'PASSWORD_RECOVERY') listener('password-recovery', toSession(session));
-        else if (event === 'SIGNED_OUT') listener('signed-out', null);
+        if (event === 'SIGNED_OUT') listener('signed-out', null);
         else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED')
           listener('signed-in', toSession(session));
       });
@@ -29,10 +28,6 @@ export function createSupabaseAuth(client: SupabaseClient<Database>): AuthPort {
     },
     async signOut() {
       await client.auth.signOut();
-    },
-    async requestPasswordReset(email, redirectTo) {
-      const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
-      return toResult(error);
     },
     async updatePassword(password) {
       const { error } = await client.auth.updateUser({ password });

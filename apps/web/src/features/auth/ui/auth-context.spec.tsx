@@ -14,7 +14,6 @@ function fakePort() {
     },
     signIn: async () => ({ ok: true }),
     signOut: async () => undefined,
-    requestPasswordReset: async () => ({ ok: true }),
     updatePassword: async () => ({ ok: true }),
     myProfile: async () => ({ userId: 'u1', name: 'Ana', role: 'vendedor' }),
   };
