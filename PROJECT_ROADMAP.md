@@ -114,6 +114,9 @@ una versión en `main`; lo que está "En develop" sale en la release siguiente.
 | 8    | **Release v1.1.0**                                                                                    | ✅                    | release/1.1.0  |
 | 8    | Arreglo: la web abre en las PCs viejas del mostrador (Chrome 109 / Firefox viejo de Windows 7)        | ✅                    | #125           |
 | 8    | **Release v1.1.1**                                                                                    | ✅                    | release/1.1.1  |
+| 8    | Login obligatorio para todos, una cuenta por vendedor (ADR-013, migración 0030)                       | ✅                    | #129–#130      |
+| 8    | Vendedores: el admin les cambia la contraseña; se va "Olvidé mi contraseña" (ADR-014, migración 0031) | ✅                    | #131–#133      |
+| 8    | **Release v1.2.0**                                                                                    | ✅                    | release/1.2.0  |
 | 8    | Alta de usuarios de la web desde la app (función en el servidor)                                      | 💡                    | —              |
 | 8    | Logo e ícono para instalar la app en el celular                                                       | 💡                    | —              |
 | 8    | Tests end-to-end en el navegador                                                                      | 💡                    | —              |

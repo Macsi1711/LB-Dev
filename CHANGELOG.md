@@ -5,6 +5,8 @@ semántico.
 
 ## [Sin publicar]
 
+## [1.2.0] - 2026-11-10
+
 ### Agregado
 
 - **Sección Vendedores, solo para el admin** (ADR-014). Lista los vendedores con su último
@@ -20,6 +22,8 @@ semántico.
   admin sigue con todo. Se van el ícono de ingresar y el "Volver al Mostrador" del login.
 - **Se va "Olvidé mi contraseña"** (ADR-014): el mail de recuperación no les llegaba a los
   vendedores. En su lugar, el login dice que le pidan una contraseña nueva a un encargado.
+- **Al salir se borra el chat de la pestaña:** en una PC compartida, el vendedor que entra
+  después no ve las búsquedas del anterior.
 - **La base ya no responde sin sesión** (migración `20261030000030_login_obligatorio.sql`,
   ADR-013). Sin login no se busca, no se ven las familias ni el contador de fotos y no se
   registran consultas. El bot de Telegram no cambia: usa su propio usuario.
